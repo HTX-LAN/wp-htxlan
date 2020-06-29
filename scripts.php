@@ -25,15 +25,7 @@
 
     // Scripts for dangerzone panel
     function HTX_danger_zone() {
-        // Script for deleting all participants - JS part
-        echo "
-        <script>
-            function HTXJS_DeleteParticipants() {
-                confirm('Vil du virkelig slette alle tilmeldinger?');
-            }
-        </script>
-        
-        
-        ";
+        // JS files
+        wp_enqueue_script( 'DangerZoneJS', "/wp-content/plugins/WPPlugin-HTXLan/JS/DangerZone.JS");
     }
         
