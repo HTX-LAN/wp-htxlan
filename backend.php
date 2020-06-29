@@ -17,7 +17,7 @@
 
     // admin page content
     function main_admin_page(){
-        // Echo to show
+        // Echo to show -> How to do Wordpress on admin pages
 
         // Widgets and style
         HTX_load_standard_backend();
@@ -58,7 +58,7 @@
         // Header
         echo "<h1>HTX Lan tilmeldings skabelon</h1>";
 
-        // Tabel med alle tilmeldinger som kan ses - Evt en knap som kan trykkes, hvor så at felterne kan blive redigerbare
+        // Liste over ting som kan ændres, som fx navne på felter og lignende
     }
 
 ?>

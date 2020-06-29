@@ -5,7 +5,7 @@
     add_shortcode('HTX_Tilmeldningsblanket','HTX_lan_tilmdeldingsblanket_function');
     //perform the shortcode output
     function HTX_lan_tilmdeldingsblanket_function($atts, $content = '', $tag){
-        // add to $html, to return it at the end
+        // add to $html, to return it at the end -> It is how to do shortcodes in Wordpress
         $html = '';
         $html .= '<p>Hello World</p>';
         return $html;
