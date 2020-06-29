@@ -29,10 +29,6 @@
 
 
         // Creating a start database for colums information
-        global $wpdb;
-        $charset_collate = $wpdb->get_charset_collate();
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
         //* Create the teams table
         $table_name = $wpdb->prefix . 'htx_column';
         $sql = "CREATE TABLE $table_name (
@@ -51,10 +47,6 @@
 
 
         // Creating a start database for plugin, where settings go
-        global $wpdb;
-        $charset_collate = $wpdb->get_charset_collate();
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
         //* Create the teams table
         $table_name = $wpdb->prefix . 'htx_settings';
         $sql = "CREATE TABLE $table_name (
