@@ -22,6 +22,9 @@
         // Widgets and style
         HTX_load_standard_backend();
 
+        // Post handling
+        HTX_backend_post();
+
         // Header
         echo "<h1>HTX Lan tilmeldings admin</h1>";
 
@@ -34,7 +37,11 @@
         echo "<p>Antal input felter: inputCount</p>";
 
         // Danger zone - Create, delete and reset tables
-        echo "<p>Antal input felter: inputCount</p>";
+        echo "<h3>Farlig zone</h3>";
+        HTX_danger_zone();
+        echo "<button class='button button-link-delete' onclick='HTXJS_DeleteParticipants()'>Slet alle tilmeldinger</button><br>";
+        echo "<button class='button button-link-delete'>Nulstil plugin</button><br>";
+        echo "<button class='button' type='submit'>Opret databaser</button>";
         
     }
     
