@@ -12,6 +12,7 @@
 
         //add_submenu_page($parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function);
         add_submenu_page('HTXLan', 'HTX LAN tildmelder liste', 'Tilmelder liste', 'manage_options', 'HTX_lan_participants_list', 'HTX_lan_participants_list_function');
+        add_submenu_page('HTXLan', 'HTX LAN form oprettor', 'Form creator', 'manage_options', 'HTX_lan_create_form', 'HTX_lan_create_function');
     }
     
 
@@ -28,21 +29,25 @@
         // Header
         echo "<h1>HTX Lan tilmeldings admin</h1>";
 
-        // Statesikker
-        // Loading statestik
-
         // Writing on page
+
+        // List of forms
+
+
+        // Statistics
         echo "<h3>Statestik</h3>";
         echo "<p>Antal tilmeldte: participentCount</p>";
         echo "<p>Antal input felter: inputCount</p>";
 
+
         // Danger zone - Create, delete and reset tables
         echo "<h3>Farlig zone</h3>";
         HTX_danger_zone();
+        $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         echo "<button class='button button-link-delete' onclick='HTXJS_DeleteParticipants()'>Slet alle tilmeldinger</button><br>";
-        echo "<button class='button button-link-delete'>Nulstil plugin</button><br>";
-        echo "<button class='button' type='submit'>Opret databaser</button>";
-        
+        echo "<button class='button button-link-delete' onclick='HTXJS_dropDatabases(\"$actual_link\")'>Slet databaser</button><br>";
+        echo "<button class='button' onclick='HTXJS_createDatabases(\"$actual_link\")'>Opret databaser</button><br>";
+        echo "<button class='button' type='submit'>Download data</button>";
     }
     
     
@@ -55,7 +60,7 @@
         // Header
         echo "<h1>HTX Lan tilmeldinger</h1>";
 
-        // Tabel med alle tilmeldinger som kan ses - Evt en knap som kan trykkes, hvor så at felterne kan blive redigerbare
+        // Tabel med alle tilmeldinger som kan ses - Evt en knap som kan trykkes, hvor så at felterne kan blive redigerbare - Man kan vælge imellem forskellige forms
     }
 
     // admin submenu page content - HTX LAN tildmeldings side laver
@@ -65,7 +70,7 @@
         // Header
         echo "<h1>HTX Lan tilmeldings skabelon</h1>";
 
-        // Liste over ting som kan ændres, som fx navne på felter og lignende
+        // Liste over ting som kan ændres, som fx navne på felter og lignende - Her skal man også kunne vælge imellem forms
     }
 
 ?>

@@ -18,14 +18,14 @@
         // HTML for information alert
         echo '<div id="informationwindow"></div>';
         // Files for JS and CSS
-        wp_enqueue_script( 'informationAlertJs', "/wp-content/plugins/WPPlugin-HTXLan/JS/informationAlert.JS");
-        wp_enqueue_style( 'informationAlertStyle', "/wp-content/plugins/WPPlugin-HTXLan/CSS/informationAlert.CSS");
+        wp_enqueue_script( 'informationAlertJs', "/wp-content/plugins/WPPlugin-HTXLan/JS/informationAlert.js");
+        wp_enqueue_style( 'informationAlertStyle', "/wp-content/plugins/WPPlugin-HTXLan/CSS/informationAlert.css");
 
     }
 
     // Scripts for dangerzone panel
     function HTX_danger_zone() {
         // JS files
-        wp_enqueue_script( 'DangerZoneJS', "/wp-content/plugins/WPPlugin-HTXLan/JS/DangerZone.JS");
+        wp_enqueue_script( 'DangerZoneJS', "/wp-content/plugins/WPPlugin-HTXLan/JS/DangerZone.js");
     }
         

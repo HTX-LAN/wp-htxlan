@@ -27,7 +27,7 @@ function informationwindowInsert(cat,text,speciel) {
     $( "#informationwindow" ).append( element );
     setTimeout(function(){ document.getElementById("IWS"+id).classList.add('statusClosing');  removeDocInfo(id)}, 10);
     function removeDocInfo(id) {setTimeout(function(){ document.getElementById(('IW'+id)).remove(); }, 5000);}
-    
+    return(id);
 }
 function informationwindowremove(id) {
     document.getElementById("IW"+id).remove();

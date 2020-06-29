@@ -7,6 +7,20 @@
 
         // Danger zone
         // Script for deleting all participants - PHP part
+
+        // Script for dropping databases
+
+        // Script for creating databases
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            switch  ($_POST['postType']) {
+                case 'createDatabases':
+                    create_db();
+                break;
+                case 'dropDatabases':
+                    drop_db();
+                break;
+            }
+        }
     }
 
     //multi explode function

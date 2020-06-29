@@ -11,7 +11,7 @@
     // Database creation
     require 'db.php';
 
-    // custom code, such as css and javascript, backed needly as php files
+    // custom code, such as css and javascript
     require 'scripts.php';
 
     // Custom functions
