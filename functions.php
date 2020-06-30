@@ -45,4 +45,13 @@
     function statistiks(){
         
     }
+
+    // script for text when sql is not working as it should (error message) - frontend
+    function HTX_frontend_sql_notworking() {
+        $html = "<p>Noget er galt her...</p>";
+        $html .= "<p>Har du haft gjort noget? 🤔</p>";
+        $html .= "<p>Hmmm, det kan også være noget fra vores side af, det er jo os der har sat det op..</p>";
+        $html .= "<p>Venligst kom tilbage igen senere, og se om det virker. <br>Hvis det ikke virker der, så venligst kontakt os.❤</p>";
+        return $html;
+    }
 ?>
