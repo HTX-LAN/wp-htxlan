@@ -65,6 +65,7 @@
         placeholderText TEXT,
         sorting INT,
         adminOnly INT,
+        required INT,
         dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
         dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ) $charset_collate;";
@@ -114,9 +115,21 @@
         $link = database_connection();
 
         // Dropping first form table (Denne skal laves om, så den dropper alle form tables, disse tables står i htx_form_tables)
-        $table_name = $wpdb->prefix . 'htx_form_1';
-        $sql = "DROP TABLE $table_name;";
-        mysqli_query($link, $sql);
+        
+        $table_name = $wpdb->prefix . 'htx_form_tables';
+        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ?");
+        $stmt->bind_param("i", $tableId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows === 0) {return "<p>Der var ingen formularer</p>";} else {
+            while($row = $result->fetch_assoc()) {
+                $tableId = $row['tableId'];
+                $table_name = $wpdb->prefix . 'htx_form_'.$tableId;
+                $sql = "DROP TABLE $table_name;";
+                mysqli_query($link, $sql);
+            }
+            $stmt->close();
+        }
 
         // Dropping tables list table
         $table_name = $wpdb->prefix . 'htx_form_tables';
@@ -145,24 +158,24 @@
             global $wpdb;
             $table_name = $wpdb->prefix . 'htx_column';
             $link->autocommit(FALSE); //turn on transactions
-            $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, adminOnly) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("issssssiss", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $adminOnly);
+            $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, adminOnly, required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("issssssissi", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $adminOnly, $required);
             $tableId = 1; 
-            $columnNameFront = "Fornavn"; $columnNameBack='firstName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 1; $placeholderText = "John"; $adminOnly = 0;
+            $columnNameFront = "Fornavn"; $columnNameBack='firstName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 1; $placeholderText = "John"; $adminOnly = 0; $required = 1;
             $stmt->execute();  
-            $columnNameFront = "Efternavn"; $columnNameBack='lastName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 2; $placeholderText = "Smith"; $adminOnly = 0;
+            $columnNameFront = "Efternavn"; $columnNameBack='lastName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 2; $placeholderText = "Smith"; $adminOnly = 0; $required = 1;
             $stmt->execute();
-            $columnNameFront = "E-mail"; $columnNameBack='email'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 3; $placeholderText = "john@htx-lan.dk"; $adminOnly = 0;
+            $columnNameFront = "E-mail"; $columnNameBack='email'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 3; $placeholderText = "john@htx-lan.dk"; $adminOnly = 0; $required = 1;
             $stmt->execute();
             $columnNameFront = "Mobil nummer"; $columnNameBack='phone'; $format="number"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 4; $placeholderText = "12345678"; $adminOnly = 0;
             $stmt->execute();
-            $columnNameFront = "Billet type"; $columnNameBack='ticketType'; $format="text"; $columnType="dropdown"; $special=1; $specialName="price"; $sorting = 5; $placeholderText = ""; $adminOnly = 0;
+            $columnNameFront = "Billet type"; $columnNameBack='ticketType'; $format="text"; $columnType="dropdown"; $special=1; $specialName="price"; $sorting = 5; $placeholderText = ""; $adminOnly = 0; $required = 1;
             $stmt->execute();
-            $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $adminOnly = 0;
+            $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $adminOnly = 0; $required = 1;
             $stmt->execute();
-            $columnNameFront = "Klasse"; $columnNameBack='class'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 7; $placeholderText = ""; $adminOnly = 0;
+            $columnNameFront = "Klasse"; $columnNameBack='class'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 7; $placeholderText = ""; $adminOnly = 0; $required = 1;
             $stmt->execute();
-            $columnNameFront = "Discord navn"; $columnNameBack='discordTag'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 8; $placeholderText = "John#1234"; $adminOnly = 0;
+            $columnNameFront = "Discord navn"; $columnNameBack='discordTag'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 8; $placeholderText = "John#1234"; $adminOnly = 0; $required = 1;
             $stmt->execute();
             $columnNameFront = "Gametag one"; $columnNameBack='gametagOne'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 9; $placeholderText = "John"; $adminOnly = 0;
             $stmt->execute();
