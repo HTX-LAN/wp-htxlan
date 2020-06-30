@@ -167,19 +167,19 @@
             $stmt->execute();
             $columnNameFront = "E-mail"; $columnNameBack='email'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 3; $placeholderText = "john@htx-lan.dk"; $adminOnly = 0; $required = 1;
             $stmt->execute();
-            $columnNameFront = "Mobil nummer"; $columnNameBack='phone'; $format="number"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 4; $placeholderText = "12345678"; $adminOnly = 0;
+            $columnNameFront = "Mobil nummer"; $columnNameBack='phone'; $format="number"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 4; $placeholderText = "12345678"; $adminOnly = 0; $required = 0;
             $stmt->execute();
             $columnNameFront = "Billet type"; $columnNameBack='ticketType'; $format="text"; $columnType="dropdown"; $special=1; $specialName="price"; $sorting = 5; $placeholderText = ""; $adminOnly = 0; $required = 1;
             $stmt->execute();
-            $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $adminOnly = 0; $required = 1;
+            $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $adminOnly = 0; $required = 1; $required = 0;
             $stmt->execute();
-            $columnNameFront = "Klasse"; $columnNameBack='class'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 7; $placeholderText = ""; $adminOnly = 0; $required = 1;
+            $columnNameFront = "Klasse"; $columnNameBack='class'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 7; $placeholderText = ""; $adminOnly = 0; $required = 1; $required = 0;
             $stmt->execute();
             $columnNameFront = "Discord navn"; $columnNameBack='discordTag'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 8; $placeholderText = "John#1234"; $adminOnly = 0; $required = 1;
             $stmt->execute();
-            $columnNameFront = "Gametag one"; $columnNameBack='gametagOne'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 9; $placeholderText = "John"; $adminOnly = 0;
+            $columnNameFront = "Gametag one"; $columnNameBack='gametagOne'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 9; $placeholderText = "John"; $adminOnly = 0; $required = 0;
             $stmt->execute();
-            $columnNameFront = "Betalt"; $columnNameBack='payed'; $format="number"; $columnType="inputbox"; $special=1; $specialName="payed"; $sorting = 10; $placeholderText = "0"; $adminOnly = 1;
+            $columnNameFront = "Betalt"; $columnNameBack='payed'; $format="number"; $columnType="inputbox"; $special=1; $specialName="payed"; $sorting = 10; $placeholderText = "0"; $adminOnly = 1; $required = 0;
             $stmt->execute();
             $stmt->close();
             $link->autocommit(TRUE); //turn off transactions + commit queued queries
