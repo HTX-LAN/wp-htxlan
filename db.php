@@ -117,8 +117,7 @@
         // Dropping first form table (Denne skal laves om, så den dropper alle form tables, disse tables står i htx_form_tables)
         
         $table_name = $wpdb->prefix . 'htx_form_tables';
-        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ?");
-        $stmt->bind_param("i", $tableId);
+        $stmt = $link->prepare("SELECT * FROM `$table_name`");
         $stmt->execute();
         $result = $stmt->get_result();
         if($result->num_rows === 0) {return "<p>Der var ingen formularer</p>";} else {
