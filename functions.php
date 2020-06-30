@@ -99,7 +99,7 @@
                         $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
                         for ($i=0; $i < count($columnNameBack); $i++) { 
                             $inputName = $columnNameBack[$i];
-                            if ($format[$i] == "number") $inputValue = floatval($_POST[$columnNameBack[$i]]); else $inputValue = strval(trim($_POST[$columnNameBack[$i]])); 
+                            $inputValue = strval(trim($_POST[$columnNameBack[$i]])); 
 
                             // Missing validation of phone number and mail adress
 

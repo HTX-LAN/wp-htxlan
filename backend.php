@@ -213,8 +213,143 @@
     // admin submenu page content - HTX LAN tildmeldings side laver
     function HTX_lan_create_function(){
         // Liste over ting som kan ændres, som fx navne på felter og lignende - Her skal man også kunne vælge imellem forms
+        // Widgets and style
+        HTX_load_standard_backend();
+        wp_enqueue_style( 'form_creator_style', "/wp-content/plugins/WPPlugin-HTXLan/CSS/formCreator.css");
+        wp_enqueue_script( 'form_creator_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/formCreator.js");
+
+        // Getting start information for database connection
+        global $wpdb;
+        // Connecting to database, with custom variable
+        $link = database_connection();
+
         // Header
         echo "<h1>HTX Lan tilmeldings skabelon</h1>";
+
+        // Main area to work in
+        echo "<div class='formCreator_main'>";
+
+        // Table of content menu
+        // Getting data about forms
+        echo "<div class='formCreator_tableOfContent rtl' id='formCreator_tableOfContent'><div class='ltr'>";
+
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 ORDER BY favorit DESC, tableName ASC");
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) echo "Ingen registreringer"; else {
+                while($row = $result->fetch_assoc()) {
+                    $tableIds[] = $row['id'];
+                    $tableNames[] = $row['tableName'];
+                }
+            }
+            
+            for ($i=0; $i < count($tableNames); $i++) { 
+                // Ved klik på den form man vil vælge, kommer formularen frem i midten af skærmen
+                echo "<a onclick='showEditForm($tableIds[$i])'>$tableNames[$i]</a><br>";
+            } 
+              
+
+            echo "<br><br><a onclick=''>Tilføj ny formular</a>";
+        echo "</div></div>";
+
+        // Content edit menu
+        echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
+        
+            for ($i=0; $i < count($tableNames); $i++) { 
+                // Make div
+                echo "<div id='edit-form-$tableIds[$i]'>";
+                // Column info
+                $table_name = $wpdb->prefix . 'htx_column';
+                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
+                $stmt->bind_param("i", $tableIds[$i]);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) echo "Noget gik galt"; else {
+                    while($row = $result->fetch_assoc()) {
+                        // Info
+                        $settingId = $row['id'];
+                        $settingTableId = $row['tableId'];
+                        $columnNameFront = $row['columnNameFront'];
+                        $columnNameBack = $row['columnNameBack'];
+                        $format = $row['format'];
+                        $columnType = $row['columnType'];
+                        $special = $row['special'];
+                        $specialName = $row['specialName'];
+                        $placeholderText = $row['placeholderText'];
+                        $sorting = $row['sorting'];
+                        $adminOnly = $row['adminOnly'];
+                        $required = $row['required'];
+                        
+                        // Write
+                        echo "<div id='settingEdit-$settingTableId-$settingId'><h4>$columnNameFront</h4>";
+                        echo "<input value='$placeholderText' class='inputBox' disabled>";
+                        echo "</div>";
+                    }
+                }
+                $stmt->close();
+
+                // End div
+                echo "</div>";
+            }
+
+        echo "</div></div>";
+
+        // Settings menu
+        echo "<div class='formCreator_settings' id='formCreator_settings'>";
+
+        // Make content, per setting basis
+        for ($i=0; $i < count($tableNames); $i++) { 
+            // Make div
+            echo "<div id='setting-form-$tableIds[$i]'>";
+            // Column info
+            $table_name = $wpdb->prefix . 'htx_column';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
+            $stmt->bind_param("i", $tableIds[$i]);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) echo "Noget gik galt"; else {
+                while($row = $result->fetch_assoc()) {
+                    // Info
+                    $settingId = $row['id'];
+                    $settingTableId = $row['tableId'];
+                    $columnNameFront = $row['columnNameFront'];
+                    $columnNameBack = $row['columnNameBack'];
+                    $format = $row['format'];
+                    $columnType = $row['columnType'];
+                    $special = $row['special'];
+                    $specialName = $row['specialName'];
+                    $placeholderText = $row['placeholderText'];
+                    $sorting = $row['sorting'];
+                    $adminOnly = $row['adminOnly'];
+                    $required = $row['required'];
+                    
+                    // Write
+                    echo "<div id='settingEdit-$settingTableId-$settingId'><h4>$columnNameFront</h4>";
+                    echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+                    echo "<div><p>Navn</p><input class='inputBox' value='$columnNameFront'></div>";
+                    echo "<div><p>format</p><input class='inputBox' value='$format'></div>";
+                    echo "<div><p>columnType</p><input class='inputBox' value='$columnType'></div>";
+                    echo "<div><p>special</p><input class='inputBox' value='$special'></div>";
+                    echo "<div><p>specialName</p><input class='inputBox' value='$specialName'></div>";
+                    echo "<div><p>placeholderText</p><input class='inputBox' value='$placeholderText'></div>";
+                    echo "<div><p>sorting</p><input class='inputBox' value='$sorting'></div>";
+                    echo "<div><p>adminOnly</p><input class='inputBox' value='$adminOnly'></div>";
+                    echo "<div><p>required</p><input class='inputBox' value='$required'></div>";
+                    echo "</div></div>";
+                }
+            }
+            $stmt->close();
+
+            // End div
+            echo "</div>";
+        }
+
+        echo "</div>";
+
+        // Ending main area
+        echo "</div>";
+
     }
 
     // admin submenu page content - HTX LAN tildmeldings side laver

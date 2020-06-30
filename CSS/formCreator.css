@@ -1,0 +1,62 @@
+/* Style for page: Form creator */
+
+/* Main area style */
+.formCreator_main {
+    max-width: 100%;
+    max-height: 80vh;
+
+    /* flexbox setup - https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+.formCreator_flexRow {
+    max-height: 80vh;
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap; 
+}
+.formCreator_flexRow div {
+    margin-right: 1rem;
+}
+
+.formCreator_tableOfContent {
+    background-color: white;
+    max-width: 25%;
+    height: 80vh;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.formCreator_edit {
+    height: 80vh;
+    max-width: 80%;
+    width: 50%;
+    padding: 1rem;
+    overflow-y: auto;
+}
+.formCreator_edit_container {
+    padding: 1rem;
+}
+
+.formCreator_settings {
+    background-color: white;
+    height: 80vh;
+    max-width: 25%;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+
+
+/* Scroll bar site */
+.ltr {
+    direction: ltr;
+}
+.rtl {
+    direction: rtl;
+}
