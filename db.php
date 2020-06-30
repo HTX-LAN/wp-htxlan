@@ -40,17 +40,18 @@
         $sql = "CREATE TABLE $table_name (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         active INT NOT NULL DEFAULT 1,
-        tableId INT,
+        favorit INT DEFAULT 0,
         shortcode TEXT,
         tableName TEXT,
+        tableDescription TEXT,
         dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
         dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ) $charset_collate;";
         dbDelta( $sql );
         // Insert standard values
-        $one = 1; $two = "HTX_Tilmeldningsblanket"; $three = 'HTX Tilmelding 1';
-        $stmt = $link->prepare("INSERT INTO $table_name (tableId, shortcode, tableName) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $one, $two, $three);
+        $one = 'Standard formular'; $two = "HTX_Tilmeldningsblanket"; $three = 'HTX Tilmelding 1'; $four = 1;
+        $stmt = $link->prepare("INSERT INTO $table_name (tableDescription, shortcode, tableName, favorit) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("sssi", $one, $two, $three, $four);
         $stmt->execute();
         $stmt->close();
 
