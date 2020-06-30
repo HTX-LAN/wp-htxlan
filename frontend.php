@@ -24,7 +24,7 @@
 
         // Getting and writing form name
         $table_name = $wpdb->prefix . 'htx_form_tables';
-        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ?");
+        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ?");
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();

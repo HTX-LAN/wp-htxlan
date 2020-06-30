@@ -40,7 +40,7 @@
                 case 'new':
                     // Check that the form trying to submit to, is the right one
                     $table_name = $wpdb->prefix . 'htx_form_tables';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ?");
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ?");
                     $stmt->bind_param("i", $tableId);
                     $stmt->execute();
                     $result = $stmt->get_result();
@@ -141,6 +141,20 @@
         $ready = str_replace($delimiters, $delimiters[0], $string);
         $launch = explode($delimiters[0], $ready);
         return  $launch;
+    }
+    
+    // Setting cookie
+    function setCustomCookie($cookieName, $cookieValue) {
+        wp_enqueue_script( 'cookie', "/wp-content/plugins/WPPlugin-HTXLan/JS/cookie.js");
+        echo "<script>
+        function setCookieTime(cname,cvalue,exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            var expires = \"expires=\" + d.toGMTString();
+            document.cookie = cname + \"=\" + cvalue + \";\" + expires + \";path=/\";
+        }
+        </script>";
+        echo "<script>setCookieTime('$cookieName','$cookieValue',30)</script>";
     }
 
     // script for text when sql is not working as it should (error message) - frontend

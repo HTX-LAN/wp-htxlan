@@ -3,11 +3,16 @@
 
     // Loading parameters - backend
     function HTX_load_standard_backend() {
-        // Style
-
         // Ajax and icons
         echo '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>';
         echo '<link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">';
+
+        // Style
+        wp_enqueue_style( 'table_design', "/wp-content/plugins/WPPlugin-HTXLan/CSS/style.css");
+
+        // Script
+        wp_enqueue_script( 'table_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/table.js");
+        wp_enqueue_script( 'cookie', "/wp-content/plugins/WPPlugin-HTXLan/JS/cookie.js");
 
         // Alert window
         HTX_information_alert_backend();
