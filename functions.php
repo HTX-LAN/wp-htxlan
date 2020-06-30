@@ -24,6 +24,17 @@
         }
     }
 
+    function database_connection() {
+        // Connecting to database, with custom variable
+        try {
+            $link = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        } catch(Exception $e) { 
+            error_log($e->getMessage());
+            return('Error connecting to database. Error message:'.$e); //Should be a message a typical user could understand
+        }
+        return $link;
+    }
+
     //multi explode function
     function multiexplode ($delimiters,$string) {
         $ready = str_replace($delimiters, $delimiters[0], $string);

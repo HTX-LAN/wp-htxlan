@@ -6,12 +6,8 @@
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        try {
-            $link = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-        } catch(Exception $e) { 
-            error_log($e->getMessage());
-            return('Error connecting to database. Error message:'.$e); //Should be a message a typical user could understand
-        }
+        // Connecting to database, with custom variable
+        $link = database_connection();
         
         // Creating a start database for plugin, where registrations go
         $table_name = $wpdb->prefix . 'htx_form_1';
@@ -114,13 +110,8 @@
     function drop_db(){
         // Getting start information
         global $wpdb;
-        // require_once( ABSPATH . 'wp-config.php' );
-        try {
-            $link = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-        } catch(Exception $e) { 
-            error_log($e->getMessage());
-            return('Error connecting to database. Error message:'.$e); //Should be a message a typical user could understand
-        }
+        // Connecting to database, with custom variable
+        $link = database_connection();
 
         // Dropping first form table (Denne skal laves om, så den dropper alle form tables, disse tables står i htx_form_tables)
         $table_name = $wpdb->prefix . 'htx_form_1';
@@ -148,12 +139,7 @@
     }
     function insert_data() {
         // Connecting to database, with custom variable
-        try {
-            $link = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-        } catch(Exception $e) { 
-            error_log($e->getMessage());
-            return('Error connecting to database. Error message:'.$e); //Should be a message a typical user could understand
-        }
+        $link = database_connection();
         // Inserting standard column in standard form
         try {
             global $wpdb;
