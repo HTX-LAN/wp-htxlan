@@ -15,6 +15,7 @@
             switch  ($_POST['postType']) {
                 case 'createDatabases':
                     create_db();
+                    insert_data();
                 break;
                 case 'dropDatabases':
                     drop_db();
