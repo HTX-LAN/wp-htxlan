@@ -8,17 +8,19 @@
     }
     
     //perform the shortcode output
-    function HTX_lan_tilmdeldingsblanket_function(){
+    function HTX_lan_tilmdeldingsblanket_function($atts = array()){
         // Custom connection to database
         $link = database_connection();
         global $wpdb;
         
         // add to $html, to return it at the end -> It is how to do shortcodes in Wordpress
         $html = "";
-        $tableId = 1;
+
+        // Check and get form from shortcode
+        if (!isset($atts['form'])) $tableId = 0; else $tableId = $atts['form'];
 
         // Standard load
-        // $html .= HTX_load_standard_frontend();
+        $html .= HTX_load_standard_frontend();
 
         // Getting and writing form name
         $table_name = $wpdb->prefix . 'htx_form_tables';
@@ -26,13 +28,16 @@
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
-        if($result->num_rows === 0) {return HTX_frontend_sql_notworking();} else {
+        if($result->num_rows === 0) {return "<p>Dette er et specielt lavet plugin, som ikke er opsat rigtigt. Godt gået 😊</p>";} else {
             while($row = $result->fetch_assoc()) {
                 $formName = $row['tableName'];
             }
-            $stmt->close();
         }
+        $stmt->close();
         $html .= "<h2>$formName</h2>";
+
+        // Post handling
+        $postError = HTX_frontend_post($tableId);
         
         // Getting and writing content to form
         // Getting column info
@@ -52,15 +57,19 @@
                 $placeholderText[] = $row['placeholderText'];
                 $sorting[] = $row['sorting'];
                 $adminOnly[] = $row['adminOnly'];
+                $required[] = $row['required'];
             }
-            $stmt->close();
         }
+        $stmt->close();
         // Setting up form
-        $html .= "<form action=".htmlspecialchars($_SERVER["PHP_SELF"])." method=\"post\">";
+        $html .= "<form method=\"post\">";
 
         // Writing for every column entry
         for ($i=0; $i < count($columnNameFront); $i++) { 
-            $html .= "<p><label>$columnNameFront[$i]</label>";
+            // Setup for required label
+            if ($required[$i] == 1) {$isRequired = "required"; $requiredStar = "<i style='color: red'>*</i>";} else {$isRequired = ""; $requiredStar = "";}
+            // Main writing of input
+            $html .= "<p><label>$columnNameFront[$i]$requiredStar</label>";
             switch ($columnType[$i]) {
                 case "dropdown":
                     // Getting settings category
@@ -72,15 +81,13 @@
                     if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
                         while($row = $result->fetch_assoc()) {
                             $setting_cat_settingId = $row['id'];
-                            $setting_cat_settingName = $row['settingName'];
-                            $setting_cat_settingType = $row['settingType'];
                         }
                     }
                     $stmt->close();
                     // Writing first part of dropdown
-                    $html .= "<select name='$columnNameFront[$i]'>";
-                    // Getting dropdown content
+                    $html .= "<select name='$columnNameBack[$i]' class='dropdown' $isRequired>";
                     
+                    // Getting dropdown content
                     $table_name = $wpdb->prefix . 'htx_settings';
                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? ORDER BY sorting");
                     $stmt->bind_param("i", $setting_cat_settingId);
@@ -90,10 +97,13 @@
                         while($row = $result->fetch_assoc()) {
                             // Getting data
                             $setting_settingName = $row['settingName'];
-                            $setting_value = $row['value'];
+                            $setting_id = $row['id'];
+
+                            // Set as selected from post
+                            if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'selected'; else $postSelected = '';
 
                             // Write data
-                            $html .= "<option name='$setting_settingName' value='$setting_value'>".$setting_settingName."</option>";
+                            $html .= "<option value='$setting_id' $postSelected>".$setting_settingName."</option>";
                         }
                     }
                     $stmt->close();
@@ -101,14 +111,22 @@
                     // Finishing dropdown
                     $html .= "</select>";
                 break;
-                default: $html .= "<input name='$columnNameFront[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' class='inputBox'></p>";
+                default: $html .= "<input name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' class='inputBox' value='".$_POST[$columnNameBack[$i]]."' $isRequired></p>";
             }
             
         }
+        $html .= "<input name='tableId' value='$tableId' style='display: none'></p>";
+
+        // Error handling block !Needs to be made to popup window
+        // if (isset($postError)) 
+        $html .= "<p>$postError</p>";
 
         // Ending form with submit and reset buttons
-        $html .= "<p><button type='submit' name='submit'>Tilmeld</button> <button type='reset' name='reset'>Nulstil</button></p>";
-        // Returning code
+        $html .= "<p><button type='submit' name='submit' value='new'>Tilmeld</button> <button type='reset' name='reset'>Nulstil</button></p>";
+
+        // Success handling - Give information via popup window, that the regristration have been saved
+        
+        // Returning html code
         return $html;
     }
 ?>

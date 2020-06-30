@@ -16,16 +16,10 @@
         active INT NOT NULL DEFAULT 1,
         dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
         dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        payed INT DEFAULT 0,
-        firstName TEXT,
-        lastName TEXT,
-        email TEXT,
-        phone TEXT,
-        ticketType TEXT,
-        class TEXT,
-        school TEXT,
-        discordTag TEXT,
-        gametagOne TEXT
+        userId INT,
+        tableId INT,
+        name TEXT,
+        value TEXT
         ) $charset_collate;";
         dbDelta( $sql );
 
@@ -33,6 +27,7 @@
         $table_name = $wpdb->prefix . 'htx_form_users';
         $sql = "CREATE TABLE $table_name (
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        active INT NOT NULL DEFAULT 1,
         tableId INT,
         email TEXT,
         dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
