@@ -70,6 +70,7 @@
         placeholderText TEXT,
         sorting INT,
         adminOnly INT,
+        disabled INT DEFAULT 0,
         required INT,
         dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
         dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
