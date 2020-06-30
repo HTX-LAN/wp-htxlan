@@ -170,9 +170,9 @@
             $stmt->execute();
             $columnNameFront = "Billet type"; $columnNameBack='ticketType'; $format="text"; $columnType="dropdown"; $special=1; $specialName="price"; $sorting = 5; $placeholderText = ""; $adminOnly = 0; $required = 1;
             $stmt->execute();
-            $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $adminOnly = 0; $required = 1; $required = 0;
+            $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $adminOnly = 0; $required = 1; $required = 1;
             $stmt->execute();
-            $columnNameFront = "Klasse"; $columnNameBack='class'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 7; $placeholderText = ""; $adminOnly = 0; $required = 1; $required = 0;
+            $columnNameFront = "Klasse"; $columnNameBack='class'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 7; $placeholderText = ""; $adminOnly = 0; $required = 1; $required = 1;
             $stmt->execute();
             $columnNameFront = "Discord navn"; $columnNameBack='discordTag'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 8; $placeholderText = "John#1234"; $adminOnly = 0; $required = 1;
             $stmt->execute();
