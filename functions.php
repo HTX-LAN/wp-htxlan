@@ -100,20 +100,25 @@
                         for ($i=0; $i < count($columnNameBack); $i++) { 
                             $inputName = $columnNameBack[$i];
                             if ($format[$i] == "number") $inputValue = floatval($_POST[$columnNameBack[$i]]); else $inputValue = strval(trim($_POST[$columnNameBack[$i]])); 
+
+                            // Missing validation of phone number and mail adress
+
+                            // Missing validation of dropdown menu
+
                             $stmt->execute();  
                         }  
                         $stmt->close();
                         $link->autocommit(TRUE); //turn off transactions + commit queued queries
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
-                        throw $e;
+                        // throw $e;
+                        return "<span style='color: red'>Tilmeldingen blev ikke tilføjet</span>";
                     }
 
-                    // Error handling
+                    // Error handling (Needs to be more specifik)
                     
                     // Success handling
-                    $error = $_POST['email'];
-                    return $error;
+                    return "<span style='color: green'>Tilmeldingen blev tilføjet</span>";
                 break;
                 default: return "Noget gik galt🤔";
             }
