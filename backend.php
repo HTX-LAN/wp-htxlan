@@ -19,8 +19,6 @@
 
     // admin page content
     function main_admin_page(){
-        // Echo to show -> How to do Wordpress on admin pages
-
         // Widgets and style
         HTX_load_standard_backend();
 
@@ -53,11 +51,9 @@
     
     
     // admin submenu
-    
     // admin submenu page content - HTX LAN tildmelder liste
     function HTX_lan_participants_list_function(){
-        // Echo to show
-
+        // Tabel med alle tilmeldinger som kan ses - Evt en knap som kan trykkes, hvor så at felterne kan blive redigerbare - Man kan vælge imellem forskellige forms
         // Widgets and style
         HTX_load_standard_backend();
 
@@ -80,9 +76,8 @@
                 $tableNames[] = $row['tableName'];
             }
 
-            // Tabel med alle tilmeldinger som kan ses - Evt en knap som kan trykkes, hvor så at felterne kan blive redigerbare - Man kan vælge imellem forskellige forms
-            if(!isset($_COOKIE["submissionTableCookie"])) echo "cookie not set";
             // Dropdown menu, with every form
+            if(!isset($_COOKIE["submissionTableCookie"])) echo "cookie not set";
             // Getting cookie value
             $cookie_name = "submissionTableCookie";
             if(!isset($_COOKIE[$cookie_name])) {
@@ -212,32 +207,21 @@
 
             // Ending table
             echo "</thead></table></div>";
-
-
-
         }
-
-        
     }
 
     // admin submenu page content - HTX LAN tildmeldings side laver
     function HTX_lan_create_function(){
-        // Echo to show
-
+        // Liste over ting som kan ændres, som fx navne på felter og lignende - Her skal man også kunne vælge imellem forms
         // Header
         echo "<h1>HTX Lan tilmeldings skabelon</h1>";
-
-        // Liste over ting som kan ændres, som fx navne på felter og lignende - Her skal man også kunne vælge imellem forms
     }
 
     // admin submenu page content - HTX LAN tildmeldings side laver
     function HTX_lan_economic_function(){
-        // Echo to show
-
+        // Økonomi side, som har alting med økonomi at gøre
         // Header
         echo "<h1>HTX Lan økonomi</h1>";
-
-        // Økonomi side, som har alting med økonomi at gøre
     }
 
 ?>
