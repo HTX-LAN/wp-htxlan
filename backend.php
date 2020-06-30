@@ -41,7 +41,7 @@
         echo "<p>Antal input felter: inputCount</p>";
 
 
-        // Danger zone - Create, delete and reset tables
+        // Danger zone - Create, delete and reset tables - (Skal laves om til at køre direkte load på siden (reload med post), istedet for via jquery)
         echo "<h3>Farlig zone</h3>";
         HTX_danger_zone();
         $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
