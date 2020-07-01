@@ -58,6 +58,7 @@
                 $sorting[] = $row['sorting'];
                 $adminOnly[] = $row['adminOnly'];
                 $required[] = $row['required'];
+                $settingCat[] = $row['settingCat'];
             }
         }
         $stmt->close();
@@ -74,8 +75,8 @@
                 case "dropdown":
                     // Getting settings category
                     $table_name = $wpdb->prefix . 'htx_settings_cat';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND settingNameBack = ? LIMIT 1");
-                    $stmt->bind_param("is", $tableId, $columnNameBack[$i]);
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? LIMIT 1");
+                    $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
                     $stmt->execute();
                     $result = $stmt->get_result();
                     if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {

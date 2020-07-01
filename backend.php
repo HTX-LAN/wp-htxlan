@@ -237,28 +237,38 @@
             $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 ORDER BY favorit DESC, tableName ASC");
             $stmt->execute();
             $result = $stmt->get_result();
-            if($result->num_rows === 0) echo "Ingen registreringer"; else {
+            if($result->num_rows === 0) {echo "Ingen tabeller"; $noTable = true;} else {
                 while($row = $result->fetch_assoc()) {
                     $tableIds[] = $row['id'];
                     $tableNames[] = $row['tableName'];
                 }
+                $noTable = false;
+                for ($i=0; $i < count($tableNames); $i++) { 
+                    // Ved klik på den form man vil vælge, kommer formularen frem i midten af skærmen
+                    echo "<form id='form-tableOfContent-$tableIds[$i]' action='admin.php' method=\"get\">
+                        <input name='page' value='".$_GET['page']."' class='hidden'>
+                        <input name='form' value='$tableIds[$i]' class='hidden'>
+                        <a onclick='submitForm(\"form-tableOfContent-$tableIds[$i]\")'>$tableNames[$i]</a><br>
+                    </form>";
+                            
+                } 
             }
             
-            for ($i=0; $i < count($tableNames); $i++) { 
-                // Ved klik på den form man vil vælge, kommer formularen frem i midten af skærmen
-                echo "<a onclick='showEditForm($tableIds[$i])'>$tableNames[$i]</a><br>";
-            } 
+            
               
 
             echo "<br><br><a onclick=''>Tilføj ny formular</a>";
         echo "</div></div>";
 
-        // Content edit menu
-        echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
-        
-            for ($i=0; $i < count($tableNames); $i++) { 
+        // Check if form exist
+        if (!$noTable AND isset($_GET['form'])) {
+            // Content edit menu
+            echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
+            
+                // Check url for form - If none form is choosen or non existing, then show nothing
+
                 // Make div
-                echo "<div id='edit-form-$tableIds[$i]'>";
+                echo "<div id='edit-form-$tableIds[$i]' class='formCreator_edit_container'>";
                 // Column info
                 $table_name = $wpdb->prefix . 'htx_column';
                 $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
@@ -280,10 +290,119 @@
                         $sorting = $row['sorting'];
                         $adminOnly = $row['adminOnly'];
                         $required = $row['required'];
+                        // onclick='submitForm(\"form-content-$settingTableId-$settingId\")
+                        // Write
+                        echo "<div id='settingEdit-$settingTableId-$settingId' class='formCreator_edit_block'><h4>$columnNameFront</h4>";
+                        echo "<form id='form-content-$settingTableId-$settingId' action='admin.php' method=\"get\">
+                            <button type='submit' class='material-icons settingIcon'>settings</button>
+                            <input name='page' value='".$_GET['page']."' class='hidden'>
+                            <input name='form' value='$settingTableId' class='hidden'>
+                            <input class='hidden' name='setting' type='text' id='$settingTableId-$settingId' value='$settingId'>
+                        </form>";
+                        echo "<input value='$placeholderText' class='inputBox' disabled>";
+                        echo "</div>";
+                    }
+                }
+                $stmt->close();
+
+                // End div
+                echo "</div>";
+
+            echo "</div></div>";
+
+            // Settings menu
+            echo "<div class='formCreator_settings' id='formCreator_settings'>";
+
+            // Make content, per setting basis
+            for ($i=0; $i < count($tableNames); $i++) { 
+                // Make div
+                echo "<div id='setting-form-$tableIds[$i]'>";
+                // Column info
+                $table_name = $wpdb->prefix . 'htx_column';
+                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
+                $stmt->bind_param("i", $tableIds[$i]);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) echo "Noget gik galt"; else {
+                    while($row = $result->fetch_assoc()) {
+                        // Info
+                        $settingId = $row['id'];
+                        $settingTableId = $row['tableId'];
+                        $columnNameFront = $row['columnNameFront'];
+                        $columnNameBack = $row['columnNameBack'];
+                        $format = $row['format'];
+                        $columnType = $row['columnType'];
+                        $special = $row['special'];
+                        $specialName = $row['specialName'];
+                        $placeholderText = $row['placeholderText'];
+                        $sorting = $row['sorting'];
+                        $adminOnly = $row['adminOnly'];
+                        $required = $row['required'];
+                        $settingCat = $row['settingCat'];
                         
                         // Write
-                        echo "<div id='settingEdit-$settingTableId-$settingId'><h4>$columnNameFront</h4>";
-                        echo "<input value='$placeholderText' class='inputBox' disabled>";
+                        echo "<div id='settingEdit-$settingTableId-$settingId'><h3>$columnNameFront</h3>";
+                        switch ($columnType) {
+                            case "inputbox":
+                                echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+                                echo "<div><p>Navn</p><input class='inputBox' value='$columnNameFront'></div>";
+                                echo "<div><p>format</p><input class='inputBox' value='$format'></div>";
+                                echo "<div><p>columnType</p><input class='inputBox' value='$columnType'></div>";
+                                echo "<div><p>special</p><input class='inputBox' value='$special'></div>";
+                                echo "<div><p>specialName</p><input class='inputBox' value='$specialName'></div>";
+                                echo "<div><p>placeholderText</p><input class='inputBox' value='$placeholderText'></div>";
+                                echo "<div><p>sorting</p><input class='inputBox' value='$sorting'></div>";
+                                echo "<div><p>required</p><input class='inputBox' value='$required'></div>";
+                                echo "</div>";
+                            break;
+                            case "dropdown":
+                                echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+                                echo "<div><p>Navn</p><input class='inputBox' value='$columnNameFront'></div>";
+                                echo "<div><p>Navn (backend)</p><input class='inputBox' value='$columnNameBack'></div>";
+                                echo "<div><p>format</p><input class='inputBox' value='$format'></div>";
+                                echo "<div><p>columnType</p><input class='inputBox' value='$columnType'></div>";
+                                echo "<div><p>special</p><input class='inputBox' value='$special'></div>";
+                                echo "<div><p>specialName</p><input class='inputBox' value='$specialName'></div>";
+                                echo "<div><p>sorting</p><input class='inputBox' value='$sorting'></div>";
+                                echo "<div><p>required</p><input class='inputBox' value='$required'></div>";
+                                echo "<h4>Dropdown indstillinger</h4>";
+                                // Getting dropdown setting category
+                                $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                                $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND id = ?");
+                                $stmt2->bind_param("is", $tableIds[$i], $settingCat);
+                                $stmt2->execute();
+                                $result2 = $stmt2->get_result();
+                                if($result2->num_rows === 0) echo "<p>Ingen indstillinger for dropdown</p>"; else {
+                                    while($row2 = $result2->fetch_assoc()) {
+                                        $row2['id'];
+                                        $row2['settingName'];
+                                        $row2['special'];
+                                        $row2['specialName'];
+                                        $row2['settingType'];
+                                        // Getting dropdown settings
+                                        $table_name3 = $wpdb->prefix . 'htx_settings';
+                                        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ?");
+                                        $stmt3->bind_param("i", $row2['id']);
+                                        $stmt3->execute();
+                                        $result3 = $stmt3->get_result();
+                                        if($result3->num_rows === 0) echo "<p>Ingen dropdown muligheder</p>"; else {
+                                            while($row3 = $result3->fetch_assoc()) {
+                                                $row3['id'];
+                                                $row3['settingName'];
+                                                $row3['value'];
+
+                                                echo "<div><p>Navn</p><input class='inputBox' value='".$row3['settingName']."'></div>";
+                                            
+                                            }
+                                        }
+                                        $stmt3->close();
+                                    }
+                                }
+                                $stmt2->close();
+                                echo "</div>";
+                            break;
+                        }
+                        
                         echo "</div>";
                     }
                 }
@@ -293,59 +412,10 @@
                 echo "</div>";
             }
 
-        echo "</div></div>";
-
-        // Settings menu
-        echo "<div class='formCreator_settings' id='formCreator_settings'>";
-
-        // Make content, per setting basis
-        for ($i=0; $i < count($tableNames); $i++) { 
-            // Make div
-            echo "<div id='setting-form-$tableIds[$i]'>";
-            // Column info
-            $table_name = $wpdb->prefix . 'htx_column';
-            $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
-            $stmt->bind_param("i", $tableIds[$i]);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if($result->num_rows === 0) echo "Noget gik galt"; else {
-                while($row = $result->fetch_assoc()) {
-                    // Info
-                    $settingId = $row['id'];
-                    $settingTableId = $row['tableId'];
-                    $columnNameFront = $row['columnNameFront'];
-                    $columnNameBack = $row['columnNameBack'];
-                    $format = $row['format'];
-                    $columnType = $row['columnType'];
-                    $special = $row['special'];
-                    $specialName = $row['specialName'];
-                    $placeholderText = $row['placeholderText'];
-                    $sorting = $row['sorting'];
-                    $adminOnly = $row['adminOnly'];
-                    $required = $row['required'];
-                    
-                    // Write
-                    echo "<div id='settingEdit-$settingTableId-$settingId'><h4>$columnNameFront</h4>";
-                    echo "<div class='formCreator_edit_container formCreator_flexRow'>";
-                    echo "<div><p>Navn</p><input class='inputBox' value='$columnNameFront'></div>";
-                    echo "<div><p>format</p><input class='inputBox' value='$format'></div>";
-                    echo "<div><p>columnType</p><input class='inputBox' value='$columnType'></div>";
-                    echo "<div><p>special</p><input class='inputBox' value='$special'></div>";
-                    echo "<div><p>specialName</p><input class='inputBox' value='$specialName'></div>";
-                    echo "<div><p>placeholderText</p><input class='inputBox' value='$placeholderText'></div>";
-                    echo "<div><p>sorting</p><input class='inputBox' value='$sorting'></div>";
-                    echo "<div><p>adminOnly</p><input class='inputBox' value='$adminOnly'></div>";
-                    echo "<div><p>required</p><input class='inputBox' value='$required'></div>";
-                    echo "</div></div>";
-                }
-            }
-            $stmt->close();
-
-            // End div
             echo "</div>";
-        }
 
-        echo "</div>";
+        }
+        
 
         // Ending main area
         echo "</div>";

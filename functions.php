@@ -165,4 +165,19 @@
         $html .= "<p>Venligst kom tilbage igen senere, og se om det virker. <br>Hvis det ikke virker der, så venligst kontakt os.❤</p>";
         return $html;
     }
+
+    // Script to get url for backend
+    function getUrl() {
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')   
+         $url = "https://";   
+        else  
+            $url = "http://";   
+        // Append the host(domain name, ip) to the URL.   
+        $url.= $_SERVER['HTTP_HOST'];   
+        
+        // Append the requested resource location to the URL   
+        $url.= $_SERVER['REQUEST_URI'];    
+        
+        return $url; 
+    }
 ?>
