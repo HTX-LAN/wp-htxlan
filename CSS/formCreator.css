@@ -53,11 +53,16 @@
     float: right;
     top: 0;
     margin-top: -2rem;
-    display: none;
+    border: none;
+    display: block;
+    opacity: 0%;
+    transition: var(--transition-speed-table) ease-in-out;
 }
 .formCreator_edit_block:hover .settingIcon  {
-    display: block;
+    opacity: 100%;
+    transition: var(--transition-speed) ease-in-out;
 } 
+
 
 
 /* Scroll bar site */

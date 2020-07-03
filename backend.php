@@ -76,8 +76,7 @@
                 $tableNames[] = $row['tableName'];
             }
 
-            // Dropdown menu, with every form
-            if(!isset($_COOKIE["submissionTableCookie"])) echo "cookie not set";
+            // Dropdown menu
             // Getting cookie value
             $cookie_name = "submissionTableCookie";
             if(!isset($_COOKIE[$cookie_name])) {
@@ -265,19 +264,22 @@
             // Content edit menu
             echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
             
-                // Check url for form - If none form is choosen or non existing, then show nothing
+            // Check url for form - If form is not existing, then show nothing
+            if (in_array($_GET['form'],$tableIds)) {
+                $tableId = $_GET['form'];
 
                 // Make div
-                echo "<div id='edit-form-$tableIds[$i]' class='formCreator_edit_container'>";
+                echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
                 // Column info
                 $table_name = $wpdb->prefix . 'htx_column';
                 $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
-                $stmt->bind_param("i", $tableIds[$i]);
+                $stmt->bind_param("i", $tableId);
                 $stmt->execute();
                 $result = $stmt->get_result();
                 if($result->num_rows === 0) echo "Noget gik galt"; else {
                     while($row = $result->fetch_assoc()) {
                         // Info
+                        $settingIds[] = $row['id'];
                         $settingId = $row['id'];
                         $settingTableId = $row['tableId'];
                         $columnNameFront = $row['columnNameFront'];
@@ -290,14 +292,16 @@
                         $sorting = $row['sorting'];
                         $adminOnly = $row['adminOnly'];
                         $required = $row['required'];
-                        // onclick='submitForm(\"form-content-$settingTableId-$settingId\")
+                       
                         // Write
-                        echo "<div id='settingEdit-$settingTableId-$settingId' class='formCreator_edit_block'><h4>$columnNameFront</h4>";
+                        echo "<div id='settingEdit-$settingTableId-$settingId' class='formCreator_edit_block ";
+                        if (isset($_GET['setting']) AND $_GET['setting'] == $settingId) echo "highlighted";
+                        echo "'><h4>$columnNameFront</h4>";
                         echo "<form id='form-content-$settingTableId-$settingId' action='admin.php' method=\"get\">
                             <button type='submit' class='material-icons settingIcon'>settings</button>
                             <input name='page' value='".$_GET['page']."' class='hidden'>
                             <input name='form' value='$settingTableId' class='hidden'>
-                            <input class='hidden' name='setting' type='text' id='$settingTableId-$settingId' value='$settingId'>
+                            <input class='hidden' name='setting' value='$settingId'>
                         </form>";
                         echo "<input value='$placeholderText' class='inputBox' disabled>";
                         echo "</div>";
@@ -307,20 +311,21 @@
 
                 // End div
                 echo "</div>";
+            }
 
             echo "</div></div>";
 
             // Settings menu
             echo "<div class='formCreator_settings' id='formCreator_settings'>";
-
-            // Make content, per setting basis
-            for ($i=0; $i < count($tableNames); $i++) { 
+            if (isset($_GET['setting']) AND in_array($_GET['setting'],$settingIds)) {
+                $setting = $_GET['setting'];
+ 
                 // Make div
-                echo "<div id='setting-form-$tableIds[$i]'>";
+                echo "<div id='setting-form-$tableId'>";
                 // Column info
                 $table_name = $wpdb->prefix . 'htx_column';
-                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
-                $stmt->bind_param("i", $tableIds[$i]);
+                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0 AND id = ?");
+                $stmt->bind_param("ii", $tableId, intval($setting));
                 $stmt->execute();
                 $result = $stmt->get_result();
                 if($result->num_rows === 0) echo "Noget gik galt"; else {
@@ -369,7 +374,7 @@
                                 // Getting dropdown setting category
                                 $table_name2 = $wpdb->prefix . 'htx_settings_cat';
                                 $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND id = ?");
-                                $stmt2->bind_param("is", $tableIds[$i], $settingCat);
+                                $stmt2->bind_param("is", $tableId, $settingCat);
                                 $stmt2->execute();
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) echo "<p>Ingen indstillinger for dropdown</p>"; else {
