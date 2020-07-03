@@ -53,7 +53,7 @@
     // admin submenu
     // admin submenu page content - HTX LAN tildmelder liste
     function HTX_lan_participants_list_function(){
-        require "PaarticipantList.php";
+        require "ParticipantList.php";
     }
 
     // admin submenu page content - HTX LAN tildmeldings side laver
