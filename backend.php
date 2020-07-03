@@ -22,8 +22,8 @@
         // Widgets and style
         HTX_load_standard_backend();
 
-        // Post handling
-        HTX_backend_post();
+        // Post handling - Dangerzone
+        HTX_backend_post_dangerZone();
 
         // Header
         echo "<h1>HTX Lan tilmeldings admin</h1>";

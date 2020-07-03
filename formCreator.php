@@ -101,8 +101,8 @@
             echo "<form method=\"post\" class='addColumn'>";
             echo "<h4>Tilføj ny række</h4>";
             // Drop down with possible types of input field
-            echo "<label>Input type: </label><br><select name='inputType'><option value='inputbox'>Input box</option><option value='dropdown'>Drop down</option></select><br>";
-            echo "<button type='submit' name='submit' value='newColumn' style='margin-top: 0.25rem'>Tilføj række</button>";
+            echo "<label>Input type: </label><br><select name='inputType'><option value='inputbox'>Input box</option><option value='dropdown'>Drop down</option></select><br><br>";
+            echo "<button type='submit' name='submit' value='newColumn' class='btn updateBtn' style='margin-top: 0.25rem'>Tilføj række</button>";
             echo "</form>";
 
             // Post handling from form
@@ -113,7 +113,7 @@
                         try {
                             $link->autocommit(FALSE); //turn on transactions
                             // Possible input types in array
-                            $possibleInput = array("inputBox", "dropdown");
+                            $possibleInput = array("inputbox", "dropdown");
                             // User input
                             $userInputType = $_POST['inputType'];
                             // Break if the user input is not known
@@ -130,6 +130,14 @@
                                 $settingCat = intval($link->insert_id);
                                 if ($settingCat < 0) throw new Exception('Setting cat is bad');
                                 $stmt->close();
+
+                                $table_name = $wpdb->prefix . 'htx_settings';
+                                $link->autocommit(FALSE); //turn on transactions
+                                $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
+                                $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
+                                $settingName = "new setting"; $value="new setting"; $special=0; $specialName=""; $settingType="dropdown";
+                                $stmt->execute(); 
+                                $stmt->close();
                             }
                             
                             // Create new column, with standard values, and user input
@@ -145,11 +153,19 @@
                             $stmt->bind_param("ii", $lastId, $lastId);
                             $stmt->execute();
                             $stmt->close();
+                            if ($userInputType == 'dropdown') {
+                                // If dropdown, then make setting category first
+                                $table_name = $wpdb->prefix . 'htx_settings_cat';
+                                $stmt = $link->prepare("UPDATE $table_name SET settingNameBack = ? WHERE id = ?");
+                                $stmt->bind_param("ii", $lastId, $settingCat);
+                                $stmt->execute();
+                                $stmt->close();
+                            }
 
                             $link->autocommit(TRUE); //turn off transactions + commit queued queries
 
                             // Alert user through prompt
-                            echo "<script>confirm('Nyt element tilføjet'); location.reload();</script>"; #Because this post is after the form, there may be problems with not loading in
+                            echo "<script>location.reload();</script>"; #Because this post is after the form, there may be problems with not loading in
                         } catch(Exception $e) {
                             $mysqli->rollback(); //remove all queries from queue if error (undo)
                             throw $e;
@@ -165,9 +181,132 @@
         echo "</div></div>";
 
         // Settings menu
-        echo "<div class='formCreator_settings' id='formCreator_settings'>";
+        echo "<div class='formCreator_settings' id='formCreator_settings'><form method=\"post\">";
         if (isset($_GET['setting']) AND in_array($_GET['setting'],$settingIds)) {
             $setting = $_GET['setting'];
+
+            // Post handling
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                switch  ($_POST['submit']) {
+                    // New submission
+                    case 'updateSetting':
+                        // Update column settings
+                        if (isset($_POST['settingsTrue']) AND $_POST['settingsTrue'] == "1") {
+                            // There are settings
+                            // Getting number of settings - Checking settingsAmount is a number
+                            if (isset($_POST['settingsAmount']) AND intval($_POST['settingsAmount']) > 0) {
+                                $settingAmount = intval($_POST['settingsAmount']);
+                                try {
+                                    $link->autocommit(FALSE); //turn on transactions
+                                    $table_name = $wpdb->prefix . 'htx_settings';
+                                    $stmt1 = $link->prepare("UPDATE `$table_name` SET settingName = ?, value = ? WHERE id = ?");
+                                    
+                                    for ($i=0; $i < $settingAmount; $i++) { 
+                                        // Update every setting
+                                        // Id for line
+                                        $lineId = intval($_POST['settingId-'.$i]);
+                                        $stmt1->bind_param("ssi", trim($_POST['settingName-'.$lineId]), trim($_POST['settingValue-'.$lineId]), $lineId);
+                                        $stmt1->execute();
+                                    }
+                                    
+                                    $stmt1->close();
+                                    $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                                } catch(Exception $e) {
+                                    $link->rollback(); //remove all queries from queue if error (undo)
+                                    throw $e;
+                                }
+                                
+                            } else echo "Something went wrong with the update";
+                        } else echo "Something went wrong with the update";
+
+                        // Update normal settings
+                        try {
+                            if (!isset($_POST['placeholderText'])) $placeholderText = ""; else $placeholderText = trim($_POST['placeholderText']);
+                            $link->autocommit(FALSE); //turn on transactions
+                            $table_name = $wpdb->prefix . 'htx_column';
+                            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, columnType = ?, special = ?, specialName = ?, sorting = ?, required = ?, placeholderText = ? WHERE id = ?");
+                            $stmt1->bind_param("sssisiisi", trim($_POST['columnNameFront']), trim($_POST['format']), trim($_POST['columnType']), intval($_POST['special']), trim($_POST['specialName']), intval($_POST['sorting']), intval($_POST['required']), $placeholderText, $setting);
+                            $stmt1->execute();
+                            $stmt1->close();
+                            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                            echo "<script>location.reload();</script>";
+                        } catch(Exception $e) {
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            throw $e;
+                        }
+                    break;
+                    case 'deleteColumn':
+                        // Delete form element, with setting cat / settings if exist
+                        try {
+                            $link->autocommit(FALSE); //turn on transactions
+
+                            // Delete cat
+                            if (isset($_POST['settingsId']) AND intval($_POST['settingsId']) > 0) {
+                                $settingsId = intval($_POST['settingsId']);
+                                $table_name = $wpdb->prefix . 'htx_settings_cat';
+                                $stmt = $link->prepare("DELETE FROM $table_name WHERE id = ?");
+                                $stmt->bind_param("i", $settingsId);
+                                $stmt->execute(); 
+                                $stmt->close();
+
+                                // Delete settings
+                                if (isset($_POST['settingsTrue']) AND $_POST['settingsTrue'] == "1") {
+                                    // There are settings
+                                    // Getting number of settings - Checking settingsAmount is a number
+                                    if (isset($_POST['settingsAmount']) AND intval($_POST['settingsAmount']) > 0) {
+                                        $settingAmount = intval($_POST['settingsAmount']);
+                                        $link->autocommit(FALSE); //turn on transactions
+                                        $table_name = $wpdb->prefix . 'htx_settings';
+                                        $stmt1 = $link->prepare("DELETE FROM $table_name WHERE id = ?");
+                                        
+                                        for ($i=0; $i < $settingAmount; $i++) { 
+                                            // Update every setting
+                                            // Id for line
+                                            $lineId = intval($_POST['settingId-'.$i]);
+                                            $stmt1->bind_param("i", $lineId);
+                                            $stmt1->execute();
+                                        }
+                                        
+                                        $stmt1->close();
+                                    }
+                                }
+                            }
+                            // Delete column
+                            $table_name = $wpdb->prefix . 'htx_column';
+                            $stmt1 = $link->prepare("DELETE FROM $table_name WHERE id = ?");
+                            $stmt1->bind_param("i", $setting);
+                            $stmt1->execute();
+                            $stmt1->close();
+                            
+                            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                            echo "<script>location.reload();</script>";
+                        } catch(Exception $e) {
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            throw $e;
+                        }
+                        
+                    break;
+                    case 'addSetting':
+                        // Add new setting element
+                        if (isset($_POST['settingsId']) AND intval($_POST['settingsId']) > 0) {
+                            $idNewSetting = intval($_POST['settingsId']);
+                            try {
+                                $table_name = $wpdb->prefix . 'htx_settings';
+                                $link->autocommit(FALSE); //turn on transactions
+                                $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
+                                $stmt->bind_param("ississ", $idNewSetting, $settingName, $value, $special, $specialName, $settingType);
+                                $settingName = "new setting"; $value="new setting"; $special=0; $specialName=""; $settingType="dropdown";
+                                $stmt->execute(); 
+                                $stmt->close();
+                                $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                            } catch(Exception $e) {
+                                $link->rollback(); //remove all queries from queue if error (undo)
+                                throw $e;
+                            }
+                        }
+                    break;
+                }
+            }
 
             // Make div
             echo "<div id='setting-form-$tableId'>";
@@ -199,14 +338,15 @@
                     switch ($columnType) {
                         case "dropdown":
                             echo "<div class='formCreator_edit_container formCreator_flexRow'>";
-                            echo "<div><p>Navn</p><input class='inputBox' value='$columnNameFront'></div>";
-                            echo "<div><p>format</p><input class='inputBox' value='$format'></div>";
-                            echo "<div><p>columnType</p><input class='inputBox' value='$columnType'></div>";
-                            echo "<div><p>special</p><input class='inputBox' value='$special'></div>";
-                            echo "<div><p>specialName</p><input class='inputBox' value='$specialName'></div>";
-                            echo "<div><p>sorting</p><input class='inputBox' value='$sorting'></div>";
-                            echo "<div><p>required</p><input class='inputBox' value='$required'></div>";
+                            echo "<div><label>Navn </label> <input class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
+                            echo "<div><label>format </label> <input class='inputBox' name='format' value='$format'></div>";
+                            echo "<div><label>columnType </label> <input class='inputBox' name='columnType' value='$columnType'></div>";
+                            echo "<div><label>special </label> <input class='inputBox' name='special' value='$special'></div>";
+                            echo "<div><label>specialName </label> <input class='inputBox' name='specialName' value='$specialName'></div>";
+                            echo "<div><label>sorting </label> <input class='inputBox' name='sorting' value='$sorting'></div>";
+                            echo "<div><label>required </label> <input class='inputBox' name='required' value='$required'></div>";
                             echo "<h4>Dropdown indstillinger</h4>";
+
                             // Getting dropdown setting category
                             $table_name2 = $wpdb->prefix . 'htx_settings_cat';
                             $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND id = ?");
@@ -226,15 +366,24 @@
                                     $stmt3->bind_param("i", $row2['id']);
                                     $stmt3->execute();
                                     $result3 = $stmt3->get_result();
-                                    if($result3->num_rows === 0) echo "<p>Ingen dropdown muligheder</p>"; else {
+                                    $i = 0;
+                                    if($result3->num_rows === 0) echo "<p>Ingen dropdown muligheder</p><br><button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button><button type='button' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button>"; else {
                                         while($row3 = $result3->fetch_assoc()) {
                                             $row3['id'];
                                             $row3['settingName'];
-                                            $row3['value'];
+                                            $rowSettingId = $row3['value'];
 
-                                            echo "<div><p>Navn</p><input class='inputBox' value='".$row3['settingName']."'></div>";
-                                        
+                                            echo "<div><label>Navn</label> <input class='inputBox' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
+                                            echo "<div><label>Værdi</label> <input class='inputBox' name='settingValue-".$row3['id']."' value='".$row3['value']."' style='margin-bottom:1.75rem;'></div>";
+                                            echo "<input class='inputBox hidden' name='settingId-$i' value='".$row3['id']."'>";
+
+                                            $i++;
                                         }
+                                        echo "<input class='inputBox hidden' name='settingsTrue' value='1'>";
+                                        echo "<input class='inputBox hidden' name='settingsAmount' value='$i'>";
+                                        echo "<input class='inputBox hidden' name='settingsId' value='". $row2['id']."'>";
+                                        echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                        echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button></div>";
                                     }
                                     $stmt3->close();
                                 }
@@ -244,14 +393,14 @@
                         break;
                         default:
                             echo "<div class='formCreator_edit_container formCreator_flexRow'>";
-                            echo "<div><p>Navn</p><input class='inputBox' value='$columnNameFront'></div>";
-                            echo "<div><p>format</p><input class='inputBox' value='$format'></div>";
-                            echo "<div><p>columnType</p><input class='inputBox' value='$columnType'></div>";
-                            echo "<div><p>special</p><input class='inputBox' value='$special'></div>";
-                            echo "<div><p>specialName</p><input class='inputBox' value='$specialName'></div>";
-                            echo "<div><p>placeholderText</p><input class='inputBox' value='$placeholderText'></div>";
-                            echo "<div><p>sorting</p><input class='inputBox' value='$sorting'></div>";
-                            echo "<div><p>required</p><input class='inputBox' value='$required'></div>";
+                            echo "<div><label>Navn </label><input class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
+                            echo "<div><label>format </label><input class='inputBox' name='format' value='$format'></div>";
+                            echo "<div><label>columnType </label><input class='inputBox' name='columnType' value='$columnType'></div>";
+                            echo "<div><label>special </label><input class='inputBox' name='special' value='$special'></div>";
+                            echo "<div><label>specialName </label><input class='inputBox' name='specialName' value='$specialName'></div>";
+                            echo "<div><label>placeholderText </label><input class='inputBox' name='placeholderText' value='$placeholderText'></div>";
+                            echo "<div><label>sorting </label><input class='inputBox' name='sorting' value='$sorting'></div>";
+                            echo "<div><label>required </label><input class='inputBox' name='required' value='$required'></div>";
                             echo "</div>";
                         break;
                     }
@@ -261,8 +410,12 @@
             }
             $stmt->close();
 
+            // make submit button
+            echo "<button type='submit' name='submit' value='updateSetting' class='btn updateBtn' style='margin-right: 0.5rem;'>Opdater</button>";
+            echo "<button type='delete' name='submit' value='deleteColumn' class='btn deleteBtn'>Slet</button>";
+
             // End div
-            echo "</div>";
+            echo "</div></form>";
         }
 
         echo "</div>";

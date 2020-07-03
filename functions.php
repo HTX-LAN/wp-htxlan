@@ -2,7 +2,7 @@
     // Functions and scripts written in php
 
     // Backend post handling
-    function HTX_backend_post() {
+    function HTX_backend_post_dangerZone() {
 
 
         // Danger zone
