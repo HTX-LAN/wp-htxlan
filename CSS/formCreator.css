@@ -63,7 +63,10 @@
     transition: var(--transition-speed) ease-in-out;
 } 
 
-
+.addColumn {
+    margin-top: 2rem;
+    border-top: 1px darkgray solid;
+}
 
 /* Scroll bar site */
 .ltr {
