@@ -22,48 +22,15 @@ if($result->num_rows === 0) echo "Ingen registreringer"; else {
         $tableNames[] = $row['tableName'];
     }
 
-    // Dropdown menu
-    // Getting cookie value
-    $cookie_name = "submissionTableCookie";
-    if(!isset($_COOKIE[$cookie_name])) {
-        // Cookie does not exist
-        // Setting new cookie
-        setCustomCookie($cookie_name, $tableIds[0]);
-    } else {
-        // Cookie exist, but needs checking
-        $tableCookie = $_COOKIE[$cookie_name];
-        if (in_array($tableCookie, $tableIds)) {
-            // Cookie is valid
-        } else {
-            // Cookie value is not correct anymore - Updating cookie and saving for 30 days
-            setCustomCookie($cookie_name, $tableIds[0]);
-            $tableCookie = $tableIds[0];
-        }
-    }
+    // Getting table id
+    if (in_array(intval($_GET['formular']), $tableIds)) $tableId = intval($_GET['formular']); else $tableId = $tableIds[0];
 
-    // Getting post value, if there has been a post
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if ($_POST['posttype'] == 'tableUpdate') {
-            $table = $_POST['formular'];
-            if ($table != $tableCookie) {
-                // Checking if id is in database
-                if (in_array($table, $tableIds)) {
-                    // Post is not the same as cookie - Updating cookie and saving for 30 days
-                    setCustomCookie($cookie_name, $table);
-                    $tableCookie = $table;
-                } else {
-                    $tableCookie = $tableIds[0];
-                    setCustomCookie($cookie_name, $tableIds[0]);
-                }
-            }
-        }
-    }
-    // Setting tableId for the rest of the page
-    $tableId = $tableCookie;
+    // Dropdown menu
+    
 
     // Starting dropdown menu
     echo "<p><h3>Formular:</h3> ";
-    echo "<form method=\"post\"><select name='formular' class='dropdown' onchange='form.submit()'>";
+    echo "<form method=\"get\"><input type='hidden' name='page' value='HTX_lan_participants_list'><select name='formular' class='dropdown' onchange='form.submit()'>";
     // writing every option
     for ($i=0; $i < count($tableIds); $i++) { 
         // Seeing if value is the choosen one
@@ -74,7 +41,7 @@ if($result->num_rows === 0) echo "Ingen registreringer"; else {
     }
     
     // Ending dropdown
-    echo "</select><input name='posttype' value='tableUpdate' class='hidden'></form><br></p>";
+    echo "</select></form><br></p>";
     
     // Start of table with head
     echo "<div class='formGroup formGroup_scroll_left'><div class='formGroup_container'><table class='InfoTable'><thead><tr>";
