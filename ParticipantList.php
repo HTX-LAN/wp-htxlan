@@ -136,7 +136,7 @@ if($result->num_rows === 0) echo "Ingen registreringer"; else {
                 $stmt2->bind_param("iis", $tableId, $userid[$i], $columnNameBack[$index]);
                 $stmt2->execute();
                 $result2 = $stmt2->get_result();
-                if($result2->num_rows === 0) echo "Ingen oplysninger"; else {
+                if($result2->num_rows === 0) echo "Null"; else {
                     while($row2 = $result2->fetch_assoc()) {
                         // Writing data from table
                         echo $row2['value'];

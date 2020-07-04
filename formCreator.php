@@ -55,10 +55,10 @@
         echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
 
         // Possible input types in array
-        $possibleInput = array("inputbox", "dropdown", "text area");
+        $possibleInput = array("inputbox", "dropdown", "text area"); #Missing: Radio buttons, checkboxes, checkboxes with text input (for ex team names per game basis), range
 
         // Possible formats types in array
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week'); #Missing "tel", but needs more backend work - needs pattern attribute to work
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month'); #Missing "tel", but needs more backend work - needs pattern attribute to work
 
         // Make div
         echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
