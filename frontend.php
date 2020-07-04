@@ -42,7 +42,7 @@
         // Getting and writing content to form
         // Getting column info
         $table_name = $wpdb->prefix . 'htx_column';
-        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
+        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0 ORDER BY sorting ASC, columnNameFront ASC");
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -57,6 +57,7 @@
                 $placeholderText[] = $row['placeholderText'];
                 $sorting[] = $row['sorting'];
                 $adminOnly[] = $row['adminOnly'];
+                $disabled[] = $row['disabled'];
                 $required[] = $row['required'];
                 $settingCat[] = $row['settingCat'];
             }
@@ -69,10 +70,12 @@
         for ($i=0; $i < count($columnNameFront); $i++) { 
             // Setup for required label
             if ($required[$i] == 1) {$isRequired = "required"; $requiredStar = "<i style='color: red'>*</i>";} else {$isRequired = ""; $requiredStar = "";}
+            // Setup for disabled
+            if ($disabled[$i] == 1) $disabledClass = "hidden"; else $disabledClass = "";
             // Main writing of input
-            $html .= "<p><label>$columnNameFront[$i]$requiredStar</label>";
             switch ($columnType[$i]) {
                 case "dropdown":
+                    $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
                     // Getting settings category
                     $table_name = $wpdb->prefix . 'htx_settings_cat';
                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? LIMIT 1");
@@ -86,7 +89,7 @@
                     }
                     $stmt->close();
                     // Writing first part of dropdown
-                    $html .= "<select name='$columnNameBack[$i]' class='dropdown' $isRequired>";
+                    $html .= "<select name='$columnNameBack[$i]' class='dropdown $disabledClass' $isRequired>";
                     
                     // Getting dropdown content
                     $table_name = $wpdb->prefix . 'htx_settings';
@@ -112,7 +115,13 @@
                     // Finishing dropdown
                     $html .= "</select>";
                 break;
-                default: $html .= "<input name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' class='inputBox' value='".$_POST[$columnNameBack[$i]]."' $isRequired></p>";
+                case "text area":
+                    $html .= "<h5>$columnNameFront[$i]</h5>";
+                    $html .= "<p>$placeholderText[$i]</p>";
+                break;
+                default: 
+                    $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";    
+                    $html .= "<input name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired></p>";
             }
             
         }

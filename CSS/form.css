@@ -112,6 +112,10 @@
 .inputBox:focus {
     background-color: var(--text-quaternary);
 }
+input[type="color"] {
+    padding: 0px;
+    width: 5rem;
+}
 /*buttons*/
 .btn {
     transition: var(--transition-speed) ease;

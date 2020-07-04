@@ -20,6 +20,7 @@
 }
 .formCreator_flexRow div {
     margin-right: 1rem;
+    width: 100%;
 }
 
 .formCreator_tableOfContent {
@@ -39,6 +40,9 @@
 .formCreator_edit_container {
     padding: 1rem;
 }
+.formCreator_edit_container div {
+    width: 100%;
+}
 
 .formCreator_settings {
     background-color: white;
@@ -46,6 +50,11 @@
     width: 25%;
     padding: 1rem;
     overflow-y: auto;
+}
+
+/* Inputs */
+.textArea {
+    width: 100%;
 }
 
 /* Icons */
