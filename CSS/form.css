@@ -114,7 +114,7 @@
 }
 input[type="color"] {
     padding: 0px;
-    width: 5rem;
+    /* width: 5rem; */
 }
 /*buttons*/
 .btn {
@@ -180,15 +180,15 @@ input[type="color"] {
 
 /* Dropdown */
 .dropdown {
-    font-size: 1.6rem !important;
-    padding: 1.5rem 1.8rem;
+    /* font-size: 1.6rem !important; */
+    /* padding: 1.5rem 1.8rem;
     padding-top: 1.5rem;
     padding-right: 1.8rem;
     padding-bottom: 1.5rem;
-    padding-left: 1.8rem;
-    background: #fff;
-    border-radius: 0;
+    padding-left: 1.8rem; */
+    /* background: #fff; */
+    /* border-radius: 0;
     border-style: solid;
     border-width: 0.1rem;
-    border-color:rgb(195, 195, 195);
+    border-color:rgb(195, 195, 195); */
 }

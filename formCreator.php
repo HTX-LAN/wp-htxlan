@@ -35,7 +35,10 @@
                 echo "<form id='form-tableOfContent-$tableIds[$i]' action='admin.php' method=\"get\">
                     <input name='page' value='".$_GET['page']."' class='hidden'>
                     <input name='form' value='$tableIds[$i]' class='hidden'>
-                    <a onclick='submitForm(\"form-tableOfContent-$tableIds[$i]\")'>$tableNames[$i]</a><br>
+                    <a onclick='submitForm(\"form-tableOfContent-$tableIds[$i]\")' ";
+                    if (isset($_GET['form']) AND $_GET['form'] == $tableIds[$i]) {echo "class='highlighted'"; $tableName = $tableNames[$i];}
+                    echo "'>$tableNames[$i]
+                    </a><br>
                 </form>";
                         
             } 
@@ -44,7 +47,17 @@
         
             
 
-        echo "<br><br><a onclick=''>Tilføj ny formular</a>";
+        echo "<br><br>
+        <form method='POST'>
+            <button type='submit' class='btn' name='submit' value='newForm'>Tilføj ny formular</button>
+        </form><br>";
+        // Post handling from form
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            if  ($_POST['submit'] == "newForm") {
+                new_HTX_form();
+            }
+        }
+        
     echo "</div></div>";
 
     // Check if form exist
@@ -62,6 +75,15 @@
 
         // Make div
         echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
+
+        // Write header
+        echo "<form method=\"get\" id='formSettings'>
+            <input name='page' value='".$_GET['page']."' class='hidden'>
+            <input name='form' value='$tableId' class='hidden'>
+            <input class='hidden' name='setting' value='0'>
+            <h2 onclick='document.getElementById(\"formSettings\").submit()' style='margin-top: 0px;'><a>$tableName</a></h2>
+        </form>";
+
         // Column info
         $table_name = $wpdb->prefix . 'htx_column';
         $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0 ORDER by sorting ASC, columnNameFront ASC");
@@ -412,6 +434,9 @@
                     
                     // Write
                     echo "<div id='settingEdit-$settingTableId-$settingId'><h3>$columnNameFront</h3>";
+
+                    if ($columnNameBack == "email") {echo "<p>Dette input kan ikke ændres, fordi dette input er essentielt for pluginet.</p></div>"; break;}
+
                     switch ($columnType) {
                         case "dropdown":
                             echo "<div class='formCreator_edit_container formCreator_flexRow'>";
@@ -567,21 +592,79 @@
                     }
                     
                     echo "</div>";
+                    // make submit button
+                    echo "<button type='submit' name='submit' value='updateSetting' class='btn updateBtn' style='margin-right: 0.5rem;'>Opdater</button>";
+                    echo "<button type='delete' name='submit' value='deleteColumn' class='btn deleteBtn'>Slet</button>";
                 }
             }
             $stmt->close();
 
-            // make submit button
-            echo "<button type='submit' name='submit' value='updateSetting' class='btn updateBtn' style='margin-right: 0.5rem;'>Opdater</button>";
-            echo "<button type='delete' name='submit' value='deleteColumn' class='btn deleteBtn'>Slet</button>";
-
             // End div
             echo "</div></form>";
-        }
+        } else if (isset($_GET['setting']) AND $_GET['setting'] == 0) {
+            // Post handling
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                switch  ($_POST['submit']) {
+                    // New submission
+                    case 'updateForm':
+                        try {
+                            $link->autocommit(FALSE); //turn on transactions
+                            $table_name = $wpdb->prefix . 'htx_form_tables';
+                            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ? WHERE id = ?");
+                            $stmt->bind_param("ssi",$_POST['tableName'], $_POST['tableDescription'], $tableId);
+                            $stmt->execute();
+                            $stmt->close();
+
+
+                            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                        } catch(Exception $e) {
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            throw $e;
+                        }
+                    break;
+                }
+            }
+
+
+            // Show form settings
+            echo "<h3>Formular indstillinger</h3>";
+            echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ? LIMIT 1");
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) echo "Noget gik galt"; else {
+                while($row = $result->fetch_assoc()) {
+                    // Info
+                    $tableShortcode = $row['shortcode'];
+                    $tableName = $row['tableName'];
+                    $tableDescription = $row['tableDescription'];
+                    $taleDateCreate = $row['dateCreate'];
+                    $tableDateUpdate = $row['dateUpdate'];
+
+                    // Name
+                    echo "<div><label for='tableName'>Navn </label> <input type='text' id='tableName' class='inputBox' name='tableName' value='$tableName'></div>";
+                    // Description
+                    echo "<div><label for='tableDescription'>Beskrivelse </label> <br><textarea id='tableDescription' class='textArea' name='tableDescription'>$tableDescription</textarea></div>";
+                    // Shortcode
+                    echo "<div><label>Shortcode </label> <br><i>[$tableShortcode form='$tableId']</i></div>";
+                    // Shortcode
+                    echo "<div><label>Dato oprettet </label> <br><i>$taleDateCreate</i></div>";
+
+
+                    echo "</div>";
+                    // make submit button
+                    echo "<button type='submit' name='submit' value='updateForm' class='btn updateBtn' style='margin-right: 0.5rem;'>Opdater</button>";
+                    echo "<button type='delete' name='submit' value='deleteForm' class='btn deleteBtn'>Slet</button>";
+                
+                }
+            }
+        } else if (isset($_GET['setting'])) echo "Den valgte input blev ikke fundet";
 
         echo "</div>";
 
-    }
+    } else if (isset($_GET['form'])) echo "Den valgte formular blev ikke fundet";
 
 
     // Ending main area
