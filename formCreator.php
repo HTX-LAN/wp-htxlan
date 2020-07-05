@@ -614,13 +614,14 @@
                             $stmt->bind_param("ssi",$_POST['tableName'], $_POST['tableDescription'], $tableId);
                             $stmt->execute();
                             $stmt->close();
-
-
                             $link->autocommit(TRUE); //turn off transactions + commit queued queries
                         } catch(Exception $e) {
                             $link->rollback(); //remove all queries from queue if error (undo)
                             throw $e;
                         }
+                    break;
+                    case 'deleteForm':
+                        echo "<script>confirm('Denn feature er endu ikke sat op');</script>";
                     break;
                 }
             }

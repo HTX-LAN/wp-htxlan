@@ -3,7 +3,7 @@
     * Plugin Name: HTX-Lan
     * Plugin URI: https://themikkel.servehttp.com/HTX-Lan-plugin
     * Description: This plugin, is a custom plugin for HTX-lan's website
-    * Version: 0.1.3
+    * Version: 0.1.4
     * Author: Mikkel Albrechtsen & Frej Nielsen
     * Author URI: https://themikkel.servehttp.com
     */
