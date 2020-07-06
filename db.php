@@ -29,7 +29,7 @@
         id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
         active INT NOT NULL DEFAULT 1,
         tableId INT,
-        payed INT default 0,
+        payed varchar(255) default 0,
         arrived INT default 0,
         email TEXT,
         dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -56,7 +56,6 @@
         $stmt->bind_param("sssi", $one, $two, $three, $four);
         $stmt->execute();
         $stmt->close();
-
 
         // Creating a table for colums information
         $table_name = $wpdb->prefix . 'htx_column';
