@@ -279,7 +279,43 @@
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
                         throw $e;
-                      }
+                    }
+                break;
+                case "arrivedtUpdate":
+                    try {
+                        $link->autocommit(FALSE); //turn on transactions
+                        // Get all user ids
+                        $table_name = $wpdb->prefix . 'htx_form_users';
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1");
+                        $stmt->bind_param("i", $tableId);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if($result->num_rows === 0) echo "Noget gik galt"; else {
+                            while($row = $result->fetch_assoc()) {
+                                $userIds[] = $row['id'];
+                            }
+                        }
+                        $stmt->close();
+                        // Getting and checking user id
+                        if (!isset($_POST['userId']) AND !in_array(intval($_POST['userId']), $userIds)) echo "break";
+                        
+                        // Getting and checking new payment id
+                        // Payment type
+                        if ($_POST['arrived'] != "0" AND $_POST['arrived'] != "1") echo "break";
+
+                        
+                        // Sending new payment id to server
+                        $table_name = $wpdb->prefix . 'htx_form_users';
+                        $stmt = $link->prepare("UPDATE $table_name SET arrived = ? WHERE id = ?");
+                        $stmt->bind_param("ii", $_POST['arrived'], $_POST['userId']);
+                        $stmt->execute();
+                        $stmt->close();
+
+                        $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                    } catch(Exception $e) {
+                        $link->rollback(); //remove all queries from queue if error (undo)
+                        throw $e;
+                    }
                 break;
             }
         }

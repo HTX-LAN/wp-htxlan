@@ -82,6 +82,7 @@
             }
             // Writing extra lines
             echo "<th>Betaling</th>";
+            echo "<th><span class='material-icons' title='Ankommet'>flight_land</span></th>";
             // Ending head
             echo "</tr></head>";
 
@@ -93,6 +94,7 @@
             while($row = $result->fetch_assoc()) {
                 $userid[] = $row['id'];
                 $payed[] = $row['payed'];
+                $arrived[] = $row['arrived'];
             }
             // Getting and writing every user information
             for ($i=0; $i < count($userid); $i++) { 
@@ -123,7 +125,9 @@
                 $paymentMethodsId = array("0", "0-f", "1-f","0-i", "1-i");
 
                 echo "<td ";
-                if ($payed[$i] == "0") echo "class='unpayed'"; else if ($payed[$i] == "0-i" OR $payed[$i] == "1-i") echo "class='crewpayed'"; else if (in_array($payed[$i], $paymentMethodsId)) echo "class='payed'"; 
+                if ($payed[$i] == "0") echo "class='unpayed'"; 
+                else if ($payed[$i] == "0-i" OR $payed[$i] == "1-i") echo "class='crewpayed'"; 
+                else if (in_array($payed[$i], $paymentMethodsId)) echo "class='payed'"; 
                 echo ">
                     <form id='$i-pay' method='POST'>
                     <input type='hidden' name='userId' value='$userid[$i]'>
@@ -150,7 +154,15 @@
                 </td>";
 
                 // Arrived
-
+                echo "<td>";
+                echo "<form id='$i-arrived' method='POST'>";
+                echo "<input type='hidden' name='post' value='arrivedtUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
+                echo "<input type='hidden' name='arrived' value='0'>";
+                echo "<input id='arrived-$i' type='checkbox' class='inputCheckbox' name='arrived' value='1' onchange='document.getElementById(\"$i-arrived\").submit()'";
+                if ($arrived[$i] == 1) echo "checked";
+                echo ">";
+                echo "</form>";
+                echo "</td>";
 
             }
             
