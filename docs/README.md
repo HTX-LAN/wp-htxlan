@@ -11,6 +11,8 @@ Systemet bygger på at man efter tilmeldingen, kan registrer om deltagerne har b
 
 Dertil vil det også være muligt at sætte en økonomi side op, således at man kan holde styr på hvor mange penge man bruger og tjener, og hvor meget der egentligt er kommet ind.
 
+Vi har på følgende link, lavet en side, hvor funktioner er skrevet ind, med hvilke der er nu, samt hvilke vi arbejder på; [Link](https://the0mikkel.github.io/WPPlugin-HTXLan/pages#main-plugin-side)
+
 ## Udviklere
 Dette plugin er lavet af frivillige elever fra LAN udvalget på HTX i Nyk. F.
 <br>Disse er på nuværende tidspunkt:
