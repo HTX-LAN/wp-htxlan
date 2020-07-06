@@ -56,7 +56,7 @@ if($result->num_rows === 0) echo "Ingen registreringer"; else {
     if($result->num_rows === 0) echo "Ingen registreringer"; else {
         // Getting every column
         $table_name3 = $wpdb->prefix . 'htx_column';
-        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE tableid = ? AND adminOnly = 0");
+        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE tableid = ?");
         $stmt3->bind_param("i", $tableId);
         $stmt3->execute();
         $result3 = $stmt3->get_result();
@@ -70,7 +70,6 @@ if($result->num_rows === 0) echo "Ingen registreringer"; else {
                 $specialName[] = $row3['specialName'];
                 $placeholderText[] = $row3['placeholderText'];
                 $sorting[] = $row3['sorting'];
-                $adminOnly[] = $row3['adminOnly'];
                 $required[] = $row3['required'];
             }
         }

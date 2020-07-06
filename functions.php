@@ -32,6 +32,7 @@
 
         // Check tableId
         if (!ctype_alnum($tableId)) return "Sql injection attempt";
+        $tableId = intval($tableId);
 
         // Post handling
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -61,7 +62,7 @@
                     // Convert values to the right format
                     // Getting column info
                     $table_name = $wpdb->prefix . 'htx_column';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0");
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ?");
                     $stmt->bind_param("i", $tableId);
                     $stmt->execute();
                     $result = $stmt->get_result();
@@ -75,7 +76,6 @@
                             $specialName[] = $row['specialName'];
                             $placeholderText[] = $row['placeholderText'];
                             $sorting[] = $row['sorting'];
-                            $adminOnly[] = $row['adminOnly'];
                             $required[] = $row['required'];
                         }
                     }
@@ -201,8 +201,8 @@
             // Creating standard inputs (First- & lastname, email & phone)
             $table_name = $wpdb->prefix . 'htx_column';
             $link->autocommit(FALSE); //turn on transactions
-            $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, adminOnly, required, settingCat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("issssssissii", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $adminOnly, $required, $settingCat);
+            $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, required, settingCat) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("issssssisii", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $required, $settingCat);
             $tableId = $newTableId; 
             $columnNameFront = "Fornavn"; $columnNameBack='firstName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 1; $placeholderText = "John"; $adminOnly = 0; $required = 1; $settingCat = 0;
             $stmt->execute();  

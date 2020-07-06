@@ -86,7 +86,7 @@
 
         // Column info
         $table_name = $wpdb->prefix . 'htx_column';
-        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0 ORDER by sorting ASC, columnNameFront ASC");
+        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? ORDER by sorting ASC, columnNameFront ASC");
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -104,7 +104,6 @@
                 $specialName = $row['specialName'];
                 $placeholderText = $row['placeholderText'];
                 $sorting = $row['sorting'];
-                $adminOnly = $row['adminOnly'];
                 $required = $row['required'];
                 $settingCat = $row['settingCat'];
                 $disabled = $row['disabled'];
@@ -206,7 +205,7 @@
                         if (!in_array($userInputType, $possibleInput)) break;
                         // Define values for new element
                         $columnNameFront = "New element"; $format=$possibleFormat[0]; $columnType=$userInputType; $special=0; $specialName=""; 
-                        $placeholderText = ""; $adminOnly = 0; $required = 0; $settingCat = 0; $sorting = $sorting+1;
+                        $placeholderText = ""; $required = 0; $settingCat = 0; $sorting = $sorting+1;
                         if ($userInputType == 'dropdown') {
                             // If dropdown, then make setting category first
                             $table_name = $wpdb->prefix . 'htx_settings_cat';
@@ -230,8 +229,8 @@
                         // Create new column, with standard values, and user input
                         global $wpdb;
                         $table_name = $wpdb->prefix . 'htx_column';
-                        $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, format, columnType, special, specialName, sorting, placeholderText, adminOnly, required, settingCat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                        $stmt->bind_param("isssssissii", $tableId, $columnNameFront, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $adminOnly, $required, $settingCat);
+                        $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, format, columnType, special, specialName, sorting, placeholderText, required, settingCat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->bind_param("isssssisii", $tableId, $columnNameFront, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $required, $settingCat);
                         $stmt->execute();
                         $lastId = intval($link->insert_id);
                         if ($lastId < 0) throw new Exception('Id is bad');
@@ -311,11 +310,29 @@
                             if (!isset($_POST['placeholderText'])) $placeholderText = ""; else $placeholderText = trim($_POST['placeholderText']);
                             if (intval($_POST['disabled']) == 1) $required = 0; else $required = intval($_POST['required']); #Disabeling the option for both required and hidden input
                             if (in_array(trim($_POST['format']), $possibleFormat)) $formatPost = trim($_POST['format']); else $formatPost = $possibleFormat[0];
+                            if (trim($_POST['columnNameFront']) == "") break;
                             $link->autocommit(FALSE); //turn on transactions
                             $table_name = $wpdb->prefix . 'htx_column';
                             $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ? WHERE id = ?");
                             $stmt1->bind_param("ssisiiisi", trim($_POST['columnNameFront']), $formatPost, $speciealPost, trim($_POST['specialName']), intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, $setting);
                             if (trim($_POST['specialName']) == "") $speciealPost = 0; else $speciealPost = 1;
+                            $stmt1->execute();
+                            $stmt1->close();
+
+                            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                            echo "<script>location.reload();</script>";
+                        } catch(Exception $e) {
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            throw $e;
+                        }
+                    break;
+                    case 'updateSorting':
+                        try {
+                            // Update sorting
+                            $link->autocommit(FALSE); //turn on transactions
+                            $table_name = $wpdb->prefix . 'htx_column';
+                            $stmt1 = $link->prepare("UPDATE `$table_name` SET sorting = ? WHERE id = ?");
+                            $stmt1->bind_param("ii", intval($_POST['sorting']), $setting);
                             $stmt1->execute();
                             $stmt1->close();
 
@@ -410,7 +427,7 @@
             echo "<div id='setting-form-$tableId'>";
             // Column info
             $table_name = $wpdb->prefix . 'htx_column';
-            $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0 AND id = ?");
+            $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND id = ?");
             $stmt->bind_param("ii", $tableId, intval($setting));
             $stmt->execute();
             $result = $stmt->get_result();
@@ -427,7 +444,6 @@
                     $specialName = $row['specialName'];
                     $placeholderText = $row['placeholderText'];
                     $sorting = $row['sorting'];
-                    $adminOnly = $row['adminOnly'];
                     $disabled = $row['disabled'];
                     $required = $row['required'];
                     $settingCat = $row['settingCat'];
@@ -435,7 +451,16 @@
                     // Write
                     echo "<div id='settingEdit-$settingTableId-$settingId'><h3>$columnNameFront</h3>";
 
-                    if ($columnNameBack == "email") {echo "<p>Dette input kan ikke ændres, fordi dette input er essentielt for pluginet.</p></div>"; break;}
+                    if ($columnNameBack == "email") {
+                        echo "<p>Dette input kan ikke ændres, fordi dette input er essentielt for pluginet.</p><p>Du kan dog ændre placeringen herunder.</p></div>";
+                        // Sorting
+                        echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            
+                        // make submit button
+                        echo "<button type='submit' name='submit' value='updateSorting' class='btn updateBtn' style='margin-right: 0.5rem;'>Opdater</button>";
+
+                        break;
+                    }
 
                     switch ($columnType) {
                         case "dropdown":

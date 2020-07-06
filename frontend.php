@@ -42,7 +42,7 @@
         // Getting and writing content to form
         // Getting column info
         $table_name = $wpdb->prefix . 'htx_column';
-        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND adminOnly = 0 ORDER BY sorting ASC, columnNameFront ASC");
+        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? ORDER BY sorting ASC, columnNameFront ASC");
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -56,7 +56,6 @@
                 $specialName[] = $row['specialName'];
                 $placeholderText[] = $row['placeholderText'];
                 $sorting[] = $row['sorting'];
-                $adminOnly[] = $row['adminOnly'];
                 $disabled[] = $row['disabled'];
                 $required[] = $row['required'];
                 $settingCat[] = $row['settingCat'];
