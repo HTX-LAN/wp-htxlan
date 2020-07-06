@@ -2,8 +2,8 @@
 HTX Lan Wordpress plugin for tilmelding til HTX Lan, lavet af elever fra HTX
 
 ## Indhold
-[Se informationer om alle sider](/pages)
-[License](/License)
+[Se informationer om alle sider](pages)<br>
+[License](License)
 
 ## Funktioner
 Dette plugin bygger på at, at man skal kunne lave helt specielle formulare, med de inputfelter som man gerne vil have.
