@@ -1,6 +1,6 @@
 # Plugin sider
 *Denne fil indeholder en liste over sider pluginnet indeholder, samt funktionerne af siderne*
-<br>[Tilbage til forsiden](../)
+<br>[Tilbage til forsiden](/WPPlugin-HTXLan)
 
 ## Sider
 - [Main plugin side](#main-plugin-side)
@@ -82,4 +82,4 @@ Side, hvor tidsplan kan sættes op
 
 
 ***Der vil blive tilføjet mere løbende***
-<br>[Tilbage til forsiden](../)
+<br>[Tilbage til forsiden](/WPPlugin-HTXLan)
