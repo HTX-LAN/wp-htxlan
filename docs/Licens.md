@@ -1,6 +1,7 @@
-MIT License
+# MIT License
+<br>[Tilbage til forsiden](../)<br>
 
-Copyright (c) 2020 The0mikkel
+<br>**Copyright (c) 2020 The0mikkel**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
