@@ -1,11 +1,11 @@
 <?php
     /**
     * Plugin Name: HTX-Lan
-    * Plugin URI: https://themikkel.servehttp.com/HTX-Lan-plugin
+    * Plugin URI: https://the0mikkel.github.io/WPPlugin-HTXLan/
     * Description: This plugin, is a custom plugin for HTX-lan's website
     * Version: 0.1.4
     * Author: Mikkel Albrechtsen & Frej Nielsen
-    * Author URI: https://themikkel.servehttp.com
+    * Author URI: https://the0mikkel.github.io/WPPlugin-HTXLan/
     */
 
     // Database creation
