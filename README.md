@@ -9,7 +9,7 @@ Dertil vil det også være muligt at sætte en økonomi side op, således at man
 
 ## Udviklere
 Dette plugin er lavet af frivillige elever fra LAN udvalget på HTX i Nyk. F.
-Disse er på nuværende tidspunkt:
+<br>Disse er på nuværende tidspunkt:
 - Mikkel
 - Frej
 
