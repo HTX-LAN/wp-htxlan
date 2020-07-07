@@ -4,6 +4,7 @@
     function create_db(){
         // Getting start information to create databases
         global $wpdb;
+        $db_name = DB_NAME;
         $charset_collate = $wpdb->get_charset_collate();
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         // Connecting to database, with custom variable
@@ -12,7 +13,7 @@
         // Creating a start database for plugin, where registrations go
         $table_name = $wpdb->prefix . 'htx_form';
         //Verify that table does not exist
-        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\"");
+        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\" AND TABLE_SCHEMA = \"$db_name\"");
         if(!$res) {
             //Failed to query database
             throw new Exception($link->error);
@@ -35,7 +36,7 @@
         // Creating table where forms tables users goes
         $table_name = $wpdb->prefix . 'htx_form_users';
         //Verify that table does not exist
-        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\"");
+        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\" AND TABLE_SCHEMA = \"$db_name\"");
         if(!$res) {
             //Failed to query database
             throw new Exception($link->error);
@@ -60,7 +61,7 @@
         // Creating table where forms tables names goes, and if they are active or not
         $table_name = $wpdb->prefix . 'htx_form_tables';
         //Verify that table does not exist
-        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\"");
+        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\" AND TABLE_SCHEMA = \"$db_name\"");
         if(!$res) {
             //Failed to query database
             throw new Exception($link->error);
@@ -89,7 +90,7 @@
         // Creating a table for colums information
         $table_name = $wpdb->prefix . 'htx_column';
         //Verify that table does not exist
-        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\"");
+        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\" AND TABLE_SCHEMA = \"$db_name\"");
         if(!$res) {
             //Failed to query database
             throw new Exception($link->error);
@@ -115,14 +116,43 @@
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) $charset_collate;";
             dbDelta( $sql );
-        }
-        // Insert standard values
 
+            //Insert default values
+            try {
+                $link->autocommit(FALSE); //turn on transactions
+                $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, required, settingCat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("issssssisii", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $required, $settingCat);
+                $tableId = 1;
+                $columnNameFront = "Fornavn"; $columnNameBack='firstName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 1; $placeholderText = "John"; $required = 1; $settingCat = 0;
+                $stmt->execute();
+                $columnNameFront = "Efternavn"; $columnNameBack='lastName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 2; $placeholderText = "Smith"; $required = 1; $settingCat = 0;
+                $stmt->execute();
+                $columnNameFront = "E-mail"; $columnNameBack='email'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 3; $placeholderText = "john@htx-lan.dk"; $required = 1; $settingCat = 0;
+                $stmt->execute();
+                $columnNameFront = "Mobil nummer"; $columnNameBack='phone'; $format="number"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 4; $placeholderText = "12345678"; $required = 0; $settingCat = 0;
+                $stmt->execute();
+                $columnNameFront = "Billet type"; $columnNameBack='ticketType'; $format="text"; $columnType="dropdown"; $special=1; $specialName="price_intrance"; $sorting = 5; $placeholderText = ""; $required = 1; $settingCat = 1;
+                $stmt->execute();
+                $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $required = 1; $required = 1; $settingCat = 2;
+                $stmt->execute();
+                $columnNameFront = "Klasse"; $columnNameBack='class'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 7; $placeholderText = ""; $required = 1; $required = 1; $settingCat = 3;
+                $stmt->execute();
+                $columnNameFront = "Discord navn"; $columnNameBack='discordTag'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 8; $placeholderText = "John#1234"; $required = 1;
+                $stmt->execute();
+                $columnNameFront = "Gametag one"; $columnNameBack='gametagOne'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 9; $placeholderText = "John"; $required = 0;
+                $stmt->execute();
+                $stmt->close();
+                $link->autocommit(TRUE); //turn off transactions + commit queued queries
+            } catch(Exception $e) {
+                $link->rollback(); //remove all queries from queue if error (undo)
+                throw $e;
+            }
+        }
 
         // Creating a start database for plugin, where settings categories goes
         $table_name = $wpdb->prefix . 'htx_settings_cat';
         //Verify that table does not exist
-        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\"");
+        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\" AND TABLE_SCHEMA = \"$db_name\"");
         if(!$res) {
             //Failed to query database
             throw new Exception($link->error);
@@ -142,12 +172,30 @@
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) $charset_collate;";
             dbDelta( $sql );
+            //Insert default values
+            try {
+                $link->autocommit(FALSE); //turn on transactions
+                $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingName, settingNameBack, special, specialName, settingType) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("isssss", $tableId, $settingName, $settingNameBack, $special, $specialName, $settingType);
+                $tableId = 1;
+                $settingName = "Billeter"; $settingNameBack='ticketType'; $special=1; $specialName="price"; $settingType="dropdown";
+                $stmt->execute();
+                $settingName = "Skole"; $settingNameBack='school'; $special=0; $specialName=""; $settingType="dropdown";
+                $stmt->execute();
+                $settingName = "klasse"; $settingNameBack='class'; $special=0; $specialName=""; $settingType="dropdown";
+                $stmt->execute();
+                $stmt->close();
+                $link->autocommit(TRUE); //turn off transactions + commit queued queries
+            } catch(Exception $e) {
+                $link->rollback(); //remove all queries from queue if error (undo)
+                throw $e;
+            }
         }
 
         // Creating a start database for plugin, where settings goes
         $table_name = $wpdb->prefix . 'htx_settings';
         //Verify that table does not exist
-        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\"");
+        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\" AND TABLE_SCHEMA = \"$db_name\"");
         if(!$res) {
             //Failed to query database
             throw new Exception($link->error);
@@ -168,7 +216,39 @@
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) $charset_collate;";
             dbDelta( $sql );
+
+            //Insert default values
+            try {
+                $link->autocommit(FALSE); //turn on transactions
+                $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type, sorting) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("isssssi", $settingId, $settingName, $value, $special, $specialName, $settingType, $sorting);
+                $settingId = 1;
+                $settingName = "Billet type 1"; $value=10; $special=1; $specialName="price"; $settingType="dropdown"; $sorting = 1;
+                $stmt->execute();
+                $settingName = "Billet type 2"; $value=20; $special=1; $specialName="price"; $settingType="dropdown"; $sorting = 2;
+                $stmt->execute();
+                $settingId = 2;
+                $settingName = "HTX"; $value="HTX"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 1;
+                $stmt->execute();
+                $settingName = "HHX"; $value="HHX"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 2;
+                $stmt->execute();
+                $settingName = "EUX/EUC"; $value="EUX/EUC"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 3;
+                $stmt->execute();
+                $settingId = 3;
+                $settingName = "Klasse 1"; $value="Klasse 1"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 1;
+                $stmt->execute();
+                $settingName = "Klasse 2"; $value="Klasse 2"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 2;
+                $stmt->execute();
+                $stmt->close();
+                $link->autocommit(TRUE); //turn off transactions + commit queued queries
+            } catch(Exception $e) {
+                $link->rollback(); //remove all queries from queue if error (undo)
+                throw $e;
+            }
         }
+
+        //Close DB connection
+        $link->close();
     }
 
     // function for dropping all tables for plugin
@@ -207,91 +287,5 @@
         $table_name = $wpdb->prefix . 'htx_settings';
         $sql = "DROP TABLE $table_name;";
         mysqli_query($link, $sql);
-    }
-    function insert_data() {
-        // Connecting to database, with custom variable
-        $link = database_connection();
-        // Inserting standard column in standard form
-        try {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'htx_column';
-            $link->autocommit(FALSE); //turn on transactions
-            $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, required, settingCat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("issssssisii", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $required, $settingCat);
-            $tableId = 1;
-            $columnNameFront = "Fornavn"; $columnNameBack='firstName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 1; $placeholderText = "John"; $required = 1; $settingCat = 0;
-            $stmt->execute();
-            $columnNameFront = "Efternavn"; $columnNameBack='lastName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 2; $placeholderText = "Smith"; $required = 1; $settingCat = 0;
-            $stmt->execute();
-            $columnNameFront = "E-mail"; $columnNameBack='email'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 3; $placeholderText = "john@htx-lan.dk"; $required = 1; $settingCat = 0;
-            $stmt->execute();
-            $columnNameFront = "Mobil nummer"; $columnNameBack='phone'; $format="number"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 4; $placeholderText = "12345678"; $required = 0; $settingCat = 0;
-            $stmt->execute();
-            $columnNameFront = "Billet type"; $columnNameBack='ticketType'; $format="text"; $columnType="dropdown"; $special=1; $specialName="price_intrance"; $sorting = 5; $placeholderText = ""; $required = 1; $settingCat = 1;
-            $stmt->execute();
-            $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $required = 1; $required = 1; $settingCat = 2;
-            $stmt->execute();
-            $columnNameFront = "Klasse"; $columnNameBack='class'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 7; $placeholderText = ""; $required = 1; $required = 1; $settingCat = 3;
-            $stmt->execute();
-            $columnNameFront = "Discord navn"; $columnNameBack='discordTag'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 8; $placeholderText = "John#1234"; $required = 1;
-            $stmt->execute();
-            $columnNameFront = "Gametag one"; $columnNameBack='gametagOne'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 9; $placeholderText = "John"; $required = 0;
-            $stmt->execute();
-            $stmt->close();
-            $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        } catch(Exception $e) {
-            $link->rollback(); //remove all queries from queue if error (undo)
-            throw $e;
-        }
-        // Inserting settings category for standard form
-        try {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'htx_settings_cat';
-            $link->autocommit(FALSE); //turn on transactions
-            $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingName, settingNameBack, special, specialName, settingType) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("isssss", $tableId, $settingName, $settingNameBack, $special, $specialName, $settingType);
-            $tableId = 1;
-            $settingName = "Billeter"; $settingNameBack='ticketType'; $special=1; $specialName="price"; $settingType="dropdown";
-            $stmt->execute();
-            $settingName = "Skole"; $settingNameBack='school'; $special=0; $specialName=""; $settingType="dropdown";
-            $stmt->execute();
-            $settingName = "klasse"; $settingNameBack='class'; $special=0; $specialName=""; $settingType="dropdown";
-            $stmt->execute();
-            $stmt->close();
-            $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        } catch(Exception $e) {
-            $link->rollback(); //remove all queries from queue if error (undo)
-            throw $e;
-        }
-        // Inserting settings for standard form
-        try {
-            global $wpdb;
-            $table_name = $wpdb->prefix . 'htx_settings';
-            $link->autocommit(FALSE); //turn on transactions
-            $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type, sorting) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("isssssi", $settingId, $settingName, $value, $special, $specialName, $settingType, $sorting);
-            $settingId = 1;
-            $settingName = "Billet type 1"; $value=10; $special=1; $specialName="price"; $settingType="dropdown"; $sorting = 1;
-            $stmt->execute();
-            $settingName = "Billet type 2"; $value=20; $special=1; $specialName="price"; $settingType="dropdown"; $sorting = 2;
-            $stmt->execute();
-            $settingId = 2;
-            $settingName = "HTX"; $value="HTX"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 1;
-            $stmt->execute();
-            $settingName = "HHX"; $value="HHX"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 2;
-            $stmt->execute();
-            $settingName = "EUX/EUC"; $value="EUX/EUC"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 3;
-            $stmt->execute();
-            $settingId = 3;
-            $settingName = "Klasse 1"; $value="Klasse 1"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 1;
-            $stmt->execute();
-            $settingName = "Klasse 2"; $value="Klasse 2"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 2;
-            $stmt->execute();
-            $stmt->close();
-            $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        } catch(Exception $e) {
-            $link->rollback(); //remove all queries from queue if error (undo)
-            throw $e;
-        }
     }
 ?>
