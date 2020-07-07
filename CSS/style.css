@@ -51,11 +51,11 @@
         border-collapse:collapse;
     }
     .InfoTable tr:nth-child(even) {
-        transition: var(--transition-speed-table) ease-in-out;
+        /* transition: var(--transition-speed-table) ease-in-out; */
         background: var(--text-secondary);
     }
     .InfoTable tr:nth-child(odd) {
-        transition: var(--transition-speed-table) ease-in-out;
+        /* transition: var(--transition-speed-table) ease-in-out; */
         background: white;
     }
     .InfoTable th {

@@ -76,6 +76,9 @@
             }
             $stmt3->close();
 
+            // Pre main column
+            echo "<th></th>";
+
             // Writing every column and insert into table head
             for ($i=0; $i < count($columnNameBack); $i++) { 
                 echo "<th>$columnNameFront[$i]</th>";
@@ -123,7 +126,8 @@
 
             // Getting and writing every user information
             for ($i=0; $i < count($userid); $i++) { 
-                echo "<tr>";
+                echo "<tr class='InfoTableRow'>";
+                echo "<td onclick=''><span class='material-icons'>edit</span></td>";
                 // For every column
                 for ($index=0; $index < count($columnNameBack); $index++) { 
                     echo "<td class=''>";
@@ -186,7 +190,7 @@
                 </td>";
 
                 // Arrived
-                echo "<td>";
+                echo "<td style='text-align: center'>";
                 echo "<form id='$i-arrived' method='POST'>";
                 echo "<input type='hidden' name='post' value='arrivedtUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
                 echo "<input type='hidden' name='arrived' value='0'>";
