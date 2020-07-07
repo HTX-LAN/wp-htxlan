@@ -11,16 +11,14 @@
         // Script for dropping databases
 
         // Script for creating databases
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            switch  ($_POST['postType']) {
-                case 'createDatabases':
-                    create_db();
-                    insert_data();
+        switch  ($_POST['postType']) {
+            case 'createDatabases':
+                create_db();
+                insert_data();
                 break;
-                case 'dropDatabases':
-                    drop_db();
+            case 'dropDatabases':
+                drop_db();
                 break;
-            }
         }
     }
 
@@ -47,7 +45,7 @@
                     $result = $stmt->get_result();
                     if($result->num_rows === 0) return "Table does not match";
                     $stmt->close();
-                    
+
                     // Checking values
                     // Check if mail exist
                     $table_name = $wpdb->prefix . 'htx_form_users';
@@ -57,7 +55,7 @@
                     $result = $stmt->get_result();
                     if($result->num_rows === 0) {} else return "Email already exist";
                     $stmt->close();
-                    
+
 
                     // Convert values to the right format
                     // Getting column info
@@ -80,7 +78,7 @@
                         }
                     }
                     $stmt->close();
-                    
+
                     // Inserting every input into row
                     try {
                         $link->autocommit(FALSE); //turn on transactions
@@ -97,16 +95,16 @@
                         $table_name = $wpdb->prefix . 'htx_form';
                         $stmt = $link->prepare("INSERT INTO `$table_name` (name, value, userId, tableId) VALUES (?, ?, ?, ?)");
                         $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
-                        for ($i=0; $i < count($columnNameBack); $i++) { 
+                        for ($i=0; $i < count($columnNameBack); $i++) {
                             $inputName = $columnNameBack[$i];
-                            $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]]))); 
+                            $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
 
                             // Missing validation of phone number and mail adress
 
                             // Missing validation of dropdown menu
 
-                            $stmt->execute();  
-                        }  
+                            $stmt->execute();
+                        }
                         $stmt->close();
                         $link->autocommit(TRUE); //turn off transactions + commit queued queries
                     } catch(Exception $e) {
@@ -116,7 +114,7 @@
                     }
 
                     // Error handling (Needs to be more specifik)
-                    
+
                     // Success handling
                     return "<span style='color: green'>Tilmeldingen blev tilføjet</span>";
                 break;
@@ -129,7 +127,7 @@
         // Connecting to database, with custom variable
         try {
             $link = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-        } catch(Exception $e) { 
+        } catch(Exception $e) {
             error_log($e->getMessage());
             return('Error connecting to database. Error message:'.$e); //Should be a message a typical user could understand
         }
@@ -142,7 +140,7 @@
         $launch = explode($delimiters[0], $ready);
         return  $launch;
     }
-    
+
     // Setting cookie
     function setCustomCookie($cookieName, $cookieValue) {
         wp_enqueue_script( 'cookie', "/wp-content/plugins/WPPlugin-HTXLan/JS/cookie.js");
@@ -168,17 +166,17 @@
 
     // Script to get url for backend
     function getUrl() {
-        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')   
-         $url = "https://";   
-        else  
-            $url = "http://";   
-        // Append the host(domain name, ip) to the URL.   
-        $url.= $_SERVER['HTTP_HOST'];   
-        
-        // Append the requested resource location to the URL   
-        $url.= $_SERVER['REQUEST_URI'];    
-        
-        return $url; 
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+         $url = "https://";
+        else
+            $url = "http://";
+        // Append the host(domain name, ip) to the URL.
+        $url.= $_SERVER['HTTP_HOST'];
+
+        // Append the requested resource location to the URL
+        $url.= $_SERVER['REQUEST_URI'];
+
+        return $url;
     }
 
     // Script to create new form
@@ -203,9 +201,9 @@
             $link->autocommit(FALSE); //turn on transactions
             $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, required, settingCat) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("issssssisii", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $required, $settingCat);
-            $tableId = $newTableId; 
+            $tableId = $newTableId;
             $columnNameFront = "Fornavn"; $columnNameBack='firstName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 1; $placeholderText = "John"; $adminOnly = 0; $required = 1; $settingCat = 0;
-            $stmt->execute();  
+            $stmt->execute();
             $columnNameFront = "Efternavn"; $columnNameBack='lastName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 2; $placeholderText = "Smith"; $adminOnly = 0; $required = 1; $settingCat = 0;
             $stmt->execute();
             $columnNameFront = "E-mail"; $columnNameBack='email'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 3; $placeholderText = "john@htx-lan.dk"; $adminOnly = 0; $required = 1; $settingCat = 0;
@@ -228,7 +226,7 @@
             // throw $e;
             return "<span style='color: red'>Tilmeldingen blev ikke tilføjet</span>";
         }
-        
+
     }
 
     // Participant list post handling from backend
@@ -238,7 +236,7 @@
         $link = database_connection();
         global $wpdb;
 
-        
+
 
         // Post handling
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -260,14 +258,14 @@
                         $stmt->close();
                         // Getting and checking user id
                         if (!isset($_POST['userId']) AND !in_array(intval($_POST['userId']), $userIds)) break;
-                        
+
                         // Getting and checking new payment id
                         // Payment type
                         $paymentMethods = array("Kontant", "Mobilepay");
                         $paymentMethodsId = array("0", "0-f", "1-f","0-i", "1-i");
                         if (!isset($_POST['paymentOption']) AND !in_array($_POST['paymentOption'], $paymentMethodsId)) break;
 
-                        
+
                         // Sending new payment id to server
                         $table_name = $wpdb->prefix . 'htx_form_users';
                         $stmt = $link->prepare("UPDATE $table_name SET payed = ? WHERE id = ?");
@@ -299,12 +297,12 @@
                         $stmt->close();
                         // Getting and checking user id
                         if (!isset($_POST['userId']) AND !in_array(intval($_POST['userId']), $userIds)) break;
-                        
+
                         // Getting and checking new payment id
                         // Payment type
                         if ($_POST['arrived'] != "0" AND $_POST['arrived'] != "1") break;
 
-                        
+
                         // Sending new payment id to server
                         $table_name = $wpdb->prefix . 'htx_form_users';
                         $stmt = $link->prepare("UPDATE $table_name SET arrived = ? WHERE id = ?");
