@@ -3,7 +3,7 @@
 
     // Admin page creation
     add_action('admin_menu', 'setup_admin_menu');
-    
+
     // Creating setup for pages
     function setup_admin_menu(){
         //https://wordpress.stackexchange.com/questions/270783/how-to-make-multiple-admin-pages-for-one-plugin/301806
@@ -15,15 +15,18 @@
         add_submenu_page('HTXLan', 'HTX LAN form oprettor', 'Form creator', 'manage_options', 'HTX_lan_create_form', 'HTX_lan_create_function');
         // add_submenu_page('HTXLan', 'HTX LAN økonomi', 'Økonomi', 'manage_options', 'HTX_lan_economic', 'HTX_lan_economic_function');
     }
-    
+
 
     // admin page content
     function main_admin_page(){
+        //Post handling
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            HTX_backend_post_dangerZone();
+            return;
+        }
+
         // Widgets and style
         HTX_load_standard_backend();
-
-        // Post handling - Dangerzone
-        HTX_backend_post_dangerZone();
 
         // Header
         echo "<h1>HTX Lan tilmeldings admin</h1>";
@@ -48,8 +51,8 @@
         echo "<button class='button' onclick='HTXJS_createDatabases(\"$actual_link\")'>Opret databaser</button><br>";
         echo "<button class='button' type='submit'>Download data</button>";
     }
-    
-    
+
+
     // admin submenu
     // admin submenu page content - HTX LAN tildmelder liste
     function HTX_lan_participants_list_function(){
