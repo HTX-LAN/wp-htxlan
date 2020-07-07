@@ -46,7 +46,7 @@ Form creator, er hvor hver form ændres og sættes op
   - [x] Tilføj dropdown input felt
   - [x] Tilføje elementer til dropdown inputs
   - [x] Tilføj text område input
-  - [ ] Tilføj radio input
+  - [x] Tilføj radio input
   - [ ] Tilføj checkbox input
   - [ ] Tilføj teams input
   - [x] Sætte input som *required*
