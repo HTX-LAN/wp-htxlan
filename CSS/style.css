@@ -299,3 +299,15 @@
     .addtablebtn:hover {
         background-color: var(--submit-color-primary);
     }
+
+
+    /* Payment status */
+    .payed, form select .payed {
+        background-color: var(--submit-color-secondary);
+    }
+    .unpayed {
+        background-color: var(--cancel-color-tertiary);
+    }
+    .crewpayed, form select .crewpayed {
+        background-color: var(--brand-secondary);
+    }
