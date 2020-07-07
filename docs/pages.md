@@ -46,7 +46,7 @@ Form creator, er hvor hver form ændres og sættes op
   - [x] Tilføj dropdown input felt
   - [x] Tilføje elementer til dropdown inputs
   - [x] Tilføj text område input
-  - [ ] Tilføj radio input
+  - [x] Tilføj radio input
   - [ ] Tilføj checkbox input
   - [ ] Tilføj teams input
   - [x] Sætte input som *required*
@@ -55,7 +55,6 @@ Form creator, er hvor hver form ændres og sættes op
   - [ ] Vis input i form baseret på andet inputs indhold
   - [ ] Input påvirker pris for deltager
   - [ ] Element som viser samlet pris inden formular kan blive indsendt
-  - [ ] Element til 
 
 ### Økonomi *(Ikke begyndt)*
 Denne side viser økonomi for event
