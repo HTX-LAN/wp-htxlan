@@ -55,7 +55,6 @@ Form creator, er hvor hver form ændres og sættes op
   - [ ] Vis input i form baseret på andet inputs indhold
   - [ ] Input påvirker pris for deltager
   - [ ] Element som viser samlet pris inden formular kan blive indsendt
-  - [ ] Element til 
 
 ### Økonomi *(Ikke begyndt)*
 Denne side viser økonomi for event
