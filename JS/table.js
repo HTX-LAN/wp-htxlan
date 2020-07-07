@@ -29,3 +29,11 @@ function() {
         $(this).parents('table').find('th:nth-child(' + t + ')').removeClass('highlighted');
     }
 });
+
+// Delete submission
+function confirmDelete(id) {
+    var userConfirm = confirm("Er du sikker på at du vil slette denne tilmelding. Dette er en permanent handling");
+    if (userConfirm == true) {
+        document.forms[id].submit();
+    }
+}

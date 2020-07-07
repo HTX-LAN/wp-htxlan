@@ -85,7 +85,10 @@
             }
             // Writing extra lines
             echo "<th>Betaling</th>";
-            echo "<th><span class='material-icons' title='Ankommet'>flight_land</span></th>";
+            echo "<th><span class='material-icons' title='Ankommet' style='cursor: help'>flight_land</span></th>";
+            echo "<th>Pris</th>";
+            echo "<th></th>";
+
             // Ending head
             echo "</tr></head>";
 
@@ -127,10 +130,10 @@
             // Getting and writing every user information
             for ($i=0; $i < count($userid); $i++) { 
                 echo "<tr class='InfoTableRow'>";
-                echo "<td onclick=''><span class='material-icons'>edit</span></td>";
+                echo "<td><span class='material-icons' style='cursor: pointer'>edit</span></td>";
                 // For every column
                 for ($index=0; $index < count($columnNameBack); $index++) { 
-                    echo "<td class=''>";
+                    echo "<td>";
                     // Getting data for specefied column
                     $table_name2 = $wpdb->prefix . 'htx_form';
                     $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableid = ? AND userId = ? AND name = ?");
@@ -200,6 +203,19 @@
                 echo "</form>";
                 echo "</td>";
 
+                // Price
+                echo "<td></td>";
+
+                // Delete
+                echo "<td>
+                <a>
+                    <form name='deleteForm-$i' id='deleteForm-$i' method='POST'>
+                        <input type='hidden' name='userid' value='$userid[$i]'>
+                        <input type='hidden' name='delete' value='deleteSubmission'>
+                        <span class='material-icons' style='cursor: pointer' onclick='confirmDelete(\"deleteForm-$i\")'>delete_forever</span>
+                    </form>
+                </a>
+                </td>";
             }
             
         }
