@@ -34,7 +34,6 @@
 
         // Creating table where forms tables users goes
         $table_name = $wpdb->prefix . 'htx_form_users';
-<<<<<<< HEAD
         //Verify that table does not exist
         $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\"");
         if(!$res) {
@@ -57,29 +56,6 @@
             ) $charset_collate;";
             dbDelta( $sql );
         }
-=======
-        //Verify that table does not exist
-        $res = $link->query("SELECT * FROM information_schema.tables WHERE TABLE_NAME = \"$table_name\"");
-        if(!$res) {
-            //Failed to query database
-            throw new Exception($link->error);
-        }
-        if($res->num_rows == 0) {
-            //Table does not exist - create it
-            $sql = "CREATE TABLE $table_name (
-            id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-            active INT NOT NULL DEFAULT 1,
-            tableId INT,
-            payed varchar(255) default 0,
-            arrived INT default 0,
-            price FLOAT default 0,
-            email TEXT,
-            dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
-            dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            ) $charset_collate;";
-            dbDelta( $sql );
-        }
->>>>>>> 3c2e58c07f5e667d933471c9393f620dc682bb59
 
         // Creating table where forms tables names goes, and if they are active or not
         $table_name = $wpdb->prefix . 'htx_form_tables';
