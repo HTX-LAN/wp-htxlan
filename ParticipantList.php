@@ -33,17 +33,17 @@
         echo "<p><h3>Formular:</h3> ";
         echo "<form method=\"get\"><input type='hidden' name='page' value='HTX_lan_participants_list'><select name='formular' class='dropdown' onchange='form.submit()'>";
         // writing every option
-        for ($i=0; $i < count($tableIds); $i++) { 
+        for ($i=0; $i < count($tableIds); $i++) {
             // Seeing if value is the choosen one
             if ($tableIds[$i] == $tableId) $isSelected = "selected"; else $isSelected = "";
 
             // Writing value
             echo "<option value='$tableIds[$i]' $isSelected>$tableNames[$i]</option>";
         }
-        
+
         // Ending dropdown
         echo "</select></form><br></p>";
-        
+
         // Start of table with head
         echo "<div class='formGroup_container'><div class='formGroup formGroup_scroll_left'><table class='InfoTable'><thead><tr>";
 
@@ -80,7 +80,7 @@
             echo "<th></th>";
 
             // Writing every column and insert into table head
-            for ($i=0; $i < count($columnNameBack); $i++) { 
+            for ($i=0; $i < count($columnNameBack); $i++) {
                 echo "<th>$columnNameFront[$i]</th>";
             }
             // Writing extra lines
@@ -131,7 +131,7 @@
 
 
             // Getting and writing every user information
-            for ($i=0; $i < count($userid); $i++) { 
+            for ($i=0; $i < count($userid); $i++) {
                 // Starting price
                 $price = 0;
                 $priceExtra = 0;
@@ -139,7 +139,7 @@
                 echo "<tr class='InfoTableRow'>";
                 echo "<td><span class='material-icons' style='cursor: pointer'>edit</span></td>";
                 // For every column
-                for ($index=0; $index < count($columnNameBack); $index++) { 
+                for ($index=0; $index < count($columnNameBack); $index++) {
                     echo "<td>";
                     // Getting data for specefied column
                     $table_name2 = $wpdb->prefix . 'htx_form';
@@ -156,7 +156,7 @@
                                 // Writing price
                                 if (in_array('price_intrance', $specialName[$index])) {
                                     $price = $price + floatval($settingValue[$row2['value']]);
-                                    
+
                                 }
                                 if (in_array('price_extra', $specialName[$index])) {
                                     $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
@@ -167,12 +167,12 @@
                                 // Writing price
                                 if (in_array('price_intrance', $specialName[$index])) {
                                     $price = $price + floatval($row2['value']);
-                                } 
+                                }
                                 if (in_array('price_intrance', $specialName[$index])) {
                                     $priceExtra = $priceExtra + floatval($row2['value']);
                                 }
-                            }                         
-                        } 
+                            }
+                        }
                     }
                     $stmt2->close();
                     echo "</td>";
@@ -185,9 +185,9 @@
                 $paymentMethodsId = array("0", "0-f", "1-f");
 
                 echo "<td ";
-                if ($payed[$i] == "0") echo "class='unpayed'"; 
-                else if ($payed[$i] == "0-i" OR $payed[$i] == "1-i") echo "class='crewpayed'"; 
-                else if (in_array($payed[$i], $paymentMethodsId)) echo "class='payed'"; 
+                if ($payed[$i] == "0") echo "class='unpayed'";
+                else if ($payed[$i] == "0-i" OR $payed[$i] == "1-i") echo "class='crewpayed'";
+                else if (in_array($payed[$i], $paymentMethodsId)) echo "class='payed'";
                 echo ">
                     <form id='$i-pay' method='POST'>
                     <input type='hidden' name='userId' value='$userid[$i]'>
@@ -196,7 +196,7 @@
                         <option value='0'";
                     if ($payed[$i] == 0) echo "selected";
                         echo">Ingen</option>";
-                for ($j=0; $j < count($paymentMethods); $j++) { 
+                for ($j=0; $j < count($paymentMethods); $j++) {
                     echo "<option value='$j-f'";
                     if ($payed[$i] == "$j-f") echo "selected";
                     echo">$paymentMethods[$j]</option>";
@@ -248,7 +248,7 @@
                     }
                     $stmt2->close();
                 }
-                
+
 
                 // Delete
                 echo "<td>
@@ -261,7 +261,7 @@
                 </a>
                 </td>";
             }
-            
+
         }
         $stmt->close();
 

@@ -12,12 +12,9 @@
 
         // Script for creating databases
         switch  ($_POST['postType']) {
-            case 'createDatabases':
-                create_db();
-                insert_data();
-                break;
-            case 'dropDatabases':
+            case 'resetDB':
                 drop_db();
+                create_db();
                 break;
         }
     }
@@ -334,12 +331,12 @@
                         $stmt->close();
                         // Getting and checking user id
                         if (!isset($_POST['userId']) AND !in_array(intval($_POST['userId']), $userIds)) break;
-                        
+
                         // Getting and checking new payment id
                         // Payment type
                         if ($_POST['crew'] != "0" AND $_POST['crew'] != "1") break;
 
-                        
+
                         // Sending new payment id to server
                         $table_name = $wpdb->prefix . 'htx_form_users';
                         $stmt = $link->prepare("UPDATE $table_name SET crew = ? WHERE id = ?");

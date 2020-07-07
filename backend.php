@@ -42,13 +42,12 @@
         echo "<p>Antal input felter: inputCount</p>";
 
 
-        // Danger zone - Create, delete and reset tables - (Skal laves om til at køre direkte load på siden (reload med post), istedet for via jquery)
+        // Danger zone - Reset tables - (Skal laves om til at køre direkte load på siden (reload med post), istedet for via jquery)
         echo "<h3>Farlig zone</h3>";
         HTX_danger_zone();
         $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_DeleteParticipants()'>Slet alle tilmeldinger</button><br>";
-        echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_dropDatabases(\"$actual_link\")'>Slet databaser</button><br>";
-        echo "<button class='btn updateBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_createDatabases(\"$actual_link\")'>Opret databaser</button><br>";
+        echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_resetDatabases(\"$actual_link\")'>Nulstil databaser</button><br>";
         echo "<button class='btn updateBtn' style='margin-bottom: 0.5rem;' type='submit'>Download data</button>";
     }
 
