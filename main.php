@@ -3,7 +3,7 @@
     * Plugin Name: HTX-Lan
     * Plugin URI: https://the0mikkel.github.io/WPPlugin-HTXLan/
     * Description: This plugin, is a custom plugin for HTX-lan's website
-    * Version: 0.1.4
+    * Version: 0.1.5
     * Author: Mikkel Albrechtsen & Frej
     * Author URI: https://the0mikkel.github.io/WPPlugin-HTXLan/
     */

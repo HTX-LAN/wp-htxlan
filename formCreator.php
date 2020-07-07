@@ -73,6 +73,10 @@
         // Possible formats types in array
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month'); #Missing "tel", but needs more backend work - needs pattern attribute to work
 
+        // Possible functions
+        $possibleFunctions = array('price_intrance', 'price_extra');
+        $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris');
+
         // Make div
         echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
 
@@ -374,13 +378,21 @@
                             $link->autocommit(FALSE); //turn on transactions
                             $table_name = $wpdb->prefix . 'htx_column';
                             $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ? WHERE id = ?");
-                            $stmt1->bind_param("ssisiiisi", htmlspecialchars(trim($_POST['columnNameFront'])), $formatPost, $speciealPost, htmlspecialchars(trim($_POST['specialName'])), intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, $setting);
-                            if (trim($_POST['specialName']) == "") $speciealPost = 0; else $speciealPost = 1;
+                            $stmt1->bind_param("ssisiiisi", htmlspecialchars(trim($_POST['columnNameFront'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, $setting);
+                            if ($_POST['specialName'] == "") $speciealPost = 0; else $speciealPost = 1;
+                            // Updating special, and inserting as array
+                            if(!empty($_POST['specialName'])) {
+                                foreach($_POST['specialName'] as $specials) {
+                                    $specialPostArrayStart[] = $specials;
+                                }
+                                $specialPostArray = implode(",", $specialPostArrayStart);
+                            } else $specialPostArray = "";
+
                             $stmt1->execute();
                             $stmt1->close();
 
                             $link->autocommit(TRUE); //turn off transactions + commit queued queries
-                            echo "<script>location.reload();</script>";
+                            // echo "<script>location.reload();</script>";
                         } catch(Exception $e) {
                             $link->rollback(); //remove all queries from queue if error (undo)
                             throw $e;
@@ -517,7 +529,7 @@
                     $format = $row['format'];
                     $columnType = $row['columnType'];
                     $special = $row['special'];
-                    $specialName = $row['specialName'];
+                    $specialName = explode(",", $row['specialName']);
                     $placeholderText = $row['placeholderText'];
                     $sorting = $row['sorting'];
                     $disabled = $row['disabled'];
@@ -540,13 +552,19 @@
 
                     switch ($columnType) {
                         case "dropdown":
-                            echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+                            echo "<div class='formCreator_edit_container formCreator_flexColumn'>";
                             // Name
                             echo "<div><label for='settingName'>Navn </label> <input type='text' id='settingName' class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
                             // Column type
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
-                            echo "<div><label for='settingSpecial'>Funktion navn </label> <input type='text' id='settingSpecial' class='inputBox' name='specialName' value='$specialName'></div>";
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctions); $i++) { 
+                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Required
@@ -622,7 +640,13 @@
                             // Column type
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
-                            echo "<div><label for='settingSpecial'>Funktion navn </label> <input type='text' id='settingSpecial' class='inputBox' name='specialName' value='$specialName'></div>";
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctions); $i++) { 
+                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Required
@@ -705,7 +729,13 @@
                             // Column type
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
-                            echo "<div><label for='settingSpecial'>Funktion navn </label> <input type='text' id='settingSpecial' class='inputBox' name='specialName' value='$specialName'></div>";
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctions); $i++) { 
+                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
                             // Placeholder text
                             echo "<div><label for='settingPlaceholder'>Placeholder tekst </label><input type='$format' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
                             // Sorting
@@ -761,7 +791,13 @@
                             // Column type
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
-                            echo "<div><label for='settingSpecial'>Funktion navn </label> <input type='text' id='settingSpecial' class='inputBox' name='specialName' value='$specialName'></div>";
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctions); $i++) { 
+                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Required

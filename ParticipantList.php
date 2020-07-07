@@ -45,7 +45,7 @@
         echo "</select></form><br></p>";
         
         // Start of table with head
-        echo "<div class='formGroup formGroup_scroll_left'><div class='formGroup_container'><table class='InfoTable'><thead><tr>";
+        echo "<div class='formGroup_container'><div class='formGroup formGroup_scroll_left'><table class='InfoTable'><thead><tr>";
 
         // Getting information from database
         // Users
@@ -68,7 +68,7 @@
                     $format[] = $row3['format'];
                     $columnType[] = $row3['columnType'];
                     $special[] = $row3['special'];
-                    $specialName[] = $row3['specialName'];
+                    $specialName[] = explode(",", $row3['specialName']);
                     $placeholderText[] = $row3['placeholderText'];
                     $sorting[] = $row3['sorting'];
                     $required[] = $row3['required'];
@@ -86,6 +86,7 @@
             // Writing extra lines
             echo "<th>Betaling</th>";
             echo "<th><span class='material-icons' title='Ankommet' style='cursor: help'>flight_land</span></th>";
+            echo "<th><span class='material-icons' title='Person er en del af crew' style='cursor: help'>people_alt</span></th>";
             echo "<th>Pris</th>";
             echo "<th></th>";
 
@@ -101,6 +102,8 @@
                 $userid[] = $row['id'];
                 $payed[] = $row['payed'];
                 $arrived[] = $row['arrived'];
+                $crew[] = $row['crew'];
+                $prices[] = $row['price'];
             }
 
             // Getting every dropdown and radio categories
@@ -129,6 +132,10 @@
 
             // Getting and writing every user information
             for ($i=0; $i < count($userid); $i++) { 
+                // Starting price
+                $price = 0;
+                $priceExtra = 0;
+
                 echo "<tr class='InfoTableRow'>";
                 echo "<td><span class='material-icons' style='cursor: pointer'>edit</span></td>";
                 // For every column
@@ -146,11 +153,25 @@
                             if (in_array($row2['name'], $settingNameBacks)) {
                                 // Writing data from id
                                 echo htmlspecialchars($settingName[$row2['value']]);
+                                // Writing price
+                                if (in_array('price_intrance', $specialName[$index])) {
+                                    $price = $price + floatval($settingValue[$row2['value']]);
+                                    
+                                }
+                                if (in_array('price_extra', $specialName[$index])) {
+                                    $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
+                                }
                             } else {
                                 // Writing data from table
                                 echo htmlspecialchars($row2['value']);
-                            }
-                            
+                                // Writing price
+                                if (in_array('price_intrance', $specialName[$index])) {
+                                    $price = $price + floatval($row2['value']);
+                                } 
+                                if (in_array('price_intrance', $specialName[$index])) {
+                                    $priceExtra = $priceExtra + floatval($row2['value']);
+                                }
+                            }                         
                         } 
                     }
                     $stmt2->close();
@@ -161,7 +182,7 @@
 
                 // Getting different payed option - These are pre determined, such as cash, mobilepay, bank, free ticket, free
                 $paymentMethods = array("Kontant", "Mobilepay");
-                $paymentMethodsId = array("0", "0-f", "1-f","0-i", "1-i");
+                $paymentMethodsId = array("0", "0-f", "1-f");
 
                 echo "<td ";
                 if ($payed[$i] == "0") echo "class='unpayed'"; 
@@ -174,21 +195,13 @@
                     <select name='paymentOption'  onchange='document.getElementById(\"$i-pay\").submit()'>
                         <option value='0'";
                     if ($payed[$i] == 0) echo "selected";
-                        echo">Ingen</option>
-                        <optgroup label='Fuld pris'>";
+                        echo">Ingen</option>";
                 for ($j=0; $j < count($paymentMethods); $j++) { 
                     echo "<option value='$j-f'";
                     if ($payed[$i] == "$j-f") echo "selected";
                     echo">$paymentMethods[$j]</option>";
                 }
-                echo "</optgroup><optgroup label='Gratis indgang'>";
-                for ($j=0; $j < count($paymentMethods); $j++) { 
-                    echo "<option value='$j-i'";
-                    if ($payed[$i] == "$j-i") echo "selected";
-                    echo">$paymentMethods[$j]</option>";
-                }
-                echo "</optgroup>
-                    </select>
+                echo "</select>
                     </form>
                 </td>";
 
@@ -203,8 +216,39 @@
                 echo "</form>";
                 echo "</td>";
 
+                // Crew
+                echo "<td style='text-align: center'>";
+                echo "<form id='$i-crew' method='POST'>";
+                echo "<input type='hidden' name='post' value='crewUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
+                echo "<input type='hidden' name='crew' value='0'>";
+                echo "<input id='crew-$i' type='checkbox' class='inputCheckbox' name='crew' value='1' onchange='document.getElementById(\"$i-crew\").submit()'";
+                if ($crew[$i] == 1) {echo "checked"; $price = 0;}
+                echo ">";
+                echo "</form>";
+                echo "</td>";
+
                 // Price
-                echo "<td></td>";
+                $price = floatval($price) + floatval($priceExtra);
+                echo "<td>$price,-</td>";
+                // Updating price, if it does not match with what is in the database
+                if ($price != $prices[$i]) {
+                    $table_name2 = $wpdb->prefix . 'htx_form_users';
+                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE id = ?");
+                    $stmt2->bind_param("i", $userid[$i]);
+                    $stmt2->execute();
+                    $result2 = $stmt2->get_result();
+                    if($result2->num_rows === 0) echo "<scrip>location.reload();</script>" /* User does not exist */; else {
+                        while($row2 = $result2->fetch_assoc()) {
+                            $table_name4 = $wpdb->prefix . 'htx_form_users';
+                            $stmt4 = $link->prepare("UPDATE $table_name4 SET price = ? WHERE id = ?");
+                            $stmt4->bind_param("si", $price, $userid[$i]);
+                            $stmt4->execute();
+                            $stmt4->close();
+                        }
+                    }
+                    $stmt2->close();
+                }
+                
 
                 // Delete
                 echo "<td>

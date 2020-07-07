@@ -31,6 +31,8 @@
         tableId INT,
         payed varchar(255) default 0,
         arrived INT default 0,
+        crew INT default 0,
+        price FLOAT default 0,
         email TEXT,
         dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
         dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -171,7 +173,7 @@
             $stmt->execute();
             $columnNameFront = "Mobil nummer"; $columnNameBack='phone'; $format="number"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 4; $placeholderText = "12345678"; $required = 0; $settingCat = 0;
             $stmt->execute();
-            $columnNameFront = "Billet type"; $columnNameBack='ticketType'; $format="text"; $columnType="dropdown"; $special=1; $specialName="price"; $sorting = 5; $placeholderText = ""; $required = 1; $settingCat = 1;
+            $columnNameFront = "Billet type"; $columnNameBack='ticketType'; $format="text"; $columnType="dropdown"; $special=1; $specialName="price_intrance"; $sorting = 5; $placeholderText = ""; $required = 1; $settingCat = 1;
             $stmt->execute();
             $columnNameFront = "Skole"; $columnNameBack='school'; $format="text"; $columnType="dropdown"; $special=0; $specialName=""; $sorting = 6; $placeholderText = ""; $required = 1; $required = 1; $settingCat = 2;
             $stmt->execute();
