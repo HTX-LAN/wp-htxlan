@@ -27,10 +27,13 @@ Denne side har et overwiew af pluginnet
 Også kaldet: *Tilmelder liste*
 Denne side viser alle tilmeldte
 - [x] Se tilmeldinger baseret på form
-- [ ] Vise den rigtige dropdown værdi i tabel
+- [x] Vise den rigtige dropdown værdi i tabel
 - [ ] Ikke vise text områder som
-- [ ] Muligt at registrer person som betalt
-- [ ] Muligt at registrer person som ankommet
+- [x] Muligt at registrer person som betalt
+- [x] Muligt at registrer person som ankommet
+- [x] Muligt at slette tilmelding
+- [ ] Muligt at ændre tilmelding
+- [ ] Muligt at se endelige pris for tilmelding
 
 ### Form creator
 Form creator, er hvor hver form ændres og sættes op
