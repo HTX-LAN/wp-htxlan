@@ -128,7 +128,7 @@
                     case "dropdown":
                         // Getting settings category
                         $table_name2 = $wpdb->prefix . 'htx_settings_cat';
-                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND  id = ? LIMIT 1");
+                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
                         $stmt2->bind_param("ii", $tableId,  $settingCat);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
@@ -147,7 +147,7 @@
                         
                         // Getting dropdown content
                         $table_name2 = $wpdb->prefix . 'htx_settings';
-                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? ORDER by sorting ASC, value ASC");
+                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
                         $stmt2->bind_param("i", $setting_cat_settingId);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
@@ -183,9 +183,9 @@
                         // Disabled handling
                         if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
                         
-                        // Getting dropdown content
+                        // Getting radio content
                         $table_name2 = $wpdb->prefix . 'htx_settings';
-                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? ORDER by sorting ASC, value ASC");
+                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
                         $stmt2->bind_param("i", $setting_cat_settingId);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
@@ -196,8 +196,8 @@
                                 $setting_id = $row2['id'];
     
                                 // Write data
-                                echo "<input type='radio' id='$columnNameBack-$setting_id' name='$columnNameBack' value='$setting_id' class='dropdown $disabledClass' disabled>
-                                <label for='$columnNameBack-$setting_id' class='dropdown $disabledClass'>$setting_settingName</label><br>";
+                                echo "<input type='radio' id='$columnNameBack-$setting_id' name='$columnNameBack' value='$setting_id' class='radio $disabledClass' disabled>
+                                <label for='$columnNameBack-$setting_id' class='radio $disabledClass'>$setting_settingName</label><br>";
 
                             }
                         }
@@ -344,13 +344,14 @@
                                     try {
                                         $link->autocommit(FALSE); //turn on transactions
                                         $table_name = $wpdb->prefix . 'htx_settings';
-                                        $stmt1 = $link->prepare("UPDATE `$table_name` SET settingName = ?, value = ? WHERE id = ?");
+                                        $stmt1 = $link->prepare("UPDATE `$table_name` SET settingName = ?, value = ?, sorting = ?, active = ? WHERE id = ?");
                                         
                                         for ($i=0; $i < $settingAmount; $i++) { 
                                             // Update every setting
                                             // Id for line
                                             $lineId = intval($_POST['settingId-'.$i]);
-                                            $stmt1->bind_param("ssi", trim($_POST['settingName-'.$lineId]), trim($_POST['settingValue-'.$lineId]), $lineId);
+                                            if (intval($_POST['settingActive-'.$lineId]) != 0 AND intval($_POST['settingActive-'.$lineId]) != 1) $active = 1; else $active = trim($_POST['settingActive-'.$lineId]);
+                                            $stmt1->bind_param("ssiii", trim($_POST['settingName-'.$lineId]), trim($_POST['settingValue-'.$lineId]), intval($_POST['settingSorting-'.$lineId]), $active, $lineId);
                                             $stmt1->execute();
                                         }
                                         
@@ -572,8 +573,13 @@
                                             $row3['settingName'];
                                             $rowSettingId = $row3['value'];
 
-                                            echo "<div><label for='dropdownSettingName-$i'>Navn</label> <input type='text' id='dropdownSettingName-$i' class='inputBox' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
-                                            echo "<div><label for='dropdownSettingValue-$i'>Værdi</label> <input type='text' id='dropdownSettingValue-$i' class='inputBox' name='settingValue-".$row3['id']."' value='".$row3['value']."' style='margin-bottom:1.75rem;'></div>";
+                                            echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
+                                            echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
+                                            echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
+                                            echo "<input type='hidden' name='settingActive-".$row3['id']."' value='1'>";
+                                            echo "<div style='margin-bottom:1.75rem;'><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox' name='settingActive-".$row3['id']."' value='0'";
+                                            if ($row3['active'] == 0) echo "checked";
+                                            echo "></div>";
                                             echo "<input class='inputBox hidden' name='settingId-$i' value='".$row3['id']."'>";
 
                                             $i++;
@@ -614,34 +620,39 @@
                             // Dropdown options
                             echo "<h4>Radio muligheder</h4>";
 
-                            // Getting dropdown setting category
+                            // Getting radio setting category
                             $table_name2 = $wpdb->prefix . 'htx_settings_cat';
                             $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND id = ?");
                             $stmt2->bind_param("is", $tableId, $settingCat);
                             $stmt2->execute();
                             $result2 = $stmt2->get_result();
-                            if($result2->num_rows === 0) echo "<p>Ingen indstillinger for dropdown</p>"; else {
+                            if($result2->num_rows === 0) echo "<p>Ingen indstillinger for radio</p>"; else {
                                 while($row2 = $result2->fetch_assoc()) {
                                     $row2['id'];
                                     $row2['settingName'];
                                     $row2['special'];
                                     $row2['specialName'];
                                     $row2['settingType'];
-                                    // Getting dropdown settings
+                                    // Getting radio settings
                                     $table_name3 = $wpdb->prefix . 'htx_settings';
                                     $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ?");
                                     $stmt3->bind_param("i", $row2['id']);
                                     $stmt3->execute();
                                     $result3 = $stmt3->get_result();
                                     $i = 0;
-                                    if($result3->num_rows === 0) echo "<p>Ingen dropdown muligheder</p><br><button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button><button type='button' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button>"; else {
+                                    if($result3->num_rows === 0) echo "<p>Ingen radio muligheder</p><br><button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button><button type='button' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button>"; else {
                                         while($row3 = $result3->fetch_assoc()) {
                                             $row3['id'];
                                             $row3['settingName'];
                                             $rowSettingId = $row3['value'];
 
-                                            echo "<div><label for='dropdownSettingName-$i'>Navn</label> <input type='text' id='dropdownSettingName-$i' class='inputBox' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
-                                            echo "<div><label for='dropdownSettingValue-$i'>Værdi</label> <input type='text' id='dropdownSettingValue-$i' class='inputBox' name='settingValue-".$row3['id']."' value='".$row3['value']."' style='margin-bottom:1.75rem;'></div>";
+                                            echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
+                                            echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
+                                            echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
+                                            echo "<input type='hidden' name='settingActive-".$row3['id']."' value='1'>";
+                                            echo "<div style='margin-bottom:1.75rem;'><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox' name='settingActive-".$row3['id']."' value='0'";
+                                            if ($row3['active'] == 0) echo "checked";
+                                            echo "></div>";
                                             echo "<input class='inputBox hidden' name='settingId-$i' value='".$row3['id']."'>";
 
                                             $i++;

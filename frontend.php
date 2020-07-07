@@ -118,7 +118,7 @@
                     $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
                     // Getting settings category
                     $table_name = $wpdb->prefix . 'htx_settings_cat';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? LIMIT 1");
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
                     $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
                     $stmt->execute();
                     $result = $stmt->get_result();
@@ -131,7 +131,7 @@
                     
                     // Getting dropdown content
                     $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? ORDER BY sorting");
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? AND active = 1  ORDER BY sorting");
                     $stmt->bind_param("i", $setting_cat_settingId);
                     $stmt->execute();
                     $result = $stmt->get_result();
