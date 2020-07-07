@@ -52,7 +52,7 @@
                     // Check if mail exist
                     $table_name = $wpdb->prefix . 'htx_form_users';
                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
-                    $stmt->bind_param("si", trim($_POST['email']), $tableId);
+                    $stmt->bind_param("si", htmlspecialchars(trim($_POST['email'])), $tableId);
                     $stmt->execute();
                     $result = $stmt->get_result();
                     if($result->num_rows === 0) {} else return "Email already exist";
@@ -88,7 +88,7 @@
                         // Inserting user and getting id
                         $table_name = $wpdb->prefix . 'htx_form_users';
                         $stmt = $link->prepare("INSERT INTO `$table_name` (tableId, email) VALUES (?, ?)");
-                        $stmt->bind_param("is", $tableId, trim($_POST['email']));
+                        $stmt->bind_param("is", $tableId, htmlspecialchars(trim($_POST['email'])));
                         $stmt->execute();
                         $formUserId = $link->insert_id;
                         $stmt->close();
@@ -99,7 +99,7 @@
                         $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
                         for ($i=0; $i < count($columnNameBack); $i++) { 
                             $inputName = $columnNameBack[$i];
-                            $inputValue = strval(trim($_POST[$columnNameBack[$i]])); 
+                            $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]]))); 
 
                             // Missing validation of phone number and mail adress
 
@@ -297,11 +297,11 @@
                         }
                         $stmt->close();
                         // Getting and checking user id
-                        if (!isset($_POST['userId']) AND !in_array(intval($_POST['userId']), $userIds)) echo "break";
+                        if (!isset($_POST['userId']) AND !in_array(intval($_POST['userId']), $userIds)) break;
                         
                         // Getting and checking new payment id
                         // Payment type
-                        if ($_POST['arrived'] != "0" AND $_POST['arrived'] != "1") echo "break";
+                        if ($_POST['arrived'] != "0" AND $_POST['arrived'] != "1") break;
 
                         
                         // Sending new payment id to server

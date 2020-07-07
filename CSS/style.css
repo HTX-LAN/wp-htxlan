@@ -140,6 +140,8 @@
         /* To make scroll bar on left */
         .formGroup_container {
             direction: ltr;
+            overflow-y: auto;
+            overflow-x: scroll;
         }
         .formGroup::-webkit-scrollbar {
             width: 0.5rem;

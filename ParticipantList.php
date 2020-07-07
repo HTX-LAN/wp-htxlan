@@ -96,6 +96,31 @@
                 $payed[] = $row['payed'];
                 $arrived[] = $row['arrived'];
             }
+
+            // Getting every dropdown and radio categories
+            $table_name3 = $wpdb->prefix . 'htx_settings_cat';
+            $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE tableId = ? AND active = 1");
+            $stmt3->bind_param("i", $tableId);
+            $stmt3->execute();
+            $result3 = $stmt3->get_result();
+            if($result3->num_rows === 0) echo ""; else {
+                while($row3 = $result3->fetch_assoc()) {
+                    $settingNameBacks[] = $row3['settingNameBack'];
+                }
+            }
+            // Getting every dropdown and radio names and values
+            $table_name3 = $wpdb->prefix . 'htx_settings';
+            $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE active = 1");
+            $stmt3->execute();
+            $result3 = $stmt3->get_result();
+            if($result3->num_rows === 0) echo ""; else {
+                while($row3 = $result3->fetch_assoc()) {
+                    $settingName[$row3['id']] = $row3['settingName'];
+                    $settingValue[$row3['id']] = $row3['value'];
+                }
+            }
+
+
             // Getting and writing every user information
             for ($i=0; $i < count($userid); $i++) { 
                 echo "<tr>";
@@ -110,8 +135,15 @@
                     $result2 = $stmt2->get_result();
                     if($result2->num_rows === 0) echo "<i style='color: red'>Null</i>"; else {
                         while($row2 = $result2->fetch_assoc()) {
-                            // Writing data from table
-                            echo $row2['value'];
+                            // Checks if dropdown or other where value is an id
+                            if (in_array($row2['name'], $settingNameBacks)) {
+                                // Writing data from id
+                                echo htmlspecialchars($settingName[$row2['value']]);
+                            } else {
+                                // Writing data from table
+                                echo htmlspecialchars($row2['value']);
+                            }
+                            
                         } 
                     }
                     $stmt2->close();

@@ -249,8 +249,8 @@
                         if ($userInputType == 'dropdown') {
                             // If dropdown, then make setting category first
                             $table_name = $wpdb->prefix . 'htx_settings_cat';
-                            $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType) VALUES (?, ?, ?)");
-                            $stmt->bind_param("iss", $tableId, $columnNameBack, $columnType);
+                            $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType, special, specialName) VALUES (?, ?, ?, ?, ?)");
+                            $stmt->bind_param("iss", $tableId, $columnNameBack, $columnType, $special, $specialName);
                             $stmt->execute();
                             $settingCat = intval($link->insert_id);
                             if ($settingCat < 0) throw new Exception('Setting cat is bad');
@@ -261,15 +261,15 @@
                             $link->autocommit(FALSE); //turn on transactions
                             $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
                             $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
-                            $settingName = "new setting"; $value="new setting"; $special=0; $specialName=""; $settingType="dropdown";
+                            $settingName = "new setting"; $value="new setting"; $settingType="dropdown";
                             $stmt->execute(); 
                             $stmt->close();
                         }
                         if ($userInputType == 'radio') {
                             // If dropdown, then make setting category first
                             $table_name = $wpdb->prefix . 'htx_settings_cat';
-                            $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType) VALUES (?, ?, ?)");
-                            $stmt->bind_param("iss", $tableId, $columnNameBack, $columnType);
+                            $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType, special, specialName) VALUES (?, ?, ?, ?, ?)");
+                            $stmt->bind_param("iss", $tableId, $columnNameBack, $columnType, $special, $specialName);
                             $stmt->execute();
                             $settingCat = intval($link->insert_id);
                             if ($settingCat < 0) throw new Exception('Setting cat is bad');
@@ -280,7 +280,7 @@
                             $link->autocommit(FALSE); //turn on transactions
                             $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
                             $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
-                            $settingName = "new setting"; $value="new setting"; $special=0; $specialName=""; $settingType="radio";
+                            $settingName = "new setting"; $value="new setting"; $settingType="radio";
                             $stmt->execute(); 
                             $stmt->close();
                         }
@@ -351,7 +351,7 @@
                                             // Id for line
                                             $lineId = intval($_POST['settingId-'.$i]);
                                             if (intval($_POST['settingActive-'.$lineId]) != 0 AND intval($_POST['settingActive-'.$lineId]) != 1) $active = 1; else $active = trim($_POST['settingActive-'.$lineId]);
-                                            $stmt1->bind_param("ssiii", trim($_POST['settingName-'.$lineId]), trim($_POST['settingValue-'.$lineId]), intval($_POST['settingSorting-'.$lineId]), $active, $lineId);
+                                            $stmt1->bind_param("ssiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, $lineId);
                                             $stmt1->execute();
                                         }
                                         
@@ -369,12 +369,12 @@
                         
                             if (!isset($_POST['placeholderText'])) $placeholderText = ""; else $placeholderText = trim($_POST['placeholderText']);
                             if (intval($_POST['disabled']) == 1) $required = 0; else $required = intval($_POST['required']); #Disabeling the option for both required and hidden input
-                            if (in_array(trim($_POST['format']), $possibleFormat)) $formatPost = trim($_POST['format']); else $formatPost = $possibleFormat[0];
+                            if (in_array(trim($_POST['format']), $possibleFormat)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
                             if (trim($_POST['columnNameFront']) == "") break;
                             $link->autocommit(FALSE); //turn on transactions
                             $table_name = $wpdb->prefix . 'htx_column';
                             $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ? WHERE id = ?");
-                            $stmt1->bind_param("ssisiiisi", trim($_POST['columnNameFront']), $formatPost, $speciealPost, trim($_POST['specialName']), intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, $setting);
+                            $stmt1->bind_param("ssisiiisi", htmlspecialchars(trim($_POST['columnNameFront'])), $formatPost, $speciealPost, htmlspecialchars(trim($_POST['specialName'])), intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, $setting);
                             if (trim($_POST['specialName']) == "") $speciealPost = 0; else $speciealPost = 1;
                             $stmt1->execute();
                             $stmt1->close();
@@ -471,7 +471,7 @@
                                 $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
                                 $stmt->bind_param("ississ", $idNewSetting, $settingName, $value, $special, $specialName, $settingType);
                                 $settingName = "new setting"; $value="new setting"; $special=0; $specialName="";
-                                if (in_array($_POST['columnType'], $possibleInput)) $settingType=$_POST['columnType']; else $settingType="dropdown";
+                                if (in_array($_POST['columnType'], $possibleInput)) $settingType=htmlspecialchars($_POST['columnType']); else $settingType="dropdown";
                                 $stmt->execute(); 
                                 $stmt->close();
                                 $link->autocommit(TRUE); //turn off transactions + commit queued queries
