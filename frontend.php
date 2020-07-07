@@ -87,8 +87,6 @@
                         }
                     }
                     $stmt->close();
-                    // Writing first part of dropdown
-                    $html .= "<select name='$columnNameBack[$i]' class='dropdown $disabledClass' $isRequired>";
                     
                     // Getting dropdown content
                     $table_name = $wpdb->prefix . 'htx_settings';
@@ -96,7 +94,11 @@
                     $stmt->bind_param("i", $setting_cat_settingId);
                     $stmt->execute();
                     $result = $stmt->get_result();
-                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                    if($result->num_rows === 0)  {return $html .= "Der er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value=''>";} else {
+                        // Writing first part of dropdown
+                        $html .= "<select name='$columnNameBack[$i]' class='dropdown $disabledClass' $isRequired>";
+
+                        // Writing dropdown options
                         while($row = $result->fetch_assoc()) {
                             // Getting data
                             $setting_settingName = $row['settingName'];
@@ -108,11 +110,12 @@
                             // Write data
                             $html .= "<option value='$setting_id' $postSelected>".$setting_settingName."</option>";
                         }
+
+                        // Finishing dropdown
+                        $html .= "</select>";
                     }
                     $stmt->close();
-
-                    // Finishing dropdown
-                    $html .= "</select>";
+                    
                 break;
                 case "radio":
                     $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
@@ -135,7 +138,7 @@
                     $stmt->bind_param("i", $setting_cat_settingId);
                     $stmt->execute();
                     $result = $stmt->get_result();
-                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                    if($result->num_rows === 0) $html .= "Der er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value=''>"; else {
                         while($row = $result->fetch_assoc()) {
                             // Getting data
                             $setting_settingName = $row['settingName'];
@@ -151,6 +154,7 @@
                     }
                     $stmt->close();
 
+                    
                 break;
                 case "text area":
                     $html .= "<h5>$columnNameFront[$i]</h5>";

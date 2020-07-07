@@ -84,3 +84,8 @@
 .rtl {
     direction: rtl;
 }
+
+/* Input box */
+input {
+    width: 100%;
+}

@@ -132,7 +132,7 @@
                         $stmt2->bind_param("ii", $tableId,  $settingCat);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                        if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
                             while($row2 = $result2->fetch_assoc()) {
                                 $setting_cat_settingId = $row2['id'];
                             }
@@ -151,7 +151,7 @@
                         $stmt2->bind_param("i", $setting_cat_settingId);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                        if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
                             while($row2 = $result2->fetch_assoc()) {
                                 // Getting data
                                 $setting_settingName = $row2['settingName'];
@@ -173,7 +173,7 @@
                         $stmt2->bind_param("ii", $tableId,  $settingCat);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                        if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
                             while($row2 = $result2->fetch_assoc()) {
                                 $setting_cat_settingId = $row2['id'];
                             }
@@ -189,7 +189,7 @@
                         $stmt2->bind_param("i", $setting_cat_settingId);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                        if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
                             while($row2 = $result2->fetch_assoc()) {
                                 // Getting data
                                 $setting_settingName = $row2['settingName'];
@@ -482,6 +482,21 @@
                         }
                     break;
                 }
+                if (isset($_POST['deleteSetting']) AND intval($_POST['deleteSetting']) > 0) {
+                    $settingId = intval($_POST['deleteSetting']);
+                    try {
+                        $table_name = $wpdb->prefix . 'htx_settings';
+                        $link->autocommit(FALSE); //turn on transactions
+                        $stmt = $link->prepare("DELETE FROM $table_name WHERE id = ?");
+                        $stmt->bind_param("i", $settingId);
+                        $stmt->execute(); 
+                        $stmt->close();
+                        $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                    } catch(Exception $e) {
+                        $link->rollback(); //remove all queries from queue if error (undo)
+                        throw $e;
+                    }
+                }
             }
 
             // Make div
@@ -567,7 +582,7 @@
                                     $stmt3->execute();
                                     $result3 = $stmt3->get_result();
                                     $i = 0;
-                                    if($result3->num_rows === 0) echo "<p>Ingen dropdown muligheder</p><br><button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button><button type='button' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button>"; else {
+                                    if($result3->num_rows === 0) echo "<div><p>Ingen radio muligheder</p></div>"; else {
                                         while($row3 = $result3->fetch_assoc()) {
                                             $row3['id'];
                                             $row3['settingName'];
@@ -577,21 +592,24 @@
                                             echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
                                             echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
                                             echo "<input type='hidden' name='settingActive-".$row3['id']."' value='1'>";
-                                            echo "<div style='margin-bottom:1.75rem;'><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox' name='settingActive-".$row3['id']."' value='0'";
+                                            echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox' name='settingActive-".$row3['id']."' value='0'";
                                             if ($row3['active'] == 0) echo "checked";
                                             echo "></div>";
                                             echo "<input class='inputBox hidden' name='settingId-$i' value='".$row3['id']."'>";
+                                            echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                            echo "<div style='width: 100%;margin-bottom:1.75rem;'><button type='submit' name='deleteSetting' value='".$row3['id']."' class='btn deleteBtn'>Slet</button></div>";
 
                                             $i++;
                                         }
-                                        echo "<input class='inputBox hidden' name='settingsTrue' value='1'>";
-                                        echo "<input class='inputBox hidden' name='settingsAmount' value='$i'>";
-                                        echo "<input class='inputBox hidden' name='settingsId' value='". $row2['id']."'>";
-                                        echo "<input class='inputBox hidden' name='columnType' value='$columnType'>";
-                                        echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
-                                        echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button></div>";
+                                        
                                     }
                                     $stmt3->close();
+                                    echo "<input class='inputBox hidden' name='settingsTrue' value='1'>";
+                                    echo "<input class='inputBox hidden' name='settingsAmount' value='$i'>";
+                                    echo "<input class='inputBox hidden' name='settingsId' value='". $row2['id']."'>";
+                                    echo "<input class='inputBox hidden' name='columnType' value='$columnType'>";
+                                    echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button></div>";
                                 }
                             }
                             $stmt2->close();
@@ -618,7 +636,7 @@
                             if ($disabled == 1) echo "checked";
                             echo "></div>";
                             // Dropdown options
-                            echo "<h4>Radio muligheder</h4>";
+                            echo "<div><h4>Radio muligheder</h4></div>";
 
                             // Getting radio setting category
                             $table_name2 = $wpdb->prefix . 'htx_settings_cat';
@@ -626,21 +644,21 @@
                             $stmt2->bind_param("is", $tableId, $settingCat);
                             $stmt2->execute();
                             $result2 = $stmt2->get_result();
-                            if($result2->num_rows === 0) echo "<p>Ingen indstillinger for radio</p>"; else {
+                            if($result2->num_rows === 0) echo "<p>Ingen indstillinger for dropdown</p>"; else {
                                 while($row2 = $result2->fetch_assoc()) {
                                     $row2['id'];
                                     $row2['settingName'];
                                     $row2['special'];
                                     $row2['specialName'];
                                     $row2['settingType'];
-                                    // Getting radio settings
+                                    // Getting dropdown settings
                                     $table_name3 = $wpdb->prefix . 'htx_settings';
                                     $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ?");
                                     $stmt3->bind_param("i", $row2['id']);
                                     $stmt3->execute();
                                     $result3 = $stmt3->get_result();
                                     $i = 0;
-                                    if($result3->num_rows === 0) echo "<p>Ingen radio muligheder</p><br><button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button><button type='button' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button>"; else {
+                                    if($result3->num_rows === 0) echo "<div><p>Ingen radio muligheder, venligst tilføj en, før formularen kan bruges</p></div>"; else {
                                         while($row3 = $result3->fetch_assoc()) {
                                             $row3['id'];
                                             $row3['settingName'];
@@ -650,21 +668,24 @@
                                             echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
                                             echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
                                             echo "<input type='hidden' name='settingActive-".$row3['id']."' value='1'>";
-                                            echo "<div style='margin-bottom:1.75rem;'><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox' name='settingActive-".$row3['id']."' value='0'";
+                                            echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox' name='settingActive-".$row3['id']."' value='0'";
                                             if ($row3['active'] == 0) echo "checked";
                                             echo "></div>";
                                             echo "<input class='inputBox hidden' name='settingId-$i' value='".$row3['id']."'>";
+                                            echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                            echo "<div style='width: 100%;margin-bottom:1.75rem;'><button type='submit' name='deleteSetting' value='".$row3['id']."' class='btn deleteBtn'>Slet</button></div>";
 
                                             $i++;
                                         }
-                                        echo "<input class='inputBox hidden' name='settingsTrue' value='1'>";
-                                        echo "<input class='inputBox hidden' name='settingsAmount' value='$i'>";
-                                        echo "<input class='inputBox hidden' name='settingsId' value='". $row2['id']."'>";
-                                        echo "<input class='inputBox hidden' name='columnType' value='$columnType'>";
-                                        echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
-                                        echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button></div>";
+                                        
                                     }
                                     $stmt3->close();
+                                    echo "<input class='inputBox hidden' name='settingsTrue' value='1'>";
+                                    echo "<input class='inputBox hidden' name='settingsAmount' value='$i'>";
+                                    echo "<input class='inputBox hidden' name='settingsId' value='". $row2['id']."'>";
+                                    echo "<input class='inputBox hidden' name='columnType' value='$columnType'>";
+                                    echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button></div>";
                                 }
                             }
                             $stmt2->close();
