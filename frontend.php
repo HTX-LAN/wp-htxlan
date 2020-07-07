@@ -114,6 +114,44 @@
                     // Finishing dropdown
                     $html .= "</select>";
                 break;
+                case "radio":
+                    $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
+                    // Getting settings category
+                    $table_name = $wpdb->prefix . 'htx_settings_cat';
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? LIMIT 1");
+                    $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                        while($row = $result->fetch_assoc()) {
+                            $setting_cat_settingId = $row['id'];
+                        }
+                    }
+                    $stmt->close();
+                    
+                    // Getting dropdown content
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? ORDER BY sorting");
+                    $stmt->bind_param("i", $setting_cat_settingId);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                        while($row = $result->fetch_assoc()) {
+                            // Getting data
+                            $setting_settingName = $row['settingName'];
+                            $setting_id = $row['id'];
+
+                            // Set as selected from post
+                            if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
+
+                            // Write data
+                            $html .= "<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' value='$setting_id' class='inputBox  $disabledClass' $postSelected>
+                            <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label><br>";
+                        }
+                    }
+                    $stmt->close();
+
+                break;
                 case "text area":
                     $html .= "<h5>$columnNameFront[$i]</h5>";
                     $html .= "<p>$placeholderText[$i]</p>";
