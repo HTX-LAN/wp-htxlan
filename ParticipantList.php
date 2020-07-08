@@ -221,7 +221,7 @@
                 // Adding payed, and arrived at the end of inputs
                 // Payed
 
-                // Getting different payed option - These are pre determined, such as cash, mobilepay, bank, free ticket, free
+                // Getting different payed option - These are pre determined, such as cash, mobilepay
                 $paymentMethods = array("Kontant", "Mobilepay");
                 $paymentMethodsId = array("0", "0-f", "1-f");
 
