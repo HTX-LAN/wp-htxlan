@@ -178,7 +178,7 @@
                 $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingName, settingNameBack, special, specialName, settingType) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param("isssss", $tableId, $settingName, $settingNameBack, $special, $specialName, $settingType);
                 $tableId = 1;
-                $settingName = "Billeter"; $settingNameBack='ticketType'; $special=1; $specialName="price"; $settingType="dropdown";
+                $settingName = "Billeter"; $settingNameBack='ticketType'; $special=1; $specialName="price_intrance"; $settingType="dropdown";
                 $stmt->execute();
                 $settingName = "Skole"; $settingNameBack='school'; $special=0; $specialName=""; $settingType="dropdown";
                 $stmt->execute();
@@ -223,9 +223,9 @@
                 $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type, sorting) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param("isssssi", $settingId, $settingName, $value, $special, $specialName, $settingType, $sorting);
                 $settingId = 1;
-                $settingName = "Billet type 1"; $value=10; $special=1; $specialName="price"; $settingType="dropdown"; $sorting = 1;
+                $settingName = "Billet type 1"; $value=10; $special=1; $specialName="price_intrance"; $settingType="dropdown"; $sorting = 1;
                 $stmt->execute();
-                $settingName = "Billet type 2"; $value=20; $special=1; $specialName="price"; $settingType="dropdown"; $sorting = 2;
+                $settingName = "Billet type 2"; $value=20; $special=1; $specialName="price_intrance"; $settingType="dropdown"; $sorting = 2;
                 $stmt->execute();
                 $settingId = 2;
                 $settingName = "HTX"; $value="HTX"; $special=0; $specialName=""; $settingType="dropdown"; $sorting = 1;
