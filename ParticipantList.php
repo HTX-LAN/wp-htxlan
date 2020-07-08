@@ -196,7 +196,6 @@
                                     if (in_array('price_extra', $specialName[$index])) {
                                         $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
                                     }
-                                    echo "check5";
                                 }
                                 
                             } else {
