@@ -76,12 +76,18 @@
             }
             $stmt3->close();
 
+            // Non user editable inputs saved
+            $nonUserInput = array('text area');
+
             // Pre main column
             echo "<th></th>";
 
             // Writing every column and insert into table head
             for ($i=0; $i < count($columnNameBack); $i++) {
-                echo "<th>$columnNameFront[$i]</th>";
+                // Check if input should not be shown
+                if (!in_array($columnType[$i], $nonUserInput)) {
+                    echo "<th>$columnNameFront[$i]</th>";
+                }
             }
             // Writing extra lines
             echo "<th>Betaling</th>";
@@ -141,14 +147,18 @@
                 echo "<td><span class='material-icons' style='cursor: pointer'>edit</span></td>";
                 // For every column
                 for ($index=0; $index < count($columnNameBack); $index++) {
-                    echo "<td>";
                     // Getting data for specefied column
                     $table_name2 = $wpdb->prefix . 'htx_form';
                     $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableid = ? AND userId = ? AND name = ?");
                     $stmt2->bind_param("iis", $tableId, $userid[$i], $columnNameBack[$index]);
                     $stmt2->execute();
                     $result2 = $stmt2->get_result();
-                    if($result2->num_rows === 0) echo "<i style='color: red'>Null</i>"; else {
+                    if($result2->num_rows === 0) {
+                        if (!in_array($columnType[$index], $nonUserInput)) {
+                            echo "<i style='color: red'>Null</i>";
+                        }
+                    }else {
+                        echo "<td>";
                         while($row2 = $result2->fetch_assoc()) {
                             // Checks if dropdown or other where value is an id
                             if (in_array($row2['name'], $settingNameBacks)) {
@@ -190,20 +200,23 @@
                                 }
                                 
                             } else {
-                                // Writing data from table
-                                echo htmlspecialchars($row2['value']);
-                                // Writing price
-                                if (in_array('price_intrance', $specialName[$index])) {
-                                    $price = $price + floatval($row2['value']);
-                                }
-                                if (in_array('price_intrance', $specialName[$index])) {
-                                    $priceExtra = $priceExtra + floatval($row2['value']);
+                                // Checks column type
+                                if (!in_array($columnType[$index], $nonUserInput)) {
+                                    // Writing data from table
+                                    echo htmlspecialchars($row2['value']);
+                                    // Writing price
+                                    if (in_array('price_intrance', $specialName[$index])) {
+                                        $price = $price + floatval($row2['value']);
+                                    }
+                                    if (in_array('price_intrance', $specialName[$index])) {
+                                        $priceExtra = $priceExtra + floatval($row2['value']);
+                                    }
                                 }
                             }
                         }
+                        echo "</td>";
                     }
                     $stmt2->close();
-                    echo "</td>";
                 }
                 // Adding payed, and arrived at the end of inputs
                 // Payed
