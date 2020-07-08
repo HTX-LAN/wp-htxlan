@@ -164,6 +164,7 @@
                                                 $price = $price + floatval($settingValue[$valueArray[$j]]);
         
                                             }
+                                            // Writing extra price
                                             if (in_array('price_extra', $specialName[$index])) {
                                                 $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
                                             }
@@ -181,6 +182,7 @@
                                         $price = $price + floatval($settingValue[$row2['value']]);
 
                                     }
+                                    // Writing extra price
                                     if (in_array('price_extra', $specialName[$index])) {
                                         $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
                                     }
