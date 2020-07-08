@@ -16,7 +16,7 @@
     $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 ORDER BY favorit DESC, tableName ASC");
     $stmt->execute();
     $result = $stmt->get_result();
-    if($result->num_rows === 0) echo "Ingen registreringer"; else {
+    if($result->num_rows === 0) echo "Ingen formularer"; else {
         while($row = $result->fetch_assoc()) {
             $tableIds[] = $row['id'];
             $tableNames[] = $row['tableName'];
