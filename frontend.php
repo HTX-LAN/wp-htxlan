@@ -126,34 +126,79 @@
                     $stmt->execute();
                     $result = $stmt->get_result();
                     if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
-                        while($row = $result->fetch_assoc()) {
-                            $setting_cat_settingId = $row['id'];
+                        while($row2 = $result->fetch_assoc()) {
+                            $setting_cat_settingId = $row2['id'];
                         }
+                        // Disabled handling
+                        if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
+                        
+                        // Getting radio content
+                        $table_name3 = $wpdb->prefix . 'htx_settings';
+                        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
+                        $stmt3->bind_param("i", $setting_cat_settingId);
+                        $stmt3->execute();
+                        $result3 = $stmt3->get_result();
+                        if($result3->num_rows === 0) $html .= "Der er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value='' disabled>"; else {
+                            while($row3 = $result3->fetch_assoc()) {
+                                // Getting data
+                                $setting_settingName = $row3['settingName'];
+                                $setting_id = $row3['id'];
+
+                                // Set as selected from post
+                                if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
+    
+                                // Write data
+                                $html .= "<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' value='$setting_id' class='inputBox  $disabledClass' $postSelected>
+                                <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label><br>";
+
+                            }
+                        }
+                        $stmt3->close();
                     }
                     $stmt->close();
                     
-                    // Getting dropdown content
-                    $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? AND active = 1  ORDER BY sorting");
-                    $stmt->bind_param("i", $setting_cat_settingId);
+                break;
+                case "checkbox":
+                    $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
+                    // Getting settings category
+                    $table_name = $wpdb->prefix . 'htx_settings_cat';
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
+                    $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
                     $stmt->execute();
                     $result = $stmt->get_result();
-                    if($result->num_rows === 0) $html .= "Der er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value=''>"; else {
-                        while($row = $result->fetch_assoc()) {
-                            // Getting data
-                            $setting_settingName = $row['settingName'];
-                            $setting_id = $row['id'];
-
-                            // Set as selected from post
-                            if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
-
-                            // Write data
-                            $html .= "<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' value='$setting_id' class='inputBox  $disabledClass' $postSelected>
-                            <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label><br>";
+                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                        while($row2 = $result->fetch_assoc()) {
+                            $setting_cat_settingId = $row2['id'];
                         }
+                        // Disabled handling
+                        if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
+                        
+                        // Getting radio content
+                        $table_name3 = $wpdb->prefix . 'htx_settings';
+                        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
+                        $stmt3->bind_param("i", $setting_cat_settingId);
+                        $stmt3->execute();
+                        $result3 = $stmt3->get_result();
+                        if($result3->num_rows === 0) $html .= "Der er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value='' disabled>"; else {
+                            $html .= "<div class='formCreator_flexRow'>";
+                            while($row3 = $result3->fetch_assoc()) {
+                                // Getting data
+                                $setting_settingName = $row3['settingName'];
+                                $setting_id = $row3['id'];
+
+                                // Set as selected from post
+                                if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
+    
+                                // Write data
+                                $html .= "<div class='checkboxDiv'><input type='checkbox' id='$columnNameBack[$i]-$setting_id' name='".$columnNameBack[$i]."[]' value='$setting_id' $postSelected>
+                                <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label></div>";
+
+                            }
+                            $html .= "</div>";
+                        }
+                        $stmt3->close();
                     }
                     $stmt->close();
-
                     
                 break;
                 case "text area":

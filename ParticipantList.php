@@ -115,6 +115,7 @@
             if($result3->num_rows === 0) echo ""; else {
                 while($row3 = $result3->fetch_assoc()) {
                     $settingNameBacks[] = $row3['settingNameBack'];
+                    $settingType[] = $row3['settingType'];
                 }
             }
             // Getting every dropdown and radio names and values
@@ -151,16 +152,44 @@
                         while($row2 = $result2->fetch_assoc()) {
                             // Checks if dropdown or other where value is an id
                             if (in_array($row2['name'], $settingNameBacks)) {
-                                // Writing data from id
-                                echo htmlspecialchars($settingName[$row2['value']]);
-                                // Writing price
-                                if (in_array('price_intrance', $specialName[$index])) {
-                                    $price = $price + floatval($settingValue[$row2['value']]);
+                                // Writing data from id, if dropdown or radio
+                                if ($columnType[$index] == "checkbox") {
+                                    $valueArray = explode(",", $row['value']);
+                                    if (count($valueArray) > 0) {
+                                        for ($j=0; $j < count($valueArray); $j++) { 
+                                            echo $settingName[$valueArray[$j]];
+                                            echo $settingValue[$valueArray[$j]];
+                                            echo $valueArray[$j];
+                                            echo $valueArray[0];
+                                            echo $valueArray[1];
+                                            echo $valueArray[8];
+                                            echo $valueArray[9];
+                                            var_export($valueArray);
+    
+                                            // Writing price
+                                            if (in_array('price_intrance', $specialName[$index])) {
+                                                $price = $price + floatval($settingValue[$valueArray[$j]]);
+        
+                                            }
+                                            if (in_array('price_extra', $specialName[$index])) {
+                                                $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    echo htmlspecialchars($settingName[$row2['value']]);
 
+                                    // Writing price
+                                    if (in_array('price_intrance', $specialName[$index])) {
+                                        $price = $price + floatval($settingValue[$row2['value']]);
+
+                                    }
+                                    if (in_array('price_extra', $specialName[$index])) {
+                                        $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
+                                    }
+                                    echo "check5";
                                 }
-                                if (in_array('price_extra', $specialName[$index])) {
-                                    $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
-                                }
+                                
                             } else {
                                 // Writing data from table
                                 echo htmlspecialchars($row2['value']);

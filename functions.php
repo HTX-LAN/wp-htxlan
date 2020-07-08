@@ -16,50 +16,51 @@
             switch  ($_POST['submit']) {
                 // New submission
                 case 'new':
-                    // Check that the form trying to submit to, is the right one
-                    $table_name = $wpdb->prefix . 'htx_form_tables';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ?");
-                    $stmt->bind_param("i", $tableId);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0) return "Table does not match";
-                    $stmt->close();
-
-                    // Checking values
-                    // Check if mail exist
-                    $table_name = $wpdb->prefix . 'htx_form_users';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
-                    $stmt->bind_param("si", htmlspecialchars(trim($_POST['email'])), $tableId);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0) {} else return "Email already exist";
-                    $stmt->close();
-
-
-                    // Convert values to the right format
-                    // Getting column info
-                    $table_name = $wpdb->prefix . 'htx_column';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ?");
-                    $stmt->bind_param("i", $tableId);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0) return "Ingen kollonner"; else {
-                        while($row = $result->fetch_assoc()) {
-                            $columnNameFront[] = $row['columnNameFront'];
-                            $columnNameBack[] = $row['columnNameBack'];
-                            $format[] = $row['format'];
-                            $columnType[] = $row['columnType'];
-                            $special[] = $row['special'];
-                            $specialName[] = $row['specialName'];
-                            $placeholderText[] = $row['placeholderText'];
-                            $sorting[] = $row['sorting'];
-                            $required[] = $row['required'];
-                        }
-                    }
-                    $stmt->close();
-
-                    // Inserting every input into row
                     try {
+                        // Check that the form trying to submit to, is the right one
+                        $table_name = $wpdb->prefix . 'htx_form_tables';
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ?");
+                        $stmt->bind_param("i", $tableId);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if($result->num_rows === 0) return "Table does not match";
+                        $stmt->close();
+
+                        // Checking values
+                        // Check if mail exist
+                        $table_name = $wpdb->prefix . 'htx_form_users';
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
+                        $stmt->bind_param("si", htmlspecialchars(trim($_POST['email'])), $tableId);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if($result->num_rows === 0) {} else return "Email already exist";
+                        $stmt->close();
+
+
+                        // Convert values to the right format
+                        // Getting column info
+                        $table_name = $wpdb->prefix . 'htx_column';
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ?");
+                        $stmt->bind_param("i", $tableId);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if($result->num_rows === 0) return "Ingen kollonner"; else {
+                            while($row = $result->fetch_assoc()) {
+                                $columnNameFront[] = $row['columnNameFront'];
+                                $columnNameBack[] = $row['columnNameBack'];
+                                $format[] = $row['format'];
+                                $columnType[] = $row['columnType'];
+                                $special[] = $row['special'];
+                                $specialName[] = $row['specialName'];
+                                $placeholderText[] = $row['placeholderText'];
+                                $sorting[] = $row['sorting'];
+                                $required[] = $row['required'];
+                            }
+                        }
+                        $stmt->close();
+
+                        // Inserting every input into row
+                    
                         $link->autocommit(FALSE); //turn on transactions
 
                         // Inserting user and getting id
@@ -76,7 +77,18 @@
                         $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
                         for ($i=0; $i < count($columnNameBack); $i++) {
                             $inputName = $columnNameBack[$i];
-                            $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
+                            
+                            // Does a speciel implode a data, when it is a checkbox
+                            if ($columnType[$i] == 'checkbox') {
+                                if(!empty($_POST[$columnNameBack[$i]])) {
+                                    foreach($_POST[$columnNameBack[$i]] as $specials) {
+                                        $specialPostArrayStart[] = $specials;
+                                    }
+                                    $inputValue = implode(",", $specialPostArrayStart);
+                                } else $inputValue = "";
+                            } else {
+                                $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
+                            }
 
                             // Missing validation of phone number and mail adress
 

@@ -68,7 +68,7 @@
         echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
 
         // Possible input types in array
-        $possibleInput = array("inputbox", "dropdown", "text area", "radio"); #Missing: checkboxes, checkboxes with text input (for ex team names per game basis), range
+        $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox"); #Missing: checkboxes with text input (for ex team names per game basis), range
 
         // Possible formats types in array
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month'); #Missing "tel", but needs more backend work - needs pattern attribute to work
@@ -181,34 +181,70 @@
                             while($row2 = $result2->fetch_assoc()) {
                                 $setting_cat_settingId = $row2['id'];
                             }
+                            // Disabled handling
+                            if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
+                            
+                            // Getting radio content
+                            $table_name3 = $wpdb->prefix . 'htx_settings';
+                            $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
+                            $stmt3->bind_param("i", $setting_cat_settingId);
+                            $stmt3->execute();
+                            $result3 = $stmt3->get_result();
+                            if($result3->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
+                                while($row3 = $result3->fetch_assoc()) {
+                                    // Getting data
+                                    $setting_settingName = $row3['settingName'];
+                                    $setting_id = $row3['id'];
+        
+                                    // Write data
+                                    echo "<input type='radio' id='$columnNameBack-$setting_id' name='$columnNameBack' value='$setting_id' class='radio $disabledClass' disabled>
+                                    <label for='$columnNameBack-$setting_id' class='radio $disabledClass'>$setting_settingName</label><br>";
+
+                                }
+                            }
+                            $stmt3->close();
                         }
                         $stmt2->close();
-
-                        // Disabled handling
-                        if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
-                        
-                        // Getting radio content
-                        $table_name2 = $wpdb->prefix . 'htx_settings';
-                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
-                        $stmt2->bind_param("i", $setting_cat_settingId);
+                    break;
+                    case "checkbox":
+                        // Getting settings category
+                        $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND  id = ? LIMIT 1");
+                        $stmt2->bind_param("ii", $tableId,  $settingCat);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
                         if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
                             while($row2 = $result2->fetch_assoc()) {
-                                // Getting data
-                                $setting_settingName = $row2['settingName'];
-                                $setting_id = $row2['id'];
-    
-                                // Write data
-                                echo "<input type='radio' id='$columnNameBack-$setting_id' name='$columnNameBack' value='$setting_id' class='radio $disabledClass' disabled>
-                                <label for='$columnNameBack-$setting_id' class='radio $disabledClass'>$setting_settingName</label><br>";
-
+                                $setting_cat_settingId = $row2['id'];
                             }
+                            // Disabled handling
+                            if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
+                            
+                            // Getting radio content
+                            $table_name3 = $wpdb->prefix . 'htx_settings';
+                            $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
+                            $stmt3->bind_param("i", $setting_cat_settingId);
+                            $stmt3->execute();
+                            $result3 = $stmt3->get_result();
+                            if($result3->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
+                                echo "<div class='formCreator_flexRow'>";
+                                while($row3 = $result3->fetch_assoc()) {
+                                    // Getting data
+                                    $setting_settingName = $row3['settingName'];
+                                    $setting_id = $row3['id'];
+        
+                                    // Write data
+                                    echo "<div class='checkboxDiv'><input type='checkbox' id='$columnNameBack-$setting_id' name='".$columnNameBack."[]' value='$setting_id' disabled>
+                                        <label for='$columnNameBack-$setting_id'>$setting_settingName</label></div>";
+
+                                }
+                                echo "</div>";
+                            }
+                            $stmt3->close();
                         }
                         $stmt2->close();
-    
-                        // Finishing dropdown
-                        echo "</select>";
+
+                        
                     break;
                     case "text area":
                         echo "<p>$placeholderText</p>";
@@ -254,7 +290,7 @@
                             // If dropdown, then make setting category first
                             $table_name = $wpdb->prefix . 'htx_settings_cat';
                             $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType, special, specialName) VALUES (?, ?, ?, ?, ?)");
-                            $stmt->bind_param("iss", $tableId, $columnNameBack, $columnType, $special, $specialName);
+                            $stmt->bind_param("issis", $tableId, $columnNameBack, $columnType, $special, $specialName);
                             $stmt->execute();
                             $settingCat = intval($link->insert_id);
                             if ($settingCat < 0) throw new Exception('Setting cat is bad');
@@ -273,7 +309,7 @@
                             // If dropdown, then make setting category first
                             $table_name = $wpdb->prefix . 'htx_settings_cat';
                             $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType, special, specialName) VALUES (?, ?, ?, ?, ?)");
-                            $stmt->bind_param("iss", $tableId, $columnNameBack, $columnType, $special, $specialName);
+                            $stmt->bind_param("issis", $tableId, $columnNameBack, $columnType, $special, $specialName);
                             $stmt->execute();
                             $settingCat = intval($link->insert_id);
                             if ($settingCat < 0) throw new Exception('Setting cat is bad');
@@ -285,6 +321,25 @@
                             $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
                             $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
                             $settingName = "new setting"; $value="new setting"; $settingType="radio";
+                            $stmt->execute(); 
+                            $stmt->close();
+                        }
+                        if ($userInputType == 'checkbox') {
+                            // If dropdown, then make setting category first
+                            $table_name = $wpdb->prefix . 'htx_settings_cat';
+                            $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType, special, specialName) VALUES (?, ?, ?, ?, ?)");
+                            $stmt->bind_param("issis", $tableId, $columnNameBack, $columnType, $special, $specialName);
+                            $stmt->execute();
+                            $settingCat = intval($link->insert_id);
+                            if ($settingCat < 0) throw new Exception('Setting cat is bad');
+                            $stmt->close();
+
+                            // Insert standard first setting
+                            $table_name = $wpdb->prefix . 'htx_settings';
+                            $link->autocommit(FALSE); //turn on transactions
+                            $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
+                            $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
+                            $settingName = "new setting"; $value="new setting"; $settingType="checkbox";
                             $stmt->execute(); 
                             $stmt->close();
                         }
@@ -302,7 +357,7 @@
                         $stmt->bind_param("ii", $lastId, $lastId);
                         $stmt->execute();
                         $stmt->close();
-                        if ($userInputType == 'dropdown' OR $userInputType == 'radio') {
+                        if (in_array($userInputType, $possibleInput)) {
                             // If dropdown, then update settingNameBack with id from column
                             $table_name = $wpdb->prefix . 'htx_settings_cat';
                             $stmt = $link->prepare("UPDATE $table_name SET settingNameBack = ? WHERE id = ?");
@@ -661,6 +716,88 @@
                             echo "></div>";
                             // Dropdown options
                             echo "<div><h4>Radio muligheder</h4></div>";
+
+                            // Getting radio setting category
+                            $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND id = ?");
+                            $stmt2->bind_param("is", $tableId, $settingCat);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            if($result2->num_rows === 0) echo "<p>Ingen indstillinger for dropdown</p>"; else {
+                                while($row2 = $result2->fetch_assoc()) {
+                                    $row2['id'];
+                                    $row2['settingName'];
+                                    $row2['special'];
+                                    $row2['specialName'];
+                                    $row2['settingType'];
+                                    // Getting dropdown settings
+                                    $table_name3 = $wpdb->prefix . 'htx_settings';
+                                    $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ?");
+                                    $stmt3->bind_param("i", $row2['id']);
+                                    $stmt3->execute();
+                                    $result3 = $stmt3->get_result();
+                                    $i = 0;
+                                    if($result3->num_rows === 0) echo "<div><p>Ingen radio muligheder, venligst tilføj en, før formularen kan bruges</p></div>"; else {
+                                        while($row3 = $result3->fetch_assoc()) {
+                                            $row3['id'];
+                                            $row3['settingName'];
+                                            $rowSettingId = $row3['value'];
+
+                                            echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
+                                            echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
+                                            echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
+                                            echo "<input type='hidden' name='settingActive-".$row3['id']."' value='1'>";
+                                            echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox' name='settingActive-".$row3['id']."' value='0'";
+                                            if ($row3['active'] == 0) echo "checked";
+                                            echo "></div>";
+                                            echo "<input class='inputBox hidden' name='settingId-$i' value='".$row3['id']."'>";
+                                            echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                            echo "<div style='width: 100%;margin-bottom:1.75rem;'><button type='submit' name='deleteSetting' value='".$row3['id']."' class='btn deleteBtn'>Slet</button></div>";
+
+                                            $i++;
+                                        }
+                                        
+                                    }
+                                    $stmt3->close();
+                                    echo "<input class='inputBox hidden' name='settingsTrue' value='1'>";
+                                    echo "<input class='inputBox hidden' name='settingsAmount' value='$i'>";
+                                    echo "<input class='inputBox hidden' name='settingsId' value='". $row2['id']."'>";
+                                    echo "<input class='inputBox hidden' name='columnType' value='$columnType'>";
+                                    echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn'>Tilføj</button></div>";
+                                }
+                            }
+                            $stmt2->close();
+                            echo "</div>";
+                        break;
+                        case "checkbox":
+                            echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+                            // Name
+                            echo "<div><label for='settingName'>Navn </label> <input type='text' id='settingName' class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
+                            // Column type
+                            echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
+                            // Special name
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctions); $i++) { 
+                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
+                            // Sorting
+                            echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Required
+                            echo "<input type='hidden' name='required' value='0'>";
+                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            if ($required == 1) echo "checked";
+                            echo "></div>";
+                            // Disabled
+                            echo "<input type='hidden' name='disabled' value='0'>";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            if ($disabled == 1) echo "checked";
+                            echo "></div>";
+                            // Dropdown options
+                            echo "<div><h4>Checkbox muligheder</h4></div>";
 
                             // Getting radio setting category
                             $table_name2 = $wpdb->prefix . 'htx_settings_cat';

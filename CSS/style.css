@@ -317,3 +317,10 @@
     .crewpayed, form select .crewpayed {
         background-color: var(--brand-secondary);
     }
+
+    /* Checkbox */
+    .checkboxDiv {
+        width: unset !important;
+        min-width: 50% !important;
+        margin-right: 0px !important;
+    }
