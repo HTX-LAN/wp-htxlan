@@ -3,6 +3,7 @@ HTX Lan Wordpress plugin for tilmelding til HTX Lan, lavet af elever fra HTX
 
 ## Indhold
 [Se informationer om alle sider](pages)<br>
+[Om forfatterne](authors)<br>
 [License](Licens)
 
 ## Funktioner
@@ -13,11 +14,11 @@ Dertil vil det også være muligt at sætte en økonomi side op, således at man
 
 Vi har på følgende link, lavet en side, hvor funktioner er skrevet ind, med hvilke der er nu, samt hvilke vi arbejder på; [Link](https://the0mikkel.github.io/WPPlugin-HTXLan/pages#main-plugin-side)
 
-## Udviklere
+## [Udviklere](authors)
 Dette plugin er lavet af frivillige elever fra LAN udvalget på HTX i Nyk. F.
 <br>Disse er på nuværende tidspunkt:
-- Mikkel
-- Frej
+- Mikkel Albrechtsen
+- Frej Alexander Nielsen
 
 ## Theme
 For at få det bedste ud af denne form, er det vigtigt at bruge et ordentligt theme og layout for siden.
