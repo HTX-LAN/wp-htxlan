@@ -1,26 +1,5 @@
 <?php
     // Functions and scripts written in php
-    //
-    // Backend post handling
-    function HTX_backend_post_dangerZone() {
-        // Danger zone
-        // Script for deleting all participants - PHP part
-
-        // Script for dropping databases
-
-        // Script for creating databases
-        if(!current_user_can("edit_files"))
-            return;
-        switch  ($_POST['postType']) {
-            case 'resetDB':
-                try {
-                    drop_db();
-                    create_db();
-                } catch(Exception $e) {
-                }
-                break;
-        }
-    }
 
     // frontend post handling
     function HTX_frontend_post($tableId) {
