@@ -10,7 +10,9 @@
     // Connecting to database, with custom variable
     $link = database_connection();
 
+    // Error handling variables
     $EconomicError = false;
+    $EconomicExtraError = 0;
 
     // Getting data about forms
     $table_name = $wpdb->prefix . 'htx_form_tables';
@@ -57,7 +59,7 @@
         $stmt2->execute();
         $result2 = $stmt2->get_result();
         if($result2->num_rows === 0) {
-            echo "Something NEEDS TO BE CHANGED";
+            echo "Ingen tilmeldinger endnu, kom tilbage når der er kommet tilmeldinger";
             $stmt2->close();
             $EconomicError = true;
         } else {
@@ -79,84 +81,211 @@
                         $usersPayedMobileIds[] = $row['id'];
                     break;
                 }
+                // Check if arrays are empty
+                if ($usersPayedFalse == NULL) $usersPayedFalse[] = "";
+                if ($usersPayedFalseIds == NULL) $usersPayedFalseIds[] = "";
+                if ($usersPayedCash == NULL) $usersPayedCash[] = "";
+                if ($usersPayedCashIds == NULL) $usersPayedCashIds[] = "";
+                if ($usersPayedMobile == NULL) $usersPayedMobile[] = "";
+                if ($usersPayedMobileIds == NULL) $usersPayedMobileIds[] = "";
                 
                 $usersArrived[$row['id']] = $row['arrived'];
                 $usersCrew[$row['id']] = $row['crew'];
                 if ($row['crew'] == "1") {
                     $usersCrewOnly[] = $row['id'];
+                } else {
+                    $usersCrewOnly[] = 0;
                 }
                 $usersPrice[$row['id']] = $row['price'];
             }
             $stmt2->close();
-            
-            // Getting every cat setting that has function as price intrance
-            $table_name2 = $wpdb->prefix . 'htx_settings_cat';
-            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND specialName = 'price_intrance'");
+
+            // Getting where price_intrance and price_extra is
+            $table_name2 = $wpdb->prefix . 'htx_column';
+            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND specialName != ''");
             $stmt2->bind_param("i", $tableId);
             $stmt2->execute();
             $result2 = $stmt2->get_result();
             if($result2->num_rows === 0) {
-                echo "Something NEEDS TO BE CHANGED";
-                $stmt2->close();
-                $EconomicError = true;
-            } else if($result2->num_rows > 1) {
-                echo "Too many intrance settings";
+                echo "Der er ingen felter med nogen funktioner";
                 $stmt2->close();
                 $EconomicError = true;
             } else {
                 // Fetching and storing values in arrays
+                $columnFunctionString = "";
                 while($row = $result2->fetch_assoc()) {
-                    $settingCatIntranceName = $row['settingName'];
-                    $settingCatIntranceNameBack = $row['settingNameBack'];
-                    $settingCatIntranceId = $row['id'];
+                    $columnId[] = $row['id'];
+                    $columnFunction[$row['id']] = explode(",", $row['specialName']);
+                    $columnFunctionString .= $row['specialName'].",";
+                    $columnName[$row['id']] = $row['columnNameBack'];
                 }
                 $stmt2->close();
-                // Getting settings for category
-                $table_name2 = $wpdb->prefix . 'htx_settings';
-                $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 AND specialName = 'price_intrance' ORDER BY sorting");
-                $stmt2->bind_param("i", $settingCatIntranceId);
-                $stmt2->execute();
-                $result2 = $stmt2->get_result();
-                if($result2->num_rows === 0) {
-                    echo "Something NEEDS TO BE CHANGED";
-                    $stmt2->close();
+            
+                $columnFunctionArray = explode(",", $columnFunctionString);
+                if (count_array_values($columnFunctionArray, 'price_intrance') > 1) {
+                    echo "Too many intrance elements";
+                    $EconomicError = true;
+                } else if (count_array_values($columnFunctionArray, 'price_intrance') < 1) {
+                    echo "Der er ikke nogen elementer sat op som ingangs pris";
                     $EconomicError = true;
                 } else {
-                    // Fetching and storing values in arrays
-                    while($row = $result2->fetch_assoc()) {
-                        $settingIntranceIds[] = $row['id'];
-                        $settingIntranceName[$row['id']] = $row['settingName'];
-                        $settingIntranceValue[$row['id']] = $row['value'];
+                    for ($j=0; $j < count($columnId); $j++) {
+                        if (in_array('price_intrance', $columnFunction[$columnId[$j]])) {
+                            $j = $columnId[$j];
+                            break;
+                        }
                     }
-                    $stmt2->close();
-                }
-
-                // Getting users submittet values for intrance
-                $table_name2 = $wpdb->prefix . 'htx_form';
-                $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND name = ?");
-                $stmt2->bind_param("is", $tableId, $settingCatIntranceNameBack);
-                $stmt2->execute();
-                $result2 = $stmt2->get_result();
-                if($result2->num_rows === 0) {
-                    echo "Ingen tilmeldinger med pris elementet besvaret";
-                    $stmt2->close();
-                    $EconomicError = true;
-                } else {
-                    // Fetching and storing values in arrays
-                    while($row = $result2->fetch_assoc()) {
-                        $userSubmittetIntranceIds[] = $row['userId'];
-                        $userSubmittetIntranceValue[$row['userId']] = $row['value'];
-                        for ($i=0; $i < count($settingIntranceIds); $i++) { 
-                            if (!in_array($row['userId'],$usersCrewOnly)) {
-                                if ($row['value'] == $settingIntranceIds[$i]) {
-                                    $userSubmittetIntrance[$settingIntranceIds[$i]][] = $row['userId'];
-                                }
+                    // Getting every cat setting that has function as price intrance
+                    $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND settingNameBack = ?");
+                    $stmt2->bind_param("is", $tableId, $columnName[$j]);
+                    $stmt2->execute();
+                    $result2 = $stmt2->get_result();
+                    if($result2->num_rows === 0) {
+                        echo "Something NEEDS TO BE CHANGED";
+                        $stmt2->close();
+                        $EconomicError = true;
+                    } else if($result2->num_rows > 1) {
+                        echo "Too many elements with the same backend name";
+                        $stmt2->close();
+                        $EconomicError = true;
+                    } else {
+                        // Fetching and storing values in arrays
+                        while($row = $result2->fetch_assoc()) {
+                            $settingCatIntranceName = $row['settingName'];
+                            $settingCatIntranceNameBack = $row['settingNameBack'];
+                            $settingCatIntranceId = $row['id'];
+                        }
+                        $stmt2->close();
+                        // Getting settings for category
+                        $table_name2 = $wpdb->prefix . 'htx_settings';
+                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER BY sorting");
+                        $stmt2->bind_param("i", $settingCatIntranceId);
+                        $stmt2->execute();
+                        $result2 = $stmt2->get_result();
+                        if($result2->num_rows === 0) {
+                            echo "Something NEEDS TO BE CHANGED";
+                            $stmt2->close();
+                            $EconomicError = true;
+                        } else {
+                            // Fetching and storing values in arrays
+                            while($row = $result2->fetch_assoc()) {
+                                $settingIntranceIds[] = $row['id'];
+                                $settingIntranceName[$row['id']] = $row['settingName'];
+                                $settingIntranceValue[$row['id']] = $row['value'];
+                            }
+                            $stmt2->close();
+                            // Getting users submittet values for intrance
+                            $table_name2 = $wpdb->prefix . 'htx_form';
+                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND name = ?");
+                            $stmt2->bind_param("is", $tableId, $settingCatIntranceNameBack);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            if($result2->num_rows === 0) {
+                                echo "Ingen tilmeldinger med pris elementet besvaret";
+                                $stmt2->close();
+                                $EconomicError = true;
                             } else {
-                                $userSubmittetIntrance[$settingIntranceIds[$i]][] = Null;
+                                // Fetching and storing values in arrays
+                                while($row = $result2->fetch_assoc()) {
+                                    $userSubmittetIntranceIds[] = $row['userId'];
+                                    $userSubmittetIntranceValue[$row['userId']] = $row['value'];
+                                    for ($i=0; $i < count($settingIntranceIds); $i++) { 
+                                        if (!in_array($row['userId'],$usersCrewOnly)) {
+                                            if ($row['value'] == $settingIntranceIds[$i]) {
+                                                $userSubmittetIntrance[$settingIntranceIds[$i]][] = $row['userId'];
+                                            } else $userSubmittetIntrance[$settingIntranceIds[$i]][] = "";
+                                        } else {
+                                            $userSubmittetIntrance[$settingIntranceIds[$i]][] = "";
+                                        }
+                                    }
+                                }
+                                $stmt2->close();
                             }
                         }
                     }
-                    $stmt2->close();
+
+                    if (count_array_values($columnFunctionArray, 'price_extra') < 1) {
+                        echo "Der er ikke nogen elementer sat op som ekstra pris";
+                        $EconomicExtraError = 1;
+                    } else {
+                        for ($j=0; $j < count($columnId); $j++) {
+                            if (in_array('price_extra', $columnFunction[$columnId[$j]])) {
+                                $j = $columnId[$j];
+                                break;
+                            }
+                        }
+                        $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND settingNameBack = ?");
+                        $stmt2->bind_param("is", $tableId, $columnName[$j]);
+                        $stmt2->execute();
+                        $result2 = $stmt2->get_result();
+                        if($result2->num_rows === 0) {
+                            echo "Something NEEDS TO BE CHANGED";
+                            $stmt2->close();
+                            $EconomicError = true;
+                        } else if($result2->num_rows > 1) {
+                            echo "Too many elements with the same backend name";
+                            $stmt2->close();
+                            $EconomicError = true;
+                        } else {
+                            // Fetching and storing values in arrays
+                            while($row = $result2->fetch_assoc()) {
+                                $settingCatExtraName[] = $row['settingName'];
+                                $settingCatExtraNameBack[] = $row['settingNameBack'];
+                                $settingCatExtraId[] = $row['id'];
+                            }
+                            $stmt2->close();
+                            for ($index=0; $index < count($settingCatExtraId); $index++) {
+                                // Getting settings for category
+                                $table_name2 = $wpdb->prefix . 'htx_settings';
+                                $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER BY sorting");
+                                $stmt2->bind_param("i", $settingCatExtraId[$index]);
+                                $stmt2->execute();
+                                $result2 = $stmt2->get_result();
+                                if($result2->num_rows === 0) {
+                                    echo "Something NEEDS TO BE CHANGED";
+                                    $stmt2->close();
+                                    $EconomicError = true;
+                                } else {
+                                    // Fetching and storing values in arrays
+                                    while($row = $result2->fetch_assoc()) {
+                                        $settingExtraIds[$index][] = $row['id'];
+                                        $settingExtraName[$index][$row['id']] = $row['settingName'];
+                                        $settingExtraValue[$index][$row['id']] = $row['value'];
+                                    }
+                                    $stmt2->close();
+                                    // Getting users submittet values for Extra
+                                    $table_name2 = $wpdb->prefix . 'htx_form';
+                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND name = ?");
+                                    $stmt2->bind_param("is", $tableId, $settingCatExtraNameBack[$index]);
+                                    $stmt2->execute();
+                                    $result2 = $stmt2->get_result();
+                                    if($result2->num_rows === 0) {
+                                        echo "Ingen tilmeldinger med pris elementet besvaret";
+                                        $stmt2->close();
+                                        $EconomicError = true;
+                                    } else {
+                                        // Fetching and storing values in arrays
+                                        while($row = $result2->fetch_assoc()) {
+                                            $userSubmittetExtraIds[$index][] = $row['userId'];
+                                            $userSubmittetExtraValue[$index][$row['userId']] = $row['value'];
+                                            for ($i=0; $i < count($settingExtraIds[$index]); $i++) { 
+                                                if (!in_array($row['userId'],$usersCrewOnly)) {
+                                                    if ($row['value'] == $settingExtraIds[$index][$i]) {
+                                                        $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = $row['userId'];
+                                                    } else $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = "";
+                                                } else {
+                                                    $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = "";
+                                                }
+                                            }
+                                        }
+                                        $stmt2->close();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -263,52 +392,64 @@
                     <th colspan='9'><h2 style='margin: 0px;'>Ekstra</h2></th>
                 </tr>";
 
-                echo "<tr>
-                    <th colspan='9'>Element navn</th>
-                </tr>
-                <tr class='InfoTableRow'>
-                    <td>Element</td>
-                    <td>100</td>
-                    <td>200</td>
-                    <td>300</td>
-                    <td>600</td>
-                    <td>10</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>60</td>
-                </tr>
-                <tr class='InfoTableRow'>
-                    <td>Element</td>
-                    <td>100</td>
-                    <td>200</td>
-                    <td>300</td>
-                    <td>600</td>
-                    <td>10</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>60</td>
-                </tr>
-                <tr class='InfoTableRow'>
-                    <td>Element</td>
-                    <td>100</td>
-                    <td>200</td>
-                    <td>300</td>
-                    <td>600</td>
-                    <td>10</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>60</td>
-                </tr>
-                <tr class='InfoTableRow'>
-                    <td>Element</td>
-                    <td>100</td>
-                    <td>200</td>
-                    <td>300</td>
-                    <td>600</td>
-                    <td>10</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>60</td>
+                // Extra row
+                if ($EconomicExtraError == 0) {
+                    for ($index=0; $index < count($settingCatExtraId); $index++) {
+                        echo "<tr>
+                                <th colspan='9'>$settingCatExtraName[$index]</th>
+                            </tr>";
+                        for ($i=0; $i < count($settingExtraIds[$index]); $i++) { 
+                            // Calculating amounts and value for every setting in element
+                            $extraNonPayedAmount[$index][$i] = count(array_intersect($userSubmittetExtra[$index][$settingExtraIds[$index][$i]],$usersPayedFalseIds));
+                            $extraNonPayedSum[$index][$i] = $extraNonPayedAmount[$index][$i]*$settingExtraValue[$index][$settingExtraIds[$index][$i]];
+                            $extraCashAmount[$index][$i] = count(array_intersect($userSubmittetExtra[$index][$settingExtraIds[$index][$i]],$usersPayedCashIds));
+                            $extraCashSum[$index][$i] = $extraCashAmount[$index][$i]*$settingExtraValue[$index][$settingExtraIds[$index][$i]];
+                            $extraMobileAmount[$index][$i] = count(array_intersect($userSubmittetExtra[$index][$settingExtraIds[$index][$i]],$usersPayedMobileIds));
+                            $extraMobileSum[$index][$i] = $extraMobileAmount[$index][$i]*$settingExtraValue[$index][$settingExtraIds[$index][$i]];
+        
+                            // Getting line total
+                            $extraSum[$index][$i] = $extraNonPayedSum[$index][$i]+$extraCashSum[$index][$i]+$extraMobileSum[$index][$i];
+                            $extraAmount[$index][$i] = $extraNonPayedAmount[$index][$i]+$extraCashAmount[$index][$i]+$extraMobileAmount[$index][$i];
+        
+                            echo "<tr class='InfoTableRow'>
+                                <td>".$settingExtraName[$index][$settingExtraIds[$index][$i]]."</td>
+                                <td>".$extraNonPayedSum[$index][$i]."</td>
+                                <td>".$extraCashSum[$index][$i]."</td>
+                                <td>".$extraMobileSum[$index][$i]."</td>
+                                <td>".$extraSum[$index][$i]."</td>
+                                <td>".$extraNonPayedAmount[$index][$i]."</td>
+                                <td>".$extraCashAmount[$index][$i]."</td>
+                                <td>".$extraMobileAmount[$index][$i]."</td>
+                                <td>".$extraAmount[$index][$i]."</td>
+                            </tr>";
+                        }
+                        // Getting sums for sum row
+                        $ExtraNonPayedTotalSum[$index] = array_sum($extraNonPayedSum[$index]);
+                        $ExtraNonPayedTotalAmount[$index] = array_sum($extraNonPayedAmount[$index]);
+                        $ExtraCashTotalSum[$index] = array_sum($extraCashSum[$index]);
+                        $ExtraCashTotalAmount[$index] = array_sum($extraCashAmount[$index]);
+                        $ExtraMobileTotalSum[$index] = array_sum($extraMobileSum[$index]);
+                        $ExtraMobileTotalAmount[$index] = array_sum($extraMobileAmount[$index]);
+                        $ExtraTotalSum[$index] = array_sum($extraSum[$index]);
+                        $ExtraTotalAmount[$index] = array_sum($extraAmount[$index]);
+        
+                        echo "<tr class='InfoTableRow'>
+                            <td><b>I alt</b></td>
+                            <td>$ExtraNonPayedTotalSum[$index]</td>
+                            <td>$ExtraCashTotalSum[$index]</td>
+                            <td>$ExtraMobileTotalSum[$index]</td>
+                            <td>$ExtraTotalSum[$index]</td>
+                            <td>$ExtraNonPayedTotalAmount[$index]</td>
+                            <td>$ExtraCashTotalAmount[$index]</td>
+                            <td>$ExtraMobileTotalAmount[$index]</td>
+                            <td>$ExtraTotalAmount[$index]</td>
+                        </tr>";
+                    }
+                }
+                
+
+                echo "<tr style='background-color: unset; height: 2rem;'>
+                    <td colspan='9' style='background-color: unset;'></td>
                 </tr>
                 <tr class='InfoTableRow'>
                     <td><b>I alt</b></td>
@@ -316,16 +457,13 @@
                     <td>800</td>
                     <td>1200</td>
                     <td>2400</td>
-                    <td>60</td>
-                    <td>80</td>
-                    <td>120</td>
-                    <td>240</td>
+                </tr>
+                <tr style='background-color: unset; height: 2rem;'>
+                    <td colspan='9' style='background-color: unset;'></td>
                 </tr>";
 
-                echo "<tr style='background-color: unset; height: 2rem;'>
-                    <td colspan='9' style='background-color: unset;'></td>
-                </tr>
-                <tr>
+                // Ekstra indkomst (on hold)
+                /*echo "<tr>
                     <th colspan='9'><h2 style='margin: 0px;'>Ekstra indkomst</h2></th>
                 </tr>
                 <tr>
@@ -352,13 +490,14 @@
                 </tr>
                 <tr style='background-color: unset; height: 2rem;'>
                     <td colspan='9' style='background-color: unset;'></td>
-                </tr>
-                <tr>
+                </tr>";*/
+
+                // Udgifter (on hold)
+                /*echo "<tr>
                     <th colspan='5'><h2 style='margin: 0px;'>Udgifter</h2></th>
                 </tr>
                 <tr>
-                    <th><h3 style='margin: 0px;'>Ekstra elementer</h3></th>
-                    <th colspan='4'></th>
+                    <th colspan='5'><h3 style='margin: 0px;'>Ekstra elementer</h3></th>
                 </tr>
                 <tr>
                     <th>Element navn</th>
@@ -391,8 +530,9 @@
                 </tr>
                 <tr style='background-color: unset; height: 2rem;'>
                     <td colspan='9' style='background-color: unset;'></td>
-                </tr>
-                <tr>
+                </tr>";*/
+
+                echo "<tr>
                     <th colspan='2'><h2 style='margin: 0px;'>Samlet</h2></th>
                 </tr>
                 <tr class='InfoTableRow'>
@@ -409,48 +549,45 @@
                 <th>Pris</th>
             </tr>
             </thead><tbody>
-            <tr>
+            <tr class='InfoTableRow'>
                 <td colspan='2'>Ikke betalt</td>
                 <td>10</td>
                 <td>100</td>
             </tr>
-            <tr>
+            <tr class='InfoTableRow'>
                 <td colspan='2'>Betalt</td>
                 <td>60</td>
                 <td>6000</td>
             </tr>
-            <tr>
+            <tr class='InfoTableRow'>
                 <td colspan='2'>Ankommet</td>
                 <td>60</td>
                 <td>6000</td>
             </tr>
-            <tr>
+            <tr class='InfoTableRow'>
                 <td colspan='2'>Ikke ankommet</td>
                 <td>60</td>
                 <td>6000</td>
             </tr>
-            <tr>
+            <tr class='InfoTableRow'>
                 <td colspan='2'>Ikke ankommet som har betalt</td>
                 <td>60</td>
                 <td>6000</td>
             </tr>
-            <tr>
+            <tr class='InfoTableRow'>
                 <td colspan='2'>Crew</td>
                 <td>60</td>
                 <td>6000</td>
             </tr>
-            <tr>
+            <tr class='InfoTableRow'>
                 <td colspan='2'>Crew som ikke har betalt</td>
                 <td>60</td>
                 <td>6000</td>
             </tr>
-            <tr>
+            <tr class='InfoTableRow'>
                 <td colspan='2'>Ikke crew</td>
                 <td>60</td>
                 <td>6000</td>
-            </tr>
-            <tr style='background-color: unset; height: 2rem;'>
-                <td colspan='9' style='background-color: unset;'></td>
             </tr>
         </tbody></table>";    
     }

@@ -132,6 +132,20 @@
         return  $launch;
     }
 
+    // Count number of times a string is in an array
+    function count_array_values($my_array, $match) { 
+        $count = 0; 
+        foreach ($my_array as $key => $value) 
+        { 
+            if ($value == $match) 
+            { 
+                $count++; 
+            } 
+        } 
+        
+        return $count; 
+    } 
+
     // Setting cookie
     function setCustomCookie($cookieName, $cookieValue) {
         wp_enqueue_script( 'cookie', "/wp-content/plugins/WPPlugin-HTXLan/JS/cookie.js");
