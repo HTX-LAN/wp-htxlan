@@ -905,7 +905,7 @@
                             echo "></div>";
 
                             // Special name (hidden)
-                            echo "<div class='hidden'><label for='settingSpecial'>Funktion navn </label> <input id='settingSpecial' class='inputBox' name='specialName' value='$specialName'></div>";
+                            echo "<div class='hidden'><label for='settingSpecial'>Funktion navn </label> <input id='settingSpecial' class='inputBox' name='specialName' value=''></div>";
                             // Format (hidden)
                             echo "<div class='hidden'><label for='settingFormat'>Format </label> <input id='settingFormat' class='inputBox' name='format' value='text'></div>";
                             // Required (hidden)
