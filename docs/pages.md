@@ -59,12 +59,19 @@ Form creator, er hvor hver form ændres og sættes op
   - [ ] Input påvirker pris for deltager
   - [ ] Element som viser samlet pris inden formular kan blive indsendt
 
-### Økonomi *(Ikke begyndt)*
+### Økonomi
 Denne side viser økonomi for event
 - [ ] Pris liste
   - [ ] Liste med teoretisk inkomst
   - [ ] Liste med faktisk inkomst
-- [ ] Liste med udgifter
+  - [ ] Antal som har tilmeldt sig
+  - [ ] Antal som har betalt, og med hvilken type
+  - [ ] Antal som er crew
+  - [ ] Beløb fra billeter
+  - [ ] Beløb fra ekstra ting
+  - [ ] Liste med udgifter
+- [ ] Muligt at tilføje custom indtægt
+- [ ] Muligt at tilføje custom udgift
 
 ### Turneringer *(Ikke begyndt)*
 Side med alle informationer til turneringer
