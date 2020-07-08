@@ -43,9 +43,9 @@
         echo "<h3>Farlig zone</h3>";
         HTX_danger_zone();
         $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-        echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_DeleteParticipants()'>Slet alle tilmeldinger</button><br>";
+        echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_DeleteParticipants(\"$actual_link\")'>Slet alle tilmeldinger</button><br>";
         echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_resetDatabases(\"$actual_link\")'>Nulstil databaser</button><br>";
-        echo "<button class='btn updateBtn' style='margin-bottom: 0.5rem;' type='submit'>Download data</button>";
+        echo "<button class='btn updateBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_downloadData(\"$actual_link\")'>Download data</button>";
     }
 
 

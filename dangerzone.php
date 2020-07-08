@@ -5,19 +5,31 @@ function htx_parse_dangerzone_request() {
         if(!current_user_can("manage_options"))
             return;
         $response = new stdClass();
+        header('Content-type: application/json');
         switch($_POST['postType']) {
             case 'resetDB':
-                header('Content-type: application/json');
                 try {
                     drop_db();
                     create_db();
                     $response->success = true;
-                    echo json_encode($response);
                 } catch(Exception $e) {
                     $response->success = false;
                     $response->error = $e->getMessage();
-                    echo json_encode($response);
                 }
+                echo json_encode($response);
+                die();
+                break;
+            case 'downloadParticipants':
+                try {
+                    $csv = to_csv("htx_form_users");
+                    $response->success = true;
+                    $response->csv = $csv;
+                    $response->filename = "htx_data_" . date("dmY-His") . ".csv";
+                } catch(Exception $e) {
+                    $response->success = false;
+                    $response->error = $e->getMessage();
+                }
+                echo json_encode($response);
                 die();
                 break;
         }

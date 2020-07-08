@@ -108,7 +108,7 @@
             $link = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
         } catch(Exception $e) {
             error_log($e->getMessage());
-            return('Error connecting to database. Error message:'.$e); //Should be a message a typical user could understand
+            return('Error connecting to database.'); //Should be a message a typical user could understand
         }
         return $link;
     }

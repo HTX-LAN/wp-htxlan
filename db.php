@@ -288,4 +288,38 @@
         $sql = "DROP TABLE $table_name;";
         mysqli_query($link, $sql);
     }
+
+    function to_csv($table_suffix) {
+        global $wpdb;
+        $link = database_connection();
+
+        $table_name = $wpdb->prefix . $table_suffix;
+
+        $result = $link->query("SELECT * FROM " . $link->real_escape_string($table_name));
+        if(!$result) {
+            //Failed to query database
+            throw new Exception($link->error);
+        }
+
+
+        $csv = "";
+        $fields = $result->field_count;
+
+        for($i = 0; $i < $fields; $i++) {
+            $csv .= "\"" . $result->fetch_field_direct($i)->name . "\",";
+        }
+        $csv .= "\n";
+
+        while($row = $result->fetch_assoc()) {
+            for($i = 0; $i < $fields; $i++) {
+                $csv .= "\"" . $row[$result->fetch_field_direct($i)->name] . "\"";
+                if($i + 1 < $fields)
+                    $csv .= ",";
+            }
+            $csv .= "\n";
+        }
+
+        $link->close();
+        return substr($csv, 0, -2);
+    }
 ?>
