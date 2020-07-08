@@ -50,7 +50,7 @@
         // Getting information from database
         // Users
         $table_name = $wpdb->prefix . 'htx_form_users';
-        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND active = 1");
+        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND active = 1");
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
