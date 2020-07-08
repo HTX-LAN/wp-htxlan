@@ -154,17 +154,10 @@
                             if (in_array($row2['name'], $settingNameBacks)) {
                                 // Writing data from id, if dropdown or radio
                                 if ($columnType[$index] == "checkbox") {
-                                    $valueArray = explode(",", $row['value']);
+                                    $valueArray = explode(",", $row2['value']);
                                     if (count($valueArray) > 0) {
                                         for ($j=0; $j < count($valueArray); $j++) { 
-                                            echo $settingName[$valueArray[$j]];
-                                            echo $settingValue[$valueArray[$j]];
-                                            echo $valueArray[$j];
-                                            echo $valueArray[0];
-                                            echo $valueArray[1];
-                                            echo $valueArray[8];
-                                            echo $valueArray[9];
-                                            var_export($valueArray);
+                                            echo htmlspecialchars($settingName[$valueArray[$j]]);
     
                                             // Writing price
                                             if (in_array('price_intrance', $specialName[$index])) {
@@ -173,6 +166,10 @@
                                             }
                                             if (in_array('price_extra', $specialName[$index])) {
                                                 $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
+                                            }
+                                            // Insert comma, if the value is not the last
+                                            if (count($valueArray) != ($j + 1)) {
+                                                echo ", ";
                                             }
                                         }
                                     }
