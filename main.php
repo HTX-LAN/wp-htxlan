@@ -4,7 +4,7 @@
     * Plugin URI: https://the0mikkel.github.io/WPPlugin-HTXLan/
     * Description: This plugin, is a custom plugin for HTX-lan's website
     * Version: 0.1.4
-    * Author: Mikkel Albrechtsen & Frej
+    * Author: Mikkel Albrechtsen & Frej Alexander Nielsen
     * Author URI: https://the0mikkel.github.io/WPPlugin-HTXLan/
     */
 
@@ -22,6 +22,9 @@
 
     // Backend for admins to see
     require 'backend.php';
+
+    // DangerZone
+    require 'dangerzone.php';
 
     //Setup to be run when the plugin is initially enabled.
     function HTX_initial_setup() {

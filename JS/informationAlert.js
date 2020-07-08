@@ -1,8 +1,10 @@
 /*informationwindow inserter - by Mikkel Albrechtsen */
+
+var timeouts = {};
+
 informationwindowInsertIDDONOTCHANGE = 0;
 function informationwindowInsert(cat,text,speciel) {
-    informationwindowInsertIDDONOTCHANGE +=1;
-    id = informationwindowInsertIDDONOTCHANGE;
+    var id = ++informationwindowInsertIDDONOTCHANGE;
     if (cat == 1) {
         cat = "succes"
         cattext = "Success";
@@ -15,10 +17,10 @@ function informationwindowInsert(cat,text,speciel) {
     } else {
         return 0;
     }
-    if (speciel != "") {
-        element = "<div id='IW"+id+"' class='succesWindows Windows "+cat+"' onclick='("+speciel+");informationwindowremove("+id+")'>";
+    if (!!speciel) {
+        element = "<div id='IW"+id+"' class='succesWindows Windows htx-"+cat+"' onclick='"+speciel+";informationwindowremove("+id+")'>";
     } else {
-        element = "<div id='IW"+id+"' class='succesWindows Windows "+cat+"' onclick='(informationwindowremove("+id+"))'>";
+        element = "<div id='IW"+id+"' class='succesWindows Windows htx-"+cat+"' onclick='informationwindowremove("+id+")'>";
     }
     element += "<p id='IWTH"+id+"' class='infoText infoTextHeader'>"+cattext+"</p>";
     element += "<p id='IWT"+id+"' class='infoText'>"+text+"</p>";
@@ -26,9 +28,13 @@ function informationwindowInsert(cat,text,speciel) {
     element += "</div></div>";
     $( "#informationwindow" ).append( element );
     setTimeout(function(){ document.getElementById("IWS"+id).classList.add('statusClosing');  removeDocInfo(id)}, 10);
-    function removeDocInfo(id) {setTimeout(function(){ document.getElementById(('IW'+id)).remove(); }, 5000);}
-    return(id);
+    function removeDocInfo(id) {timeouts[id] = setTimeout(function(){ delete timeouts[id]; document.getElementById(('IW'+id)).remove(); }, 5000);}
+    return id;
 }
 function informationwindowremove(id) {
+    if(timeouts.hasOwnProperty(id)) {
+        clearTimeout(timeouts[id]);
+        delete timeouts[id];
+    }
     document.getElementById("IW"+id).remove();
 }

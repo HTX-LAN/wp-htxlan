@@ -4,6 +4,9 @@
     // Admin page creation
     add_action('admin_menu', 'setup_admin_menu');
 
+    //Handle post requests
+    add_action('init', 'htx_parse_dangerzone_request');
+
     // Creating setup for pages
     function setup_admin_menu(){
         //https://wordpress.stackexchange.com/questions/270783/how-to-make-multiple-admin-pages-for-one-plugin/301806
@@ -19,12 +22,6 @@
 
     // admin page content
     function main_admin_page(){
-        //Post handling
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            HTX_backend_post_dangerZone();
-            return;
-        }
-
         // Widgets and style
         HTX_load_standard_backend();
 

@@ -74,22 +74,22 @@
     padding-bottom: 0.5rem;
     margin-bottom: 0rem;
 }
-.succes {
-    background-color: var(--submit-color-secondary);
+.htx-succes {
+    background-color: var(--submit-color-secondary)!important;
 }
-.succes .statusBar {
-    background-color: var(--submit-color-primary);
+.htx-succes .statusBar {
+    background-color: var(--submit-color-primary)!important;
 }
-.warning {
-    background-color: var(--cancel-color-secondary);
+.htx-warning {
+    background-color: var(--cancel-color-secondary)!important;
 }
-.warning .statusBar {
-    background-color: var(--cancel-color-primary);
+.htx-warning .statusBar {
+    background-color: var(--cancel-color-primary)!important;
 }
-.error {
-    background-color: var(--delete-color-secondary);
+.htx-error {
+    background-color: var(--delete-color-secondary)!important;
     color: white;
 }
-.error .statusBar {
-    background-color: var(--delete-color-primary);
+.htx-error .statusBar {
+    background-color: var(--delete-color-primary)!important;
 }

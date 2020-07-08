@@ -43,4 +43,3 @@
         // JS files
         wp_enqueue_script( 'DangerZoneJS', "/wp-content/plugins/WPPlugin-HTXLan/JS/DangerZone.js");
     }
-        
