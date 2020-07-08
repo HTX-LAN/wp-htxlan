@@ -6,6 +6,7 @@
 
     //Handle post requests
     add_action('wp_ajax_htx_parse_dangerzone_request', 'htx_parse_dangerzone_request');
+    add_action('wp_ajax_htx_delete_form', 'htx_delete_form');
 
     // Creating setup for pages
     function setup_admin_menu(){

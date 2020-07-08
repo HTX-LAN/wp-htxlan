@@ -23,8 +23,8 @@
     // Backend for admins to see
     require 'backend.php';
 
-    // DangerZone
-    require 'dangerzone.php';
+    // Post request handlers
+    require 'post_handlers.php';
 
     //Setup to be run when the plugin is initially enabled.
     function HTX_initial_setup() {
