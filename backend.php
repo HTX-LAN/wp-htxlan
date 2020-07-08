@@ -5,7 +5,7 @@
     add_action('admin_menu', 'setup_admin_menu');
 
     //Handle post requests
-    add_action('init', 'htx_parse_dangerzone_request');
+    add_action('wp_ajax_htx_parse_dangerzone_request', 'htx_parse_dangerzone_request');
 
     // Creating setup for pages
     function setup_admin_menu(){
@@ -42,10 +42,9 @@
         // Danger zone - Reset tables - (Skal laves om til at køre direkte load på siden (reload med post), istedet for via jquery)
         echo "<h3>Farlig zone</h3>";
         HTX_danger_zone();
-        $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-        echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_DeleteParticipants(\"$actual_link\")'>Slet alle tilmeldinger</button><br>";
-        echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_resetDatabases(\"$actual_link\")'>Nulstil databaser</button><br>";
-        echo "<button class='btn updateBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_downloadData(\"$actual_link\")'>Download data</button>";
+        echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_DeleteParticipants()'>Slet alle tilmeldinger</button><br>";
+        echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_resetDatabases()'>Nulstil databaser</button><br>";
+        echo "<button class='btn updateBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_downloadData()'>Download data</button>";
     }
 
 

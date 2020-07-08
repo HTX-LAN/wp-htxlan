@@ -16,8 +16,6 @@ function htx_parse_dangerzone_request() {
                     $response->success = false;
                     $response->error = $e->getMessage();
                 }
-                echo json_encode($response);
-                die();
                 break;
             case 'downloadParticipants':
                 try {
@@ -29,10 +27,10 @@ function htx_parse_dangerzone_request() {
                     $response->success = false;
                     $response->error = $e->getMessage();
                 }
-                echo json_encode($response);
-                die();
                 break;
         }
+        echo json_encode($response);
+        wp_die();
     }
 }
 

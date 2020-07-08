@@ -2,12 +2,13 @@
 
 
 // Reset all databases
-function HTXJS_resetDatabases(url) {
+function HTXJS_resetDatabases() {
     var confirmCreate = confirm("Er du sikker på at du vil nulstille databaser?");
     if (confirmCreate == true) {
         var id = informationwindowInsert(2, "Arbejder på det...");
-        $.post(url, {
-            postType: "resetDB"
+        $.post(ajaxurl, {
+            postType: "resetDB",
+            action: "htx_parse_dangerzone_request"
         }, function(data) {
             informationwindowremove(id);
             if(data.success)
@@ -22,10 +23,11 @@ function HTXJS_resetDatabases(url) {
 }
 
 // Reset all databases
-function HTXJS_downloadData(url) {
+function HTXJS_downloadData() {
     var id = informationwindowInsert(2, "Arbejder på det...");
-    $.post(url, {
-        postType: "downloadParticipants"
+    $.post(ajaxurl, {
+        postType: "downloadParticipants",
+        action: "htx_parse_dangerzone_request"
     }, function(data) {
         informationwindowremove(id);
         if(data.success) {
