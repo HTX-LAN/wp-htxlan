@@ -19,7 +19,7 @@ Denne side har et overwiew af pluginnet
   - [x] Nulstil databaser
   - [x] Opret databaser
   - [ ] Slet alle tilmeldinger
-  - [ ] Download data
+  - [x] Download data
 - [ ] Event liste *(Eventuelt)*
   - [ ] Mulighed for at oprette events, som økonomi kører på, samt forms
 
