@@ -6,13 +6,13 @@ informationwindowInsertIDDONOTCHANGE = 0;
 function informationwindowInsert(cat,text,speciel) {
     var id = ++informationwindowInsertIDDONOTCHANGE;
     if (cat == 1) {
-        cat = "succes"
+        cat = "succes";
         cattext = "Success";
     } else if (cat == 2) {
         cat = "warning";
         cattext = "Advarsel";
     } else if (cat == 3) {
-        cat = "error"
+        cat = "error";
         cattext = "Error!";
     } else {
         return 0;
@@ -27,7 +27,7 @@ function informationwindowInsert(cat,text,speciel) {
     element += "<div id='IWS"+id+"' class='statusBar'>";
     element += "</div></div>";
     $( "#informationwindow" ).append( element );
-    setTimeout(function(){ document.getElementById("IWS"+id).classList.add('statusClosing');  removeDocInfo(id)}, 10);
+    setTimeout(function(){ document.getElementById("IWS"+id).classList.add('statusClosing');  removeDocInfo(id);}, 10);
     function removeDocInfo(id) {timeouts[id] = setTimeout(function(){ delete timeouts[id]; document.getElementById(('IW'+id)).remove(); }, 5000);}
     return id;
 }
