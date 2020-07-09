@@ -212,75 +212,74 @@
                         for ($j=0; $j < count($columnId); $j++) {
                             if (in_array('price_extra', $columnFunction[$columnId[$j]])) {
                                 $j = $columnId[$j];
-                                break;
-                            }
-                        }
-                        $table_name2 = $wpdb->prefix . 'htx_settings_cat';
-                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND settingNameBack = ?");
-                        $stmt2->bind_param("is", $tableId, $columnName[$j]);
-                        $stmt2->execute();
-                        $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0) {
-                            echo "Something NEEDS TO BE CHANGED";
-                            $stmt2->close();
-                            $EconomicError = true;
-                        } else if($result2->num_rows > 1) {
-                            echo "Too many elements with the same backend name";
-                            $stmt2->close();
-                            $EconomicError = true;
-                        } else {
-                            // Fetching and storing values in arrays
-                            while($row = $result2->fetch_assoc()) {
-                                $settingCatExtraName[] = $row['settingName'];
-                                $settingCatExtraNameBack[] = $row['settingNameBack'];
-                                $settingCatExtraId[] = $row['id'];
-                            }
-                            $stmt2->close();
-                            for ($index=0; $index < count($settingCatExtraId); $index++) {
-                                // Getting settings for category
-                                $table_name2 = $wpdb->prefix . 'htx_settings';
-                                $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER BY sorting");
-                                $stmt2->bind_param("i", $settingCatExtraId[$index]);
+                                $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                                $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND settingNameBack = ?");
+                                $stmt2->bind_param("is", $tableId, $columnName[$j]);
                                 $stmt2->execute();
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) {
                                     echo "Something NEEDS TO BE CHANGED";
                                     $stmt2->close();
                                     $EconomicError = true;
+                                } else if($result2->num_rows > 1) {
+                                    echo "Too many elements with the same backend name";
+                                    $stmt2->close();
+                                    $EconomicError = true;
                                 } else {
                                     // Fetching and storing values in arrays
                                     while($row = $result2->fetch_assoc()) {
-                                        $settingExtraIds[$index][] = $row['id'];
-                                        $settingExtraName[$index][$row['id']] = $row['settingName'];
-                                        $settingExtraValue[$index][$row['id']] = $row['value'];
+                                        $settingCatExtraName[] = $row['settingName'];
+                                        $settingCatExtraNameBack[] = $row['settingNameBack'];
+                                        $settingCatExtraId[] = $row['id'];
                                     }
                                     $stmt2->close();
-                                    // Getting users submittet values for Extra
-                                    $table_name2 = $wpdb->prefix . 'htx_form';
-                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND name = ?");
-                                    $stmt2->bind_param("is", $tableId, $settingCatExtraNameBack[$index]);
-                                    $stmt2->execute();
-                                    $result2 = $stmt2->get_result();
-                                    if($result2->num_rows === 0) {
-                                        echo "Ingen tilmeldinger med pris elementet besvaret";
-                                        $stmt2->close();
-                                        $EconomicError = true;
-                                    } else {
-                                        // Fetching and storing values in arrays
-                                        while($row = $result2->fetch_assoc()) {
-                                            $userSubmittetExtraIds[$index][] = $row['userId'];
-                                            $userSubmittetExtraValue[$index][$row['userId']] = $row['value'];
-                                            for ($i=0; $i < count($settingExtraIds[$index]); $i++) { 
-                                                if (!in_array($row['userId'],$usersCrewOnly)) {
-                                                    if ($row['value'] == $settingExtraIds[$index][$i]) {
-                                                        $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = $row['userId'];
-                                                    } else $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = "";
-                                                } else {
-                                                    $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = "";
+                                    for ($index=0; $index < count($settingCatExtraId); $index++) {
+                                        // Getting settings for category
+                                        $table_name2 = $wpdb->prefix . 'htx_settings';
+                                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER BY sorting");
+                                        $stmt2->bind_param("i", $settingCatExtraId[$index]);
+                                        $stmt2->execute();
+                                        $result2 = $stmt2->get_result();
+                                        if($result2->num_rows === 0) {
+                                            echo "Something NEEDS TO BE CHANGED";
+                                            $stmt2->close();
+                                            $EconomicError = true;
+                                        } else {
+                                            // Fetching and storing values in arrays
+                                            while($row = $result2->fetch_assoc()) {
+                                                $settingExtraIds[$index][] = $row['id'];
+                                                $settingExtraName[$index][$row['id']] = $row['settingName'];
+                                                $settingExtraValue[$index][$row['id']] = $row['value'];
+                                            }
+                                            $stmt2->close();
+                                            // Getting users submittet values for Extra
+                                            $table_name2 = $wpdb->prefix . 'htx_form';
+                                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND name = ?");
+                                            $stmt2->bind_param("is", $tableId, $settingCatExtraNameBack[$index]);
+                                            $stmt2->execute();
+                                            $result2 = $stmt2->get_result();
+                                            if($result2->num_rows === 0) {
+                                                echo "Ingen tilmeldinger med pris elementet besvaret";
+                                                $stmt2->close();
+                                                $EconomicError = true;
+                                            } else {
+                                                // Fetching and storing values in arrays
+                                                while($row = $result2->fetch_assoc()) {
+                                                    $userSubmittetExtraIds[$index][] = $row['userId'];
+                                                    $userSubmittetExtraValue[$index][$row['userId']] = $row['value'];
+                                                    for ($i=0; $i < count($settingExtraIds[$index]); $i++) { 
+                                                        if (!in_array($row['userId'],$usersCrewOnly)) {
+                                                            if ($row['value'] == $settingExtraIds[$index][$i]) {
+                                                                $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = $row['userId'];
+                                                            } else $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = "";
+                                                        } else {
+                                                            $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = "";
+                                                        }
+                                                    }
                                                 }
+                                                $stmt2->close();
                                             }
                                         }
-                                        $stmt2->close();
                                     }
                                 }
                             }
@@ -393,6 +392,7 @@
                 </tr>";
 
                 // Extra row
+                var_dump($settingCatExtraId);
                 if ($EconomicExtraError == 0) {
                     for ($index=0; $index < count($settingCatExtraId); $index++) {
                         echo "<tr>
