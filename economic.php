@@ -131,6 +131,7 @@
                 $columnFunctionString = "";
                 while($row = $result2->fetch_assoc()) {
                     $columnId[] = $row['id'];
+                    $columnNameFront[$row['id']] = $row['columnNameFront'];
                     $columnFunction[$row['id']] = explode(",", $row['specialName']);
                     $columnFunctionString .= $row['specialName'].",";
                     $columnName[$row['id']] = $row['columnNameBack'];
@@ -168,7 +169,7 @@
                     } else {
                         // Fetching and storing values in arrays
                         while($row = $result2->fetch_assoc()) {
-                            $settingCatIntranceName = $row['settingName'];
+                            $settingCatIntranceName = $columnNameFront[$j];
                             $settingCatIntranceNameBack = $row['settingNameBack'];
                             $settingCatIntranceId = $row['id'];
                         }
@@ -240,15 +241,11 @@
                                     echo "Ingen ekstra værdier<br>";
                                     $stmt2->close();
                                     $EconomicExtraErrorError = 1;
-                                } else if($result2->num_rows > 1) {
-                                    echo "Too many elements with the same backend name<br>";
-                                    $stmt2->close();
-                                    $EconomicExtraErrorError = 1;
                                 } else {
                                     $EconomicExtraErrorError = 0;
                                     // Fetching and storing values in arrays
                                     while($row = $result2->fetch_assoc()) {
-                                        $settingCatExtraName[$g] = $row['settingName'];
+                                        $settingCatExtraName[$g] = $columnNameFront[$j];
                                         $settingCatExtraNameBack[$g] = $row['settingNameBack'];
                                         $settingCatExtraId[$g] = $row['id'];
                                     }
