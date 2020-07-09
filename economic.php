@@ -277,13 +277,9 @@
                                                 $userSubmittetExtraIds[$g][] = $row['userId'];
                                                 $userSubmittetExtraValue[$g][$row['userId']] = $row['value'];
                                                 for ($i=0; $i < count($settingExtraIds[$g]); $i++) { 
-                                                    if (!in_array($row['userId'],$usersCrewOnly)) {
-                                                        if ($row['value'] == $settingExtraIds[$g][$i]) {
-                                                            $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = $row['userId'];
-                                                        } else $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = "";
-                                                    } else {
-                                                        $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = "";
-                                                    }
+                                                    if ($row['value'] == $settingExtraIds[$g][$i]) {
+                                                        $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = $row['userId'];
+                                                    } else $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = "";
                                                 }
                                             }
                                             $stmt2->close();
@@ -460,23 +456,7 @@
                     $AllExtraCashTotalSum = array_sum($ExtraCashTotalSum);
                     $AllExtraMobileTotalSum = array_sum($ExtraMobileTotalSum);
                 }
-
-
-
-                echo "<tr style='background-color: unset; height: 2rem;'>
-                    <td colspan='9' style='background-color: unset;'></td>
-                </tr>
-                <tr class='InfoTableRow'>
-                    <td><b>I alt</b></td>
-                    <td>400</td>
-                    <td>800</td>
-                    <td>1200</td>
-                    <td>2400</td>
-                </tr>
-                <tr style='background-color: unset; height: 2rem;'>
-                    <td colspan='9' style='background-color: unset;'></td>
-                </tr>";
-
+                
                 // Ekstra indkomst (on hold)
                 /*echo "<tr>
                     <th colspan='9'><h2 style='margin: 0px;'>Ekstra indkomst</h2></th>
@@ -506,6 +486,28 @@
                 <tr style='background-color: unset; height: 2rem;'>
                     <td colspan='9' style='background-color: unset;'></td>
                 </tr>";*/
+
+                $totalIncomeNonPayed = $AllExtraNonPayedTotalSum + $IntranceNonPayedTotalAmount;
+                $totalIncomeCash = $AllExtraCashTotalSum + $IntranceCashTotalAmount;
+                $totalIncomeMobile = $AllExtraMobileTotalSum + $IntranceMobileTotalAmount;
+                $totalIncomePayed = $totalIncomeCash + $totalIncomeMobile;
+                $totalIncome = $totalIncomePayed + $totalIncomeNonPayed;
+
+
+                echo "<tr style='background-color: unset; height: 2rem;'>
+                    <td colspan='9' style='background-color: unset;'></td>
+                </tr>
+                <tr class='InfoTableRow'>
+                    <td><b>I alt</b></td>
+                    <td>$totalIncomeNonPayed</td>
+                    <td>$totalIncomeCash</td>
+                    <td>$totalIncomeMobile</td>
+                    <td>$totalIncome</td>
+                </tr>
+                <tr style='background-color: unset; height: 2rem;'>
+                    <td colspan='9' style='background-color: unset;'></td>
+                </tr>";
+
 
                 // Udgifter (on hold)
                 /*echo "<tr>
