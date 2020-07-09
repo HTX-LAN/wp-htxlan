@@ -1,4 +1,10 @@
 <?php
+    //Prevent direct file access
+    if(!defined('ABSPATH')) {
+        header("Location: ../../../");
+        die();
+    }
+
     // Tabel med alle tilmeldinger som kan ses - Evt en knap som kan trykkes, hvor så at felterne kan blive redigerbare - Man kan vælge imellem forskellige forms
     // Widgets and style
     HTX_load_standard_backend();
@@ -166,13 +172,13 @@
                                 if ($columnType[$index] == "checkbox") {
                                     $valueArray = explode(",", $row2['value']);
                                     if (count($valueArray) > 0) {
-                                        for ($j=0; $j < count($valueArray); $j++) { 
+                                        for ($j=0; $j < count($valueArray); $j++) {
                                             echo htmlspecialchars($settingName[$valueArray[$j]]);
-    
+
                                             // Writing price
                                             if (in_array('price_intrance', $specialName[$index])) {
                                                 $price = $price + floatval($settingValue[$valueArray[$j]]);
-        
+
                                             }
                                             // Writing extra price
                                             if (in_array('price_extra', $specialName[$index])) {
@@ -197,7 +203,7 @@
                                         $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
                                     }
                                 }
-                                
+
                             } else {
                                 // Checks column type
                                 if (!in_array($columnType[$index], $nonUserInput)) {

@@ -1,4 +1,10 @@
 <?php
+    //Prevent direct file access
+    if(!defined('ABSPATH')) {
+        header("Location: ../../../");
+        die();
+    }
+
     // Functions and scripts written in php
 
     // frontend post handling
@@ -60,7 +66,7 @@
                         $stmt->close();
 
                         // Inserting every input into row
-                    
+
                         $link->autocommit(FALSE); //turn on transactions
 
                         // Inserting user and getting id
@@ -77,7 +83,7 @@
                         $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
                         for ($i=0; $i < count($columnNameBack); $i++) {
                             $inputName = $columnNameBack[$i];
-                            
+
                             // Does a speciel implode a data, when it is a checkbox
                             if ($columnType[$i] == 'checkbox') {
                                 if(!empty($_POST[$columnNameBack[$i]])) {
@@ -133,18 +139,18 @@
     }
 
     // Count number of times a string is in an array
-    function count_array_values($my_array, $match) { 
-        $count = 0; 
-        foreach ($my_array as $key => $value) 
-        { 
-            if ($value == $match) 
-            { 
-                $count++; 
-            } 
-        } 
-        
-        return $count; 
-    } 
+    function count_array_values($my_array, $match) {
+        $count = 0;
+        foreach ($my_array as $key => $value)
+        {
+            if ($value == $match)
+            {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
 
     // Setting cookie
     function setCustomCookie($cookieName, $cookieValue) {

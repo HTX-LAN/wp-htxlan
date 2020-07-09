@@ -1,4 +1,10 @@
 <?php
+    //Prevent direct file access
+    if(!defined('ABSPATH')) {
+        header("Location: ../../../");
+        die();
+    }
+
     // Widgets and style
     HTX_load_standard_backend();
 
@@ -88,7 +94,7 @@
                 if ($usersPayedCashIds == NULL) $usersPayedCashIds[] = "";
                 if ($usersPayedMobile == NULL) $usersPayedMobile[] = "";
                 if ($usersPayedMobileIds == NULL) $usersPayedMobileIds[] = "";
-                
+
                 $usersArrived[$row['id']] = $row['arrived'];
                 $usersCrew[$row['id']] = $row['crew'];
                 if ($row['crew'] == "1") {
@@ -120,7 +126,7 @@
                     $columnName[$row['id']] = $row['columnNameBack'];
                 }
                 $stmt2->close();
-            
+
                 $columnFunctionArray = explode(",", $columnFunctionString);
                 if (count_array_values($columnFunctionArray, 'price_intrance') > 1) {
                     echo "Too many intrance elements";
@@ -190,7 +196,7 @@
                                 while($row = $result2->fetch_assoc()) {
                                     $userSubmittetIntranceIds[] = $row['userId'];
                                     $userSubmittetIntranceValue[$row['userId']] = $row['value'];
-                                    for ($i=0; $i < count($settingIntranceIds); $i++) { 
+                                    for ($i=0; $i < count($settingIntranceIds); $i++) {
                                         if (!in_array($row['userId'],$usersCrewOnly)) {
                                             if ($row['value'] == $settingIntranceIds[$i]) {
                                                 $userSubmittetIntrance[$settingIntranceIds[$i]][] = $row['userId'];
@@ -316,7 +322,7 @@
                 </tr>
             </thead>
             <tbody>";
-                for ($i=0; $i < count($settingIntranceIds); $i++) { 
+                for ($i=0; $i < count($settingIntranceIds); $i++) {
                     // Calculating amounts and value for every setting in element
                     $intranceNonPayedAmount[$i] = count(array_intersect($userSubmittetIntrance[$settingIntranceIds[$i]],$usersPayedFalseIds));
                     $intranceNonPayedSum[$i] = $intranceNonPayedAmount[$i]*$settingIntranceValue[$settingIntranceIds[$i]];
@@ -398,7 +404,7 @@
                         echo "<tr>
                                 <th colspan='9'>$settingCatExtraName[$index]</th>
                             </tr>";
-                        for ($i=0; $i < count($settingExtraIds[$index]); $i++) { 
+                        for ($i=0; $i < count($settingExtraIds[$index]); $i++) {
                             // Calculating amounts and value for every setting in element
                             $extraNonPayedAmount[$index][$i] = count(array_intersect($userSubmittetExtra[$index][$settingExtraIds[$index][$i]],$usersPayedFalseIds));
                             $extraNonPayedSum[$index][$i] = $extraNonPayedAmount[$index][$i]*$settingExtraValue[$index][$settingExtraIds[$index][$i]];
@@ -406,11 +412,11 @@
                             $extraCashSum[$index][$i] = $extraCashAmount[$index][$i]*$settingExtraValue[$index][$settingExtraIds[$index][$i]];
                             $extraMobileAmount[$index][$i] = count(array_intersect($userSubmittetExtra[$index][$settingExtraIds[$index][$i]],$usersPayedMobileIds));
                             $extraMobileSum[$index][$i] = $extraMobileAmount[$index][$i]*$settingExtraValue[$index][$settingExtraIds[$index][$i]];
-        
+
                             // Getting line total
                             $extraSum[$index][$i] = $extraNonPayedSum[$index][$i]+$extraCashSum[$index][$i]+$extraMobileSum[$index][$i];
                             $extraAmount[$index][$i] = $extraNonPayedAmount[$index][$i]+$extraCashAmount[$index][$i]+$extraMobileAmount[$index][$i];
-        
+
                             echo "<tr class='InfoTableRow'>
                                 <td>".$settingExtraName[$index][$settingExtraIds[$index][$i]]."</td>
                                 <td>".$extraNonPayedSum[$index][$i]."</td>
@@ -432,7 +438,7 @@
                         $ExtraMobileTotalAmount[$index] = array_sum($extraMobileAmount[$index]);
                         $ExtraTotalSum[$index] = array_sum($extraSum[$index]);
                         $ExtraTotalAmount[$index] = array_sum($extraAmount[$index]);
-        
+
                         echo "<tr class='InfoTableRow'>
                             <td><b>I alt</b></td>
                             <td>$ExtraNonPayedTotalSum[$index]</td>
@@ -446,7 +452,7 @@
                         </tr>";
                     }
                 }
-                
+
 
                 echo "<tr style='background-color: unset; height: 2rem;'>
                     <td colspan='9' style='background-color: unset;'></td>
@@ -589,7 +595,7 @@
                 <td>60</td>
                 <td>6000</td>
             </tr>
-        </tbody></table>";    
+        </tbody></table>";
     }
 
 ?>

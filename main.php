@@ -8,6 +8,12 @@
     * Author URI: https://the0mikkel.github.io/WPPlugin-HTXLan/authors
     */
 
+    //Prevent direct file access
+    if(!defined('ABSPATH')) {
+        header("Location: ../../../");
+        die();
+    }
+
     // Database creation
     require 'db.php';
 
