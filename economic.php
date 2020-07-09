@@ -114,6 +114,7 @@
             if ($usersPayedMobile == NULL) $usersPayedMobile[] = "0";
             if ($usersPayedMobileIds == NULL) $usersPayedMobileIds[] = "0";
             if ($usersArrivedOnly == NULL) $usersArrivedOnly = "";
+            if ($usersNotArrivedOnly == NULL) $usersNotArrivedOnly[] = "";
             if ($usersCrewOnlyOnly == NULL) $usersCrewOnlyOnly = "";
 
             // Getting where price_intrance and price_extra is
@@ -123,7 +124,7 @@
             $stmt2->execute();
             $result2 = $stmt2->get_result();
             if($result2->num_rows === 0) {
-                echo "Der er ingen felter med nogen funktioner";
+                echo "Der er ingen felter med nogen funktioner endnu.<br>Derfor kan økonomi siden desværre ikke virke.";
                 $stmt2->close();
                 $EconomicError = true;
             } else {
@@ -140,7 +141,7 @@
 
                 $columnFunctionArray = explode(",", $columnFunctionString);
                 if (count_array_values($columnFunctionArray, 'price_intrance') > 1) {
-                    echo "Too many intrance elements";
+                    echo "Der er sat for mange elementer op til at være 'Indgangs pris', og derved virker økonomi siden ikke";
                     $EconomicError = true;
                 } else if (count_array_values($columnFunctionArray, 'price_intrance') < 1) {
                     echo "Der er ikke nogen elementer sat op som ingangs pris";
@@ -159,11 +160,12 @@
                     $stmt2->execute();
                     $result2 = $stmt2->get_result();
                     if($result2->num_rows === 0) {
-                        echo "Something NEEDS TO BE CHANGED";
+                        echo "Den indstilling du har valgt som 'Indgang pris' er desværre ikke en som kan bruges sammen med økonomi siden.";
                         $stmt2->close();
                         $EconomicError = true;
                     } else if($result2->num_rows > 1) {
-                        echo "Too many elements with the same backend name";
+                        echo "Noget er gruligt galt, venligst rapporter dette til udviklerne:<br>
+                        <i style='color:red'>Economic page - Too many settings category, with the same backend name for intrance price</i>";
                         $stmt2->close();
                         $EconomicError = true;
                     } else {
@@ -181,7 +183,7 @@
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
                         if($result2->num_rows === 0) {
-                            echo "Something NEEDS TO BE CHANGED";
+                            echo "Der er ingen værdier for 'Indgangs pris' formular elementet, og derved virker økonomi siden ikke.";
                             $stmt2->close();
                             $EconomicError = true;
                         } else {
@@ -199,7 +201,7 @@
                             $stmt2->execute();
                             $result2 = $stmt2->get_result();
                             if($result2->num_rows === 0) {
-                                echo "Ingen tilmeldinger med pris elementet besvaret";
+                                echo "Ingen tilmeldinger med pris elementet besvaret - Du burde overveje at lave det element til 'required'";
                                 $stmt2->close();
                                 $EconomicError = true;
                             } else {
@@ -223,7 +225,7 @@
                     }
 
                     if (count_array_values($columnFunctionArray, 'price_extra') < 1) {
-                        echo "Der er ikke nogen elementer sat op som ekstra pris<br>";
+                        // echo "Der er ikke nogen elementer sat op som ekstra pris<br>"; #Don't repport this error, as it is optional to have extra prices
                         $EconomicExtraError = 1;
                     } else {
                         $g = 0;
@@ -238,9 +240,14 @@
                                 $stmt2->execute();
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) {
-                                    echo "Ingen ekstra værdier<br>";
+                                    echo "Den indstilling du har valgt som 'Ekstra pris' er desværre ikke en som kan bruges sammen med økonomi siden.";
                                     $stmt2->close();
-                                    $EconomicExtraErrorError = 1;
+                                    $EconomicExtraError = 1;
+                                } else if($result2->num_rows > 1) {
+                                    echo "Noget er gruligt galt, venligst rapporter dette til udviklerne:<br>
+                                    <i style='color:red'>Economic page - Too many settings category, with the same backend name for extra price</i>";
+                                    $stmt2->close();
+                                    $EconomicExtraError = 1;
                                 } else {
                                     $EconomicExtraErrorError = 0;
                                     // Fetching and storing values in arrays
@@ -257,9 +264,9 @@
                                     $stmt2->execute();
                                     $result2 = $stmt2->get_result();
                                     if($result2->num_rows === 0) {
-                                        echo "Something NEEDS TO BE CHANGED";
+                                        echo "Der er ingen værdier for 'Ekstra pris' formular elementet, og derved virker økonomi siden ikke.";
                                         $stmt2->close();
-                                        $EconomicExtraErrorError = true;
+                                        $EconomicExtraErrorError = 1;
                                     } else {
                                         // Fetching and storing values in arrays
                                         while($row = $result2->fetch_assoc()) {
@@ -275,9 +282,9 @@
                                         $stmt2->execute();
                                         $result2 = $stmt2->get_result();
                                         if($result2->num_rows === 0) {
-                                            echo "Ingen tilmeldinger med pris elementet besvaret";
+                                            echo "Ingen tilmeldinger med pris elementet besvaret - Du burde overveje at lave det element til 'required'";
                                             $stmt2->close();
-                                            $EconomicExtraErrorError = true;
+                                            $EconomicExtraErrorError = 1;
                                         } else {
                                             // Fetching and storing values in arrays
                                             while($row = $result2->fetch_assoc()) {
@@ -393,14 +400,6 @@
                     <td>$IntranceCashTotalAmount</td>
                     <td>$IntranceMobileTotalAmount</td>
                     <td>$IntranceTotalAmount</td>
-                </tr>
-
-                <tr style='background-color: unset; height: 2rem;'>
-                    <td colspan='9' style='background-color: unset;'></td>
-                </tr>
-
-                <tr>
-                    <th colspan='9'><h2 style='margin: 0px;'>Ekstra</h2></th>
                 </tr>";
                 $AllExtraNonPayedTotalSum = 0;
                 $AllExtraCashTotalSum = 0;
@@ -408,6 +407,12 @@
 
                 // Extra row
                 if ($EconomicExtraError == 0) {
+                    echo "<tr style='background-color: unset; height: 2rem;'>
+                        <td colspan='9' style='background-color: unset;'></td>
+                    </tr>
+                    <tr>
+                        <th colspan='9'><h2 style='margin: 0px;'>Ekstra</h2></th>
+                    </tr>";
                     for ($index=0; $index < count($settingCatExtraId); $index++) {
                         echo "<tr>
                                 <th colspan='9'>$settingCatExtraName[$index]</th>
@@ -627,14 +632,14 @@
                 <th>Statestik</th>
                 <th>Antal</th>
             </tr>
+            <tr class='InfoTableRow'>
+                <td>Betalt</td>
+                <td>$amountPayed</td>
+            </tr>
             </thead><tbody>
             <tr class='InfoTableRow'>
                 <td>Ikke betalt</td>
                 <td>$amountNonPayed</td>
-            </tr>
-            <tr class='InfoTableRow'>
-                <td>Betalt</td>
-                <td>$amountPayed</td>
             </tr>
             <tr class='InfoTableRow'>
                 <td>Ankommet</td>
