@@ -41,7 +41,7 @@
         // Dropdown menu
         // Starting dropdown menu
         echo "<p><h3>Formular:</h3> ";
-        echo "<form method=\"get\"><input type='hidden' name='page' value='HTX_lan_participants_list'><select name='formular' class='dropdown' onchange='form.submit()'>";
+        echo "<form method=\"get\"><input type='hidden' name='page' value='HTX_lan_economic'><select name='formular' class='dropdown' onchange='form.submit()'>";
         // writing every option
         for ($i=0; $i < count($tableIds); $i++) {
             // Seeing if value is the choosen one
@@ -465,7 +465,11 @@
                 }
                 
                 // Ekstra indkomst (on hold)
-                /*echo "<tr>
+                /*echo "
+                <tr style='background-color: unset; height: 2rem;'>
+                    <td colspan='9' style='background-color: unset;'></td>
+                </tr>
+                <tr>
                     <th colspan='9'><h2 style='margin: 0px;'>Ekstra indkomst</h2></th>
                 </tr>
                 <tr>
