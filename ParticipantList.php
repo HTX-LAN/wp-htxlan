@@ -161,9 +161,11 @@
                     $result2 = $stmt2->get_result();
                     if($result2->num_rows === 0) {
                         if (!in_array($columnType[$index], $nonUserInput)) {
-                            echo "<i style='color: red'>Null</i>";
+                            echo "<td>";
+                            echo "<i style='color: red'>-</i>";
+                            echo "</td>";
                         }
-                    }else {
+                    } else {
                         echo "<td>";
                         while($row2 = $result2->fetch_assoc()) {
                             // Checks if dropdown or other where value is an id
