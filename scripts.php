@@ -1,4 +1,10 @@
 <?php
+    //Prevent direct file access
+    if(!defined('ABSPATH')) {
+        header("Location: ../../../");
+        die();
+    }
+
     // Scripts with all sorts of code, that is written in either JS og CSS
 
     // Loading parameters - backend

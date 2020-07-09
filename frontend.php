@@ -1,4 +1,10 @@
 <?php
+    //Prevent direct file access
+    if(!defined('ABSPATH')) {
+        header("Location: ../../../");
+        die();
+    }
+
     // Frontend php site
 
     // Shortcode for blancket
@@ -6,13 +12,13 @@
     function frontend_update(){
         add_shortcode('HTX_Tilmeldningsblanket','HTX_lan_tilmdeldingsblanket_function');
     }
-    
+
     //perform the shortcode output
     function HTX_lan_tilmdeldingsblanket_function($atts = array()){
         // Custom connection to database
         $link = database_connection();
         global $wpdb;
-        
+
         // add to $html, to return it at the end -> It is how to do shortcodes in Wordpress
         $html = "";
 
@@ -38,7 +44,7 @@
 
         // Post handling
         $postError = HTX_frontend_post($tableId);
-        
+
         // Getting and writing content to form
         // Getting column info
         $table_name = $wpdb->prefix . 'htx_column';
@@ -66,7 +72,7 @@
         $html .= "<form method=\"post\">";
 
         // Writing for every column entry
-        for ($i=0; $i < count($columnNameFront); $i++) { 
+        for ($i=0; $i < count($columnNameFront); $i++) {
             // Setup for required label
             if ($required[$i] == 1) {$isRequired = "required"; $requiredStar = "<i style='color: red'>*</i>";} else {$isRequired = ""; $requiredStar = "";}
             // Setup for disabled
@@ -87,7 +93,7 @@
                         }
                     }
                     $stmt->close();
-                    
+
                     // Getting dropdown content
                     $table_name = $wpdb->prefix . 'htx_settings';
                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? ORDER BY sorting");
@@ -115,7 +121,7 @@
                         $html .= "</select>";
                     }
                     $stmt->close();
-                    
+
                 break;
                 case "radio":
                     $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
@@ -131,7 +137,7 @@
                         }
                         // Disabled handling
                         if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
-                        
+
                         // Getting radio content
                         $table_name3 = $wpdb->prefix . 'htx_settings';
                         $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
@@ -146,7 +152,7 @@
 
                                 // Set as selected from post
                                 if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
-    
+
                                 // Write data
                                 $html .= "<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' value='$setting_id' class='inputBox  $disabledClass' $postSelected>
                                 <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label><br>";
@@ -156,7 +162,7 @@
                         $stmt3->close();
                     }
                     $stmt->close();
-                    
+
                 break;
                 case "checkbox":
                     $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
@@ -172,7 +178,7 @@
                         }
                         // Disabled handling
                         if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
-                        
+
                         // Getting radio content
                         $table_name3 = $wpdb->prefix . 'htx_settings';
                         $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
@@ -188,7 +194,7 @@
 
                                 // Set as selected from post
                                 if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
-    
+
                                 // Write data
                                 $html .= "<div class='checkboxDiv'><input type='checkbox' id='$columnNameBack[$i]-$setting_id' name='".$columnNameBack[$i]."[]' value='$setting_id' $postSelected>
                                 <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label></div>";
@@ -199,29 +205,29 @@
                         $stmt3->close();
                     }
                     $stmt->close();
-                    
+
                 break;
                 case "text area":
                     $html .= "<h5>$columnNameFront[$i]</h5>";
                     $html .= "<p>$placeholderText[$i]</p>";
                 break;
-                default: 
-                    $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";    
+                default:
+                    $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
                     $html .= "<input name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired></p>";
             }
-            
+
         }
         $html .= "<input name='tableId' value='$tableId' style='display: none'></p>";
 
         // Error handling block !Needs to be made to popup window
-        // if (isset($postError)) 
+        // if (isset($postError))
         $html .= "<p>$postError</p>";
 
         // Ending form with submit and reset buttons
         $html .= "<p><button type='submit' name='submit' value='new'>Tilmeld</button> <button type='reset' name='reset'>Nulstil</button></p>";
 
         // Success handling - Give information via popup window, that the regristration have been saved
-        
+
         // Returning html code
         return $html;
     }

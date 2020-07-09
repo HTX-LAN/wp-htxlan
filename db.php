@@ -1,4 +1,11 @@
 <?php
+
+//Prevent direct file access
+if(!defined('ABSPATH')) {
+    header("Location: ../../../");
+    die();
+}
+
 // Databases for plugin
 
     function create_db(){
