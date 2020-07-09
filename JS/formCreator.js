@@ -3,6 +3,17 @@ function showEditForm(id) {
 
 }
 
+//https://stackoverflow.com/a/901144
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
 // Script to submit form based on id
 function submitForm(id) {
     document.getElementById(id).submit();
@@ -18,8 +29,8 @@ function HTXJS_deleteForm(formid) {
         }, function(data) {
             informationwindowremove(id);
             if(data.success) {
-                //TODO: Update and remove necessary values
                 informationwindowInsert(1, "Formularen blev slettet.");
+                location.search = "page=" + getParameterByName("page");
             } else {
                 informationwindowInsert(3, "Kunne ikke slette formularen.");
                 console.log(data.error);
@@ -38,7 +49,10 @@ function HTXJS_updateForm(formid) {
     }, function(data) {
         informationwindowremove(id);
         if(data.success) {
-            //TODO: Update and remove necessary values
+            //Update values
+            $('#form-tableOfContent-' + formid + ' a').text($('#tableName').val());
+            $('#formSettings h2 a').text($('#tableName').val());
+
             informationwindowInsert(1, "Formularen blev opdateret.");
         } else {
             informationwindowInsert(3, "Kunne ikke opdatere formularen.");
@@ -54,8 +68,12 @@ function HTXJS_createForm() {
     }, function(data) {
         informationwindowremove(id);
         if(data.success) {
-            //TODO: Update necessary values
-            informationwindowInsert(1, "Formularen blev oprettet. ID " + data.id);
+            $('.highlighted').each(function() {
+                $(this).removeClass('highlighted');
+            });
+            $("#formCreator_tableOfContent").append("<form id='form-tableOfContent-" + data.id + "' action='admin.php' method=\"get\"><input name='page' value='" + getParameterByName('page') + "' type='hidden'><input name='form' value='" + data.id + "' type='hidden'><a onclick='submitForm(\"form-tableOfContent-" + data.id + "\")' class='highlighted'>" + data.name + "</a><br></form>");
+            submitForm("form-tableOfContent-" + data.id);
+            informationwindowInsert(1, "Formularen blev oprettet.");
         } else {
             informationwindowInsert(3, "Kunne ikke oprette en ny formular.");
             console.log(data.error);
@@ -72,8 +90,8 @@ function HTXJS_addColumn(formid) {
     }, function(data) {
         informationwindowremove(id);
         if(data.success) {
-            //TODO: Update necessary values
-            informationwindowInsert(1, "Ny række blev oprettet. ID " + data.id);
+            informationwindowInsert(1, "Ny række blev oprettet.");
+            location.reload();
         } else {
             informationwindowInsert(3, "Kunne ikke oprette ny række.");
             console.log(data.error);
@@ -90,8 +108,8 @@ function HTXJS_updateSorting(setting) {
     }, function(data) {
         informationwindowremove(id);
         if(data.success) {
-            //TODO: Update necessary values
             informationwindowInsert(1, "Sorteringen blev opdateret");
+            location.reload();
         } else {
             informationwindowInsert(3, "Kunne ikke opdatere sorteringen.");
             console.log(data.error);
@@ -141,7 +159,7 @@ function HTXJS_updateColumn(setting) {
     $.post(ajaxurl, form, function(data) {
         informationwindowremove(id);
         if(data.success) {
-            //TODO: Update necessary values
+            location.reload();
             informationwindowInsert(1, "Rækken blev opdateret");
         } else {
             informationwindowInsert(3, "Kunne ikke opdatere rækken.");
@@ -166,8 +184,8 @@ function HTXJS_deleteColumn(setting) {
     $.post(ajaxurl, form, function(data) {
         informationwindowremove(id);
         if(data.success) {
-            //TODO: Update necessary values
             informationwindowInsert(1, "Rækken blev slettet");
+            location.search = "page=" + getParameterByName("page") + "&form=" + getParameterByName("form");
         } else {
             informationwindowInsert(3, "Kunne ikke slette rækken.");
             console.log(data.error);
@@ -183,7 +201,7 @@ function HTXJS_deleteSetting(setting) {
     }, function(data) {
         informationwindowremove(id);
         if(data.success) {
-            //TODO: Update necessary values
+            location.reload();
             informationwindowInsert(1, "Valgmuligheden blev slettet");
         } else {
             informationwindowInsert(3, "Valgmuligheden kunne ikke slettes.");
@@ -201,7 +219,7 @@ function HTXJS_addSetting(setting, type) {
     }, function(data) {
         informationwindowremove(id);
         if(data.success) {
-            //TODO: Update necessary values
+            location.reload();
             informationwindowInsert(1, "Valgmuligheden blev tilføjet");
         } else {
             informationwindowInsert(3, "Valgmuligheden kunne ikke tilføjes.");

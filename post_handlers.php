@@ -148,6 +148,7 @@ function htx_create_form() {
             $link->close();
             $response->success = true;
             $response->id = $tableId;
+            $response->name = $Name;
         } catch(Exception $e) {
             $response->success = false;
             $response->error = $e->getMessage();
