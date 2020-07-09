@@ -190,56 +190,6 @@
         return $url;
     }
 
-    // Script to create new form
-    function new_HTX_form() {
-        try {
-            $link = database_connection();
-            global $wpdb;
-            $link->autocommit(FALSE); //turn on transactions
-
-            // Creating new form in form tables
-            echo "create!";
-            $table_name = $wpdb->prefix . 'htx_form_tables';
-            $shortcode = "HTX_Tilmeldningsblanket"; $Name = 'Ny formular';
-            $stmt = $link->prepare("INSERT INTO $table_name (shortcode, tableName) VALUES (?, ?)");
-            $stmt->bind_param("ss", $shortcode, $Name);
-            $stmt->execute();
-            $newTableId = intval($link->insert_id);
-            $stmt->close();
-
-            // Creating standard inputs (First- & lastname, email & phone)
-            $table_name = $wpdb->prefix . 'htx_column';
-            $link->autocommit(FALSE); //turn on transactions
-            $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, required, settingCat) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("issssssisii", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $required, $settingCat);
-            $tableId = $newTableId;
-            $columnNameFront = "Fornavn"; $columnNameBack='firstName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 1; $placeholderText = "John"; $adminOnly = 0; $required = 1; $settingCat = 0;
-            $stmt->execute();
-            $columnNameFront = "Efternavn"; $columnNameBack='lastName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 2; $placeholderText = "Smith"; $adminOnly = 0; $required = 1; $settingCat = 0;
-            $stmt->execute();
-            $columnNameFront = "E-mail"; $columnNameBack='email'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 3; $placeholderText = "john@htx-lan.dk"; $adminOnly = 0; $required = 1; $settingCat = 0;
-            $stmt->execute();
-            $columnNameFront = "Mobil nummer"; $columnNameBack='phone'; $format="number"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 4; $placeholderText = "12345678"; $adminOnly = 0; $required = 0; $settingCat = 0;
-            $stmt->execute();
-            $stmt->close();
-
-            // Reload page to new form
-            echo "<form id='installNewForm' method='GET'>
-                <input type='hidden' name='page' value='HTX_lan_create_form'>
-                <input type='hidden' name='form' value='$tableId'>
-            </form>
-            <script>document.getElementById('installNewForm').submit()</script>";
-
-
-            $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        } catch(Exception $e) {
-            $link->rollback(); //remove all queries from queue if error (undo)
-            // throw $e;
-            return "<span style='color: red'>Tilmeldingen blev ikke tilføjet</span>";
-        }
-
-    }
-
     // Participant list post handling from backend
     function participantList_post($tableId){
         // Post handling

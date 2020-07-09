@@ -1,4 +1,10 @@
 <?php
+    //Prevent direct file access
+    if(!defined('ABSPATH')) {
+        header("Location: ../../../");
+        die();
+    }
+
     // Backend php page
 
     // Admin page creation
@@ -7,6 +13,12 @@
     //Handle post requests
     add_action('wp_ajax_htx_parse_dangerzone_request', 'htx_parse_dangerzone_request');
     add_action('wp_ajax_htx_delete_form', 'htx_delete_form');
+    add_action('wp_ajax_htx_update_form', 'htx_update_form');
+    add_action('wp_ajax_htx_create_form', 'htx_create_form');
+    add_action('wp_ajax_htx_new_column', 'htx_new_column');
+    add_action('wp_ajax_htx_update_sorting', 'htx_update_sorting');
+    add_action('wp_ajax_htx_update_column', 'htx_update_column');
+    add_action('wp_ajax_htx_delete_column', 'htx_delete_column');
 
     // Creating setup for pages
     function setup_admin_menu(){
