@@ -124,19 +124,19 @@ function HTXJS_updateColumn(setting) {
     if($('#settingsAmount').length)
         form.settingsAmount = $('#settingsAmount').val();
     $(".settingId").each(function() {
-        form[$(this).attr('id')] = $(this).val();
+        form[$(this).attr('name')] = $(this).val();
     });
     $(".settingActive").each(function() {
-        form[$(this).attr('id')] = $(this).val();
+        form[$(this).attr('name')] = $(this).val();
     });
     $(".settingName").each(function() {
-        form[$(this).attr('id')] = $(this).val();
+        form[$(this).attr('name')] = $(this).val();
     });
     $(".settingValue").each(function() {
-        form[$(this).attr('id')] = $(this).val();
+        form[$(this).attr('name')] = $(this).val();
     });
     $(".settingSorting").each(function() {
-        form[$(this).attr('id')] = $(this).val();
+        form[$(this).attr('name')] = $(this).val();
     });
     $.post(ajaxurl, form, function(data) {
         informationwindowremove(id);
@@ -170,6 +170,41 @@ function HTXJS_deleteColumn(setting) {
             informationwindowInsert(1, "Rækken blev slettet");
         } else {
             informationwindowInsert(3, "Kunne ikke slette rækken.");
+            console.log(data.error);
+        }
+    });
+}
+
+function HTXJS_deleteSetting(setting) {
+    var id = informationwindowInsert(2, "Arbejder på det...");
+    $.post(ajaxurl, {
+        action: "htx_delete_setting",
+        setting: setting
+    }, function(data) {
+        informationwindowremove(id);
+        if(data.success) {
+            //TODO: Update necessary values
+            informationwindowInsert(1, "Valgmuligheden blev slettet");
+        } else {
+            informationwindowInsert(3, "Valgmuligheden kunne ikke slettes.");
+            console.log(data.error);
+        }
+    });
+}
+
+function HTXJS_addSetting(setting, type) {
+    var id = informationwindowInsert(2, "Arbejder på det...");
+    $.post(ajaxurl, {
+        action: "htx_add_setting",
+        setting: setting,
+        columnType: type
+    }, function(data) {
+        informationwindowremove(id);
+        if(data.success) {
+            //TODO: Update necessary values
+            informationwindowInsert(1, "Valgmuligheden blev tilføjet");
+        } else {
+            informationwindowInsert(3, "Valgmuligheden kunne ikke tilføjes.");
             console.log(data.error);
         }
     });

@@ -469,4 +469,81 @@ function htx_delete_column() {
     }
 }
 
+function htx_delete_setting() {
+    if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setting'])) {
+        if(!current_user_can("manage_options"))
+            return;
+        $response = new stdClass();
+        header('Content-type: application/json');
+        try {
+            global $wpdb;
+            $link = database_connection();
+
+            $settingId = $_POST['setting'];
+            $table_name = $wpdb->prefix . 'htx_settings';
+            $link->autocommit(FALSE); //turn on transactions
+            $stmt = $link->prepare("DELETE FROM $table_name WHERE id = ?");
+            $stmt->bind_param("i", $settingId);
+            $stmt->execute();
+            $stmt->close();
+            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+            $link->close();
+            $response->success = true;
+        } catch(Exception $e) {
+            $response->success = false;
+            $response->error = $e->getMessage();
+            $link->rollback(); //remove all queries from queue if error (undo)
+        }
+        echo json_encode($response);
+        wp_die();
+    }
+}
+
+function htx_add_setting() {
+    if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setting'])) {
+        if(!current_user_can("manage_options"))
+            return;
+        $response = new stdClass();
+        $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox");
+        header('Content-type: application/json');
+        try {
+            global $wpdb;
+            $link = database_connection();
+
+            $table_name = $wpdb->prefix . 'htx_settings';
+            $link->autocommit(FALSE); //turn on transactions
+            $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ississ", $_POST['setting'], $settingName, $value, $special, $specialName, $settingType);
+            $settingName = "new setting"; $value="new setting"; $special=0; $specialName="";
+            if (in_array($_POST['columnType'], $possibleInput)) $settingType=htmlspecialchars($_POST['columnType']); else $settingType="dropdown";
+            $stmt->execute();
+            $stmt->close();
+            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+            $link->close();
+            $response->success = true;
+        } catch(Exception $e) {
+            $response->success = false;
+            $response->error = $e->getMessage();
+            $link->rollback(); //remove all queries from queue if error (undo)
+        }
+        echo json_encode($response);
+        wp_die();
+    }
+
+    try {
+        $table_name = $wpdb->prefix . 'htx_settings';
+        $link->autocommit(FALSE); //turn on transactions
+        $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ississ", $idNewSetting, $settingName, $value, $special, $specialName, $settingType);
+        $settingName = "new setting"; $value="new setting"; $special=0; $specialName="";
+        if (in_array($_POST['columnType'], $possibleInput)) $settingType=htmlspecialchars($_POST['columnType']); else $settingType="dropdown";
+        $stmt->execute();
+        $stmt->close();
+        $link->autocommit(TRUE); //turn off transactions + commit queued queries
+    } catch(Exception $e) {
+        $link->rollback(); //remove all queries from queue if error (undo)
+        throw $e;
+    }
+}
+
 ?>

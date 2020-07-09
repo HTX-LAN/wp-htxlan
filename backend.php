@@ -19,6 +19,8 @@
     add_action('wp_ajax_htx_update_sorting', 'htx_update_sorting');
     add_action('wp_ajax_htx_update_column', 'htx_update_column');
     add_action('wp_ajax_htx_delete_column', 'htx_delete_column');
+    add_action('wp_ajax_htx_delete_setting', 'htx_delete_setting');
+    add_action('wp_ajax_htx_add_setting', 'htx_add_setting');
 
     // Creating setup for pages
     function setup_admin_menu(){
