@@ -113,7 +113,7 @@ function HTXJS_updateColumn(setting) {
         sorting: $('#settingSorting').val()
     };
     var specials = [];
-    $('#special').each(function() {
+    $('.special').each(function() {
         if($(this).is(":checked")) {
             specials.push($(this).val());
         }
@@ -138,18 +138,7 @@ function HTXJS_updateColumn(setting) {
     $(".settingSorting").each(function() {
         form[$(this).attr('id')] = $(this).val();
     });
-    $.post(ajaxurl, {
-        action: "htx_update_column",
-        name: $('#settingName').val(),
-        format: $('#settingFormat option:selected').val(),
-        entrance: $('#function-0').is(":checked"),
-        extra: $('#function-1').is(":checked"),
-        placeholder: $('#settingPlaceholder').val(),
-        required: $('#settingRequired').is(":checked"),
-        disabled: $('#settingDisabled').is(":checked"),
-        setting: setting,
-        sorting: $('#settingSorting').val()
-    }, function(data) {
+    $.post(ajaxurl, form, function(data) {
         informationwindowremove(id);
         if(data.success) {
             //TODO: Update necessary values
