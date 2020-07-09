@@ -62,12 +62,15 @@ Form creator, er hvor hver form ændres og sættes op
 ### Økonomi
 Denne side viser økonomi for event
 - [ ] Pris liste
-  - [ ] Liste med teoretisk inkomst
-  - [ ] Liste med faktisk inkomst
-  - [ ] Antal som har tilmeldt sig
-  - [ ] Antal som har betalt, og med hvilken type
-  - [ ] Antal som er crew
-  - [ ] Beløb fra billeter
+  - [x] Antal som har tilmeldt sig
+  - [x] Antal som har betalt, og med hvilken type
+  - [x] Priser for hver betalings type
+  - [x] Antal som er crew
+  - [x] Antal som er gæster
+  - [x] Antal som Ikke har betalt
+  - [x] Antal som har betalt
+  - [x] Antal som har betalt men ikke er kommet
+  - [x] Beløb fra billeter
   - [ ] Beløb fra ekstra ting
   - [ ] Liste med udgifter
 - [ ] Muligt at tilføje custom indtægt
