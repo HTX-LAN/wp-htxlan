@@ -133,7 +133,7 @@
                         $stmt2->bind_param("ii", $tableId,  $settingCat);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
+                        if($result2->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen"; break;} else {
                             while($row2 = $result2->fetch_assoc()) {
                                 $setting_cat_settingId = $row2['id'];
                             }
@@ -152,7 +152,7 @@
                         $stmt2->bind_param("i", $setting_cat_settingId);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
+                        if($result2->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen"; break;} else {
                             while($row2 = $result2->fetch_assoc()) {
                                 // Getting data
                                 $setting_settingName = $row2['settingName'];
@@ -174,7 +174,7 @@
                         $stmt2->bind_param("ii", $tableId,  $settingCat);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
+                        if($result2->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen"; break;} else {
                             while($row2 = $result2->fetch_assoc()) {
                                 $setting_cat_settingId = $row2['id'];
                             }
@@ -187,7 +187,7 @@
                             $stmt3->bind_param("i", $setting_cat_settingId);
                             $stmt3->execute();
                             $result3 = $stmt3->get_result();
-                            if($result3->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
+                            if($result3->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen"; break;} else {
                                 while($row3 = $result3->fetch_assoc()) {
                                     // Getting data
                                     $setting_settingName = $row3['settingName'];
@@ -210,7 +210,7 @@
                         $stmt2->bind_param("ii", $tableId,  $settingCat);
                         $stmt2->execute();
                         $result2 = $stmt2->get_result();
-                        if($result2->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
+                        if($result2->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen"; break;} else {
                             while($row2 = $result2->fetch_assoc()) {
                                 $setting_cat_settingId = $row2['id'];
                             }
@@ -223,7 +223,7 @@
                             $stmt3->bind_param("i", $setting_cat_settingId);
                             $stmt3->execute();
                             $result3 = $stmt3->get_result();
-                            if($result3->num_rows === 0) echo "Ingen mulige valg, venligst tilføj nogen"; else {
+                            if($result3->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen"; break;} else {
                                 echo "<div class='formCreator_flexRow'>";
                                 while($row3 = $result3->fetch_assoc()) {
                                     // Getting data
