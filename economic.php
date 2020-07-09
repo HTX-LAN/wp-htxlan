@@ -544,17 +544,28 @@
                     <td>300</td>
                     <td>600</td>
                     <td colspan='4'></td>
-                </tr>
-                <tr style='background-color: unset; height: 2rem;'>
-                    <td colspan='9' style='background-color: unset;'></td>
-                </tr>";*/
+                </tr>*/
 
-                echo "<tr>
-                    <th colspan='2'><h2 style='margin: 0px;'>Samlet</h2></th>
+                echo "</tbody>
+                </table><br>";
+
+                $TotalNonPayed = $totalIncomeNonPayed;
+                $TotalPayed = $totalIncomePayed;
+                $Total = $totalIncome;
+
+                echo "<table class='InfoTable' style='width: unset'><thead>
+                <tr>
+                    <th><h2 style='margin: 0px;'>Samlet</h2></th>
+                    <th>Ikke betalt</th>
+                    <th>Betalt</th>
+                    <th>Totalt</th>
                 </tr>
+                </thead><tbody>
                 <tr class='InfoTableRow'>
                     <td>i alt</td>
-                    <td>100</td>
+                    <td>$TotalNonPayed</td>
+                    <td>$TotalPayed</td>
+                    <td>$Total</td>
                 </tr>
             </tbody>
         </table><br>";
