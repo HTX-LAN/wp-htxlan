@@ -327,7 +327,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctions); $i++) {
                                     if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
                                 }
                             echo "</div></div>";
@@ -409,7 +409,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctions); $i++) {
                                     if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
                                 }
                             echo "</div></div>";
@@ -491,7 +491,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctions); $i++) {
                                     if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
                                 }
                             echo "</div></div>";
@@ -642,7 +642,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctions); $i++) {
                                     if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
                                 }
                             echo "</div></div>";
