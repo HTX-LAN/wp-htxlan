@@ -87,24 +87,24 @@
                         $usersPayedMobileIds[] = $row['id'];
                     break;
                 }
-                // Check if arrays are empty
-                if ($usersPayedFalse == NULL) $usersPayedFalse[] = "";
-                if ($usersPayedFalseIds == NULL) $usersPayedFalseIds[] = "";
-                if ($usersPayedCash == NULL) $usersPayedCash[] = "";
-                if ($usersPayedCashIds == NULL) $usersPayedCashIds[] = "";
-                if ($usersPayedMobile == NULL) $usersPayedMobile[] = "";
-                if ($usersPayedMobileIds == NULL) $usersPayedMobileIds[] = "";
 
                 $usersArrived[$row['id']] = $row['arrived'];
                 $usersCrew[$row['id']] = $row['crew'];
                 if ($row['crew'] == "1") {
                     $usersCrewOnly[] = $row['id'];
                 } else {
-                    $usersCrewOnly[] = 0;
+                    $usersCrewOnly[] = 'none';
                 }
                 $usersPrice[$row['id']] = $row['price'];
             }
             $stmt2->close();
+            // Check if arrays are empty
+            if ($usersPayedFalse == NULL) $usersPayedFalse[] = "0";
+            if ($usersPayedFalseIds == NULL) $usersPayedFalseIds[] = "0";
+            if ($usersPayedCash == NULL) $usersPayedCash[] = "0";
+            if ($usersPayedCashIds == NULL) $usersPayedCashIds[] = "0";
+            if ($usersPayedMobile == NULL) $usersPayedMobile[] = "0";
+            if ($usersPayedMobileIds == NULL) $usersPayedMobileIds[] = "0";
 
             // Getting where price_intrance and price_extra is
             $table_name2 = $wpdb->prefix . 'htx_column';
@@ -212,79 +212,82 @@
                     }
 
                     if (count_array_values($columnFunctionArray, 'price_extra') < 1) {
-                        echo "Der er ikke nogen elementer sat op som ekstra pris";
+                        echo "Der er ikke nogen elementer sat op som ekstra pris<br>";
                         $EconomicExtraError = 1;
                     } else {
-                        for ($j=0; $j < count($columnId); $j++) {
-                            if (in_array('price_extra', $columnFunction[$columnId[$j]])) {
-                                $j = $columnId[$j];
+                        $g = 0;
+                        for ($f=0; $f < count($columnId); $f++) {
+                            // echo $j." <br>";
+                            if (in_array('price_extra', $columnFunction[$columnId[$f]])) {
+                                $j = $columnId[$f];
+
                                 $table_name2 = $wpdb->prefix . 'htx_settings_cat';
                                 $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND settingNameBack = ?");
                                 $stmt2->bind_param("is", $tableId, $columnName[$j]);
                                 $stmt2->execute();
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) {
-                                    echo "Something NEEDS TO BE CHANGED";
+                                    echo "Ingen ekstra værdier<br>";
                                     $stmt2->close();
-                                    $EconomicError = true;
+                                    $EconomicExtraErrorError = 1;
                                 } else if($result2->num_rows > 1) {
-                                    echo "Too many elements with the same backend name";
+                                    echo "Too many elements with the same backend name<br>";
                                     $stmt2->close();
-                                    $EconomicError = true;
+                                    $EconomicExtraErrorError = 1;
                                 } else {
+                                    $EconomicExtraErrorError = 0;
                                     // Fetching and storing values in arrays
                                     while($row = $result2->fetch_assoc()) {
-                                        $settingCatExtraName[] = $row['settingName'];
-                                        $settingCatExtraNameBack[] = $row['settingNameBack'];
-                                        $settingCatExtraId[] = $row['id'];
+                                        $settingCatExtraName[$g] = $row['settingName'];
+                                        $settingCatExtraNameBack[$g] = $row['settingNameBack'];
+                                        $settingCatExtraId[$g] = $row['id'];
                                     }
                                     $stmt2->close();
-                                    for ($index=0; $index < count($settingCatExtraId); $index++) {
-                                        // Getting settings for category
-                                        $table_name2 = $wpdb->prefix . 'htx_settings';
-                                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER BY sorting");
-                                        $stmt2->bind_param("i", $settingCatExtraId[$index]);
+                                    // Getting settings for category
+                                    $table_name2 = $wpdb->prefix . 'htx_settings';
+                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER BY sorting");
+                                    $stmt2->bind_param("i", $settingCatExtraId[$g]);
+                                    $stmt2->execute();
+                                    $result2 = $stmt2->get_result();
+                                    if($result2->num_rows === 0) {
+                                        echo "Something NEEDS TO BE CHANGED";
+                                        $stmt2->close();
+                                        $EconomicExtraErrorError = true;
+                                    } else {
+                                        // Fetching and storing values in arrays
+                                        while($row = $result2->fetch_assoc()) {
+                                            $settingExtraIds[$g][] = $row['id'];
+                                            $settingExtraName[$g][$row['id']] = $row['settingName'];
+                                            $settingExtraValue[$g][$row['id']] = $row['value'];
+                                        }
+                                        $stmt2->close();
+                                        // Getting users submittet values for Extra
+                                        $table_name2 = $wpdb->prefix . 'htx_form';
+                                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND name = ?");
+                                        $stmt2->bind_param("is", $tableId, $settingCatExtraNameBack[$g]);
                                         $stmt2->execute();
                                         $result2 = $stmt2->get_result();
                                         if($result2->num_rows === 0) {
-                                            echo "Something NEEDS TO BE CHANGED";
+                                            echo "Ingen tilmeldinger med pris elementet besvaret";
                                             $stmt2->close();
-                                            $EconomicError = true;
+                                            $EconomicExtraErrorError = true;
                                         } else {
                                             // Fetching and storing values in arrays
                                             while($row = $result2->fetch_assoc()) {
-                                                $settingExtraIds[$index][] = $row['id'];
-                                                $settingExtraName[$index][$row['id']] = $row['settingName'];
-                                                $settingExtraValue[$index][$row['id']] = $row['value'];
-                                            }
-                                            $stmt2->close();
-                                            // Getting users submittet values for Extra
-                                            $table_name2 = $wpdb->prefix . 'htx_form';
-                                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND active = 1 AND name = ?");
-                                            $stmt2->bind_param("is", $tableId, $settingCatExtraNameBack[$index]);
-                                            $stmt2->execute();
-                                            $result2 = $stmt2->get_result();
-                                            if($result2->num_rows === 0) {
-                                                echo "Ingen tilmeldinger med pris elementet besvaret";
-                                                $stmt2->close();
-                                                $EconomicError = true;
-                                            } else {
-                                                // Fetching and storing values in arrays
-                                                while($row = $result2->fetch_assoc()) {
-                                                    $userSubmittetExtraIds[$index][] = $row['userId'];
-                                                    $userSubmittetExtraValue[$index][$row['userId']] = $row['value'];
-                                                    for ($i=0; $i < count($settingExtraIds[$index]); $i++) { 
-                                                        if (!in_array($row['userId'],$usersCrewOnly)) {
-                                                            if ($row['value'] == $settingExtraIds[$index][$i]) {
-                                                                $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = $row['userId'];
-                                                            } else $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = "";
-                                                        } else {
-                                                            $userSubmittetExtra[$index][$settingExtraIds[$index][$i]][] = "";
-                                                        }
+                                                $userSubmittetExtraIds[$g][] = $row['userId'];
+                                                $userSubmittetExtraValue[$g][$row['userId']] = $row['value'];
+                                                for ($i=0; $i < count($settingExtraIds[$g]); $i++) { 
+                                                    if (!in_array($row['userId'],$usersCrewOnly)) {
+                                                        if ($row['value'] == $settingExtraIds[$g][$i]) {
+                                                            $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = $row['userId'];
+                                                        } else $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = "";
+                                                    } else {
+                                                        $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = "";
                                                     }
                                                 }
-                                                $stmt2->close();
                                             }
+                                            $stmt2->close();
+                                            $g++;
                                         }
                                     }
                                 }
@@ -396,9 +399,11 @@
                 <tr>
                     <th colspan='9'><h2 style='margin: 0px;'>Ekstra</h2></th>
                 </tr>";
+                $AllExtraNonPayedTotalSum = 0;
+                $AllExtraCashTotalSum = 0;
+                $AllExtraMobileTotalSum = 0;
 
                 // Extra row
-                var_dump($settingCatExtraId);
                 if ($EconomicExtraError == 0) {
                     for ($index=0; $index < count($settingCatExtraId); $index++) {
                         echo "<tr>
@@ -451,7 +456,11 @@
                             <td>$ExtraTotalAmount[$index]</td>
                         </tr>";
                     }
+                    $AllExtraNonPayedTotalSum = array_sum($ExtraNonPayedTotalSum);
+                    $AllExtraCashTotalSum = array_sum($ExtraCashTotalSum);
+                    $AllExtraMobileTotalSum = array_sum($ExtraMobileTotalSum);
                 }
+
 
 
                 echo "<tr style='background-color: unset; height: 2rem;'>
