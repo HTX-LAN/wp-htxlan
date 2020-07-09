@@ -164,17 +164,48 @@ function htx_new_column() {
         if(!current_user_can("manage_options"))
             return;
         $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox");
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month');
         $response = new stdClass();
         header('Content-type: application/json');
         try {
             global $wpdb;
             $link = database_connection();
-            $link->autocommit(FALSE); //turn on transactions
+            $link->autocommit(FALSE); //turn off transactions
             // User input
-            $userInputType = $_POST['inputType'];
-            $tableId = $_POST['tableId'];
-            //Default values
-            $format = 'text';
+            // Check if inputType is valid
+            if (in_array($_POST['inputType'],$possibleInput)) 
+                $userInputType = $_POST['inputType'];
+            else 
+                $userInputType = $possibleInput[0];
+            // Check if table exist
+            $tableId = intval($_POST['tableId']);
+
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ? AND active = 1");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) throw new Exception("Form does not exist");
+            $stmt->close();
+
+            // Get last sorting
+            $table_name = $wpdb->prefix . 'htx_column';
+            $stmt = $link->prepare("SELECT sorting FROM $table_name WHERE tableId = ? AND active = 1 ORDER BY sorting DESC LIMIT 1");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {} else {
+                while($row = $result->fetch_assoc()) {
+                    $sorting = $row['sorting'];
+                  }
+                  
+            }
+            $stmt->close();
+
             // Break if the user input is not known
             if (!in_array($userInputType, $possibleInput)) throw new Exception('Invalid input type');
             // Define values for new element
