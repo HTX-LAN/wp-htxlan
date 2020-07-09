@@ -89,11 +89,19 @@
                 }
 
                 $usersArrived[$row['id']] = $row['arrived'];
+                if ($row['arrived'] == "1") {
+                    $usersArrivedOnly[] = $row['id'];
+                } else {
+                    $usersNotArrivedOnly[] = $row['id'];
+                }
                 $usersCrew[$row['id']] = $row['crew'];
                 if ($row['crew'] == "1") {
                     $usersCrewOnly[] = $row['id'];
                 } else {
                     $usersCrewOnly[] = 'none';
+                }
+                if ($row['crew'] == "1") {
+                    $usersCrewOnlyOnly[] = $row['id'];
                 }
                 $usersPrice[$row['id']] = $row['price'];
             }
@@ -105,6 +113,8 @@
             if ($usersPayedCashIds == NULL) $usersPayedCashIds[] = "0";
             if ($usersPayedMobile == NULL) $usersPayedMobile[] = "0";
             if ($usersPayedMobileIds == NULL) $usersPayedMobileIds[] = "0";
+            if ($usersArrivedOnly == NULL) $usersArrivedOnly = "";
+            if ($usersCrewOnlyOnly == NULL) $usersCrewOnlyOnly = "";
 
             // Getting where price_intrance and price_extra is
             $table_name2 = $wpdb->prefix . 'htx_column';
@@ -304,7 +314,7 @@
                     <th colspan='9'><h2 style='margin: 0px;'>Indkomst</h2></th>
                 </tr>
                 <tr>
-                    <th><h3 style='margin: 0px;'>Indgang</h3></th>
+                    <th>Indgang </th>
                     <th colspan='4'>Beløb</th>
                     <th colspan='4'>Antal</th>
                 </tr>
@@ -487,9 +497,9 @@
                     <td colspan='9' style='background-color: unset;'></td>
                 </tr>";*/
 
-                $totalIncomeNonPayed = $AllExtraNonPayedTotalSum + $IntranceNonPayedTotalAmount;
-                $totalIncomeCash = $AllExtraCashTotalSum + $IntranceCashTotalAmount;
-                $totalIncomeMobile = $AllExtraMobileTotalSum + $IntranceMobileTotalAmount;
+                $totalIncomeNonPayed = $AllExtraNonPayedTotalSum + $IntranceNonPayedTotalSum;
+                $totalIncomeCash = $AllExtraCashTotalSum + $IntranceCashTotalSum;
+                $totalIncomeMobile = $AllExtraMobileTotalSum + $IntranceMobileTotalSum;
                 $totalIncomePayed = $totalIncomeCash + $totalIncomeMobile;
                 $totalIncome = $totalIncomePayed + $totalIncomeNonPayed;
 
@@ -555,7 +565,7 @@
 
                 echo "<table class='InfoTable' style='width: unset'><thead>
                 <tr>
-                    <th><h2 style='margin: 0px;'>Samlet</h2></th>
+                    <th>Samlet</th>
                     <th>Ikke betalt</th>
                     <th>Betalt</th>
                     <th>Totalt</th>
@@ -570,52 +580,84 @@
             </tbody>
         </table><br>";
 
+        // Getting amount payed and not payed
+        $amountNonPayed = $IntranceNonPayedTotalAmount;
+        $amountPayed = $IntranceCashTotalAmount+$IntranceMobileTotalAmount;
+        // Getting arrived count
+        if ($usersArrivedOnly != "") {
+            $amountArrived = count($usersArrivedOnly);
+        } else $amountArrived = 0;
+        // Not arrived
+        if ($usersNotArrivedOnly != "") {
+            $amountNotArrived = count($usersNotArrivedOnly);
+        } else $amountNotArrived = 0;
+        // not arrived that has payed
+        $AmountNotArrivedPayed = 0;
+        for ($i=0; $i < count($settingIntranceIds); $i++) {
+            if ($EconomicExtraError == 0) {
+                $AmountNotArrivedPayed = $AmountNotArrivedPayed + count(array_intersect($usersNotArrivedOnly, array_intersect($userSubmittetExtra[0][$settingExtraIds[0][$i]],$usersPayedMobileIds)));
+                $AmountNotArrivedPayed = $AmountNotArrivedPayed + count(array_intersect($usersNotArrivedOnly, array_intersect($userSubmittetExtra[0][$settingExtraIds[0][$i]],$usersPayedCashIds)));
+            } else {
+                $AmountNotArrivedPayed = $AmountNotArrivedPayed + count(array_intersect($usersNotArrivedOnly, array_intersect($userSubmittetIntrance[$settingIntranceIds[$i]],$usersPayedMobileIds)));
+                $AmountNotArrivedPayed = $AmountNotArrivedPayed + count(array_intersect($usersNotArrivedOnly, array_intersect($userSubmittetIntrance[$settingIntranceIds[$i]],$usersPayedCashIds)));
+            }
+            
+        }
+        // Crew
+        if ($usersCrewOnlyOnly != "") {
+            $amountCrew = count($usersCrewOnlyOnly);
+            // Crew not payed
+            $AmountNotPayedCrew = 0;
+            for ($i=0; $i < count($settingIntranceIds); $i++) {
+                if ($EconomicExtraError == 0) {
+                    $AmountNotPayedCrew = $AmountNotPayedCrew + count(array_intersect($usersCrewOnlyOnly, array_intersect($userSubmittetExtra[0][$settingExtraIds[0][$i]],$usersPayedMobileIds)));
+                    $AmountNotPayedCrew = $AmountNotPayedCrew + count(array_intersect($usersCrewOnlyOnly, array_intersect($userSubmittetExtra[0][$settingExtraIds[0][$i]],$usersPayedCashIds)));
+                }
+            }
+        } else {
+            $amountCrew = 0;
+            $AmountNotPayedCrew = 0;
+        }
+        // Guests amount
+        $AmountGuests = $IntranceTotalAmount-$amountCrew;
+
         echo "<br><table class='InfoTable' style='width: unset'><thead>
             <tr>
-                <th colspan='2'>Statestik</th>
+                <th>Statestik</th>
                 <th>Antal</th>
-                <th>Pris</th>
             </tr>
             </thead><tbody>
             <tr class='InfoTableRow'>
-                <td colspan='2'>Ikke betalt</td>
-                <td>10</td>
-                <td>100</td>
+                <td>Ikke betalt</td>
+                <td>$amountNonPayed</td>
             </tr>
             <tr class='InfoTableRow'>
-                <td colspan='2'>Betalt</td>
-                <td>60</td>
-                <td>6000</td>
+                <td>Betalt</td>
+                <td>$amountPayed</td>
             </tr>
             <tr class='InfoTableRow'>
-                <td colspan='2'>Ankommet</td>
-                <td>60</td>
-                <td>6000</td>
+                <td>Ankommet</td>
+                <td>$amountArrived</td>
             </tr>
             <tr class='InfoTableRow'>
-                <td colspan='2'>Ikke ankommet</td>
-                <td>60</td>
-                <td>6000</td>
+                <td>Ikke ankommet</td>
+                <td>$amountNotArrived</td>
             </tr>
             <tr class='InfoTableRow'>
-                <td colspan='2'>Ikke ankommet som har betalt</td>
-                <td>60</td>
-                <td>6000</td>
+                <td>Ikke ankommet som har betalt</td>
+                <td>$AmountNotArrivedPayed</td>
             </tr>
             <tr class='InfoTableRow'>
-                <td colspan='2'>Crew</td>
-                <td>60</td>
-                <td>6000</td>
+                <td>Crew</td>
+                <td>$amountCrew</td>
             </tr>
             <tr class='InfoTableRow'>
-                <td colspan='2'>Crew som ikke har betalt</td>
-                <td>60</td>
-                <td>6000</td>
+                <td>Crew som ikke har betalt</td>
+                <td>$AmountNotPayedCrew</td>
             </tr>
             <tr class='InfoTableRow'>
-                <td colspan='2'>Ikke crew</td>
-                <td>60</td>
-                <td>6000</td>
+                <td>Gæster</td>
+                <td>$AmountGuests</td>
             </tr>
         </tbody></table>";
     }
