@@ -215,6 +215,7 @@ if(!defined('ABSPATH')) {
             active INT NOT NULL DEFAULT 1,
             settingName TEXT,
             value TEXT,
+            expence float DEFAULT 0,
             special TEXT,
             specialName TEXT,
             type text,

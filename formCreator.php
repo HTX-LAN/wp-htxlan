@@ -73,6 +73,10 @@
         // Possible functions
         $possibleFunctions = array('price_intrance', 'price_extra');
         $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris');
+        $possibleFunctionsNonInput = array('Indgangs pris', 'Ekstra pris');
+        $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris');
+        $possibleFunctionsAll = array('NULL');
+        $possibleFunctionsAllName = array('Ingen');
 
         // Make div
         echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
@@ -325,10 +329,10 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctions); $i++) {
-                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
+                                    if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
                                     echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
-                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                    <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Sorting
@@ -407,10 +411,10 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctions); $i++) {
-                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
+                                    if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
                                     echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
-                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                    <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Sorting
@@ -489,10 +493,10 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctions); $i++) {
-                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
+                                    if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
                                     echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
-                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                    <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Sorting
@@ -578,10 +582,10 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctions); $i++) {
-                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                for ($i=0; $i < count($possibleFunctionsAll); $i++) {
+                                    if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
                                     echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
-                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                    <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Placeholder text
@@ -616,7 +620,7 @@
                             echo "></div>";
 
                             // Special name (hidden)
-                            echo "<div class='hidden'><label for='settingSpecial'>Funktion navn </label> <input id='settingSpecial' class='inputBox' name='specialName' value=''></div>";
+                            echo "<div class='hidden'><label for='settingSpecial'>Funktion navn </label> <input id='settingSpecial' class='inputBox' class='special' name='specialName' value=''></div>";
                             // Format (hidden)
                             echo "<div class='hidden'><label for='settingFormat'>Format </label> <input id='settingFormat' class='inputBox' name='format' value='text'></div>";
                             // Required (hidden)
@@ -640,10 +644,10 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctions); $i++) {
-                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                for ($i=0; $i < count($possibleFunctionsAll); $i++) {
+                                    if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
                                     echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
-                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
+                                    <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Sorting
