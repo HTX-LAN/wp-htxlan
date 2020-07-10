@@ -164,6 +164,7 @@ function htx_new_column() {
         if(!current_user_can("manage_options"))
             return;
         $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox");
+        $possibleInputWithSettingCat = array("dropdown", "radio", "checkbox");
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month');
         $response = new stdClass();
         header('Content-type: application/json');
@@ -227,7 +228,7 @@ function htx_new_column() {
             $stmt->close();
 
             $columnNameBack = $lastId;
-            if ($userInputType == 'dropdown') {
+            if (in_array($userInputType, $possibleInputWithSettingCat)){
                 // If dropdown, then make setting category first
                 $table_name = $wpdb->prefix . 'htx_settings_cat';
                 $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType, special, specialName) VALUES (?, ?, ?, ?, ?)");
@@ -244,62 +245,19 @@ function htx_new_column() {
                 $link->autocommit(FALSE); //turn on transactions
                 $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
-                $settingName = "new setting"; $value="new setting"; $settingType="dropdown";
+                $settingName = "new setting"; $value="new setting"; 
+                $settingType=$userInputType;
+                $stmt->execute();
+                $stmt->close();
+
+                $table_name = $wpdb->prefix . 'htx_column';
+                $stmt = $link->prepare("UPDATE $table_name SET settingCat = ? WHERE id = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("ii", $settingCat, $lastId);
                 $stmt->execute();
                 $stmt->close();
             }
-            if ($userInputType == 'radio') {
-                // If dropdown, then make setting category first
-                $table_name = $wpdb->prefix . 'htx_settings_cat';
-                $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType, special, specialName) VALUES (?, ?, ?, ?, ?)");
-                if(!$stmt)
-                    throw new Exception($link->error);
-                $stmt->bind_param("issis", $tableId, $columnNameBack, $columnType, $special, $specialName);
-                $stmt->execute();
-                $settingCat = intval($link->insert_id);
-                if ($settingCat < 0) throw new Exception('Invalid settings category');
-                $stmt->close();
-
-                // Insert standard first setting
-                $table_name = $wpdb->prefix . 'htx_settings';
-                $link->autocommit(FALSE); //turn on transactions
-                $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
-                if(!$stmt)
-                    throw new Exception($link->error);
-                $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
-                $settingName = "new setting"; $value="new setting"; $settingType="radio";
-                $stmt->execute();
-                $stmt->close();
-            }
-            if ($userInputType == 'checkbox') {
-                // If dropdown, then make setting category first
-                $table_name = $wpdb->prefix . 'htx_settings_cat';
-                $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingNameBack, settingType, special, specialName) VALUES (?, ?, ?, ?, ?)");
-                if(!$stmt)
-                    throw new Exception($link->error);
-                $stmt->bind_param("issis", $tableId, $columnNameBack, $columnType, $special, $specialName);
-                $stmt->execute();
-                $settingCat = intval($link->insert_id);
-                if ($settingCat < 0) throw new Exception('Invalid settings category');
-                $stmt->close();
-
-                // Insert standard first setting
-                $table_name = $wpdb->prefix . 'htx_settings';
-                $link->autocommit(FALSE); //turn on transactions
-                $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
-                $settingName = "new setting"; $value="new setting"; $settingType="checkbox";
-                $stmt->execute();
-                $stmt->close();
-            }
-
-            $table_name = $wpdb->prefix . 'htx_settings_cat';
-            $stmt = $link->prepare("UPDATE $table_name SET settingNameBack = ? WHERE id = ?");
-            if(!$stmt)
-                throw new Exception($link->error);
-            $stmt->bind_param("ii", $lastId, $settingCat);
-            $stmt->execute();
-            $stmt->close();
 
             $link->autocommit(TRUE); //turn off transactions + commit queued queries
             $link->close();
