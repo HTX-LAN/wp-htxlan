@@ -73,7 +73,7 @@
         // Possible functions
         $possibleFunctions = array('price_intrance', 'price_extra');
         $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris');
-        $possibleFunctionsNonInput = array('Indgangs pris', 'Ekstra pris');
+        $possibleFunctionsNonInput = array('price_intrance', 'price_extra');
         $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris');
         $possibleFunctionsAll = array('NULL');
         $possibleFunctionsAllName = array('Ingen');
@@ -331,7 +331,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
                                     if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsNonInput[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
                                 }
                             echo "</div></div>";
@@ -378,6 +378,8 @@
 
                                             echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox settingName' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
                                             echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox settingValue' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
+                                            if (!in_array($possibleFunctionsNonInput[1], $specialName)) $expenceDisabled = 'hidden'; else $expenceDisabled = '';
+                                            echo "<div class='$expenceDisabled'><label for='extraSettingExpence-$i'>Udgift</label> <input type='text' id='extraSettingExpence-$i' class='inputBox settingExpence' name='settingExpence-".$row3['id']."' value='".$row3['expence']."''></div>";
                                             echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox settingSorting' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
                                             echo "<input class='settingActive' type='hidden' name='settingActive-".$row3['id']."' value='1'>";
                                             echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox' name='settingActive-".$row3['id']."' value='0'";
@@ -413,7 +415,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
                                     if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsNonInput[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
                                 }
                             echo "</div></div>";
@@ -460,6 +462,9 @@
 
                                             echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox settingName' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
                                             echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox settingValue' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
+                                            if (in_array($possibleFunctionsNonInput[1], $specialName)) {
+                                                echo "<div><label for='extraSettingExpence-$i'>Udgift</label> <input type='text' id='extraSettingExpence-$i' class='inputBox settingExpence' name='settingExpence-".$row3['id']."' value='".$row3['expence']."''></div>";
+                                            }
                                             echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox settingSorting' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
                                             echo "<input type='hidden' name='settingActive-".$row3['id']."' value='1'>";
                                             echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox settingActive' name='settingActive-".$row3['id']."' value='0'";
@@ -495,7 +500,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
                                     if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsNonInput[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
                                 }
                             echo "</div></div>";
@@ -542,6 +547,9 @@
 
                                             echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox settingName' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
                                             echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox settingValue' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
+                                            if (in_array($possibleFunctionsNonInput[1], $specialName)) {
+                                                echo "<div><label for='extraSettingExpence-$i'>Udgift</label> <input type='text' id='extraSettingExpence-$i' class='inputBox settingExpence' name='settingExpence-".$row3['id']."' value='".$row3['expence']."''></div>";
+                                            }
                                             echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox settingSorting' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
                                             echo "<input type='hidden' name='settingActive-".$row3['id']."' value='1'>";
                                             echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox settingActive' name='settingActive-".$row3['id']."' value='0'";
@@ -584,7 +592,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctionsAll); $i++) {
                                     if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsNonInput[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
                                 }
                             echo "</div></div>";
@@ -646,7 +654,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctionsAll); $i++) {
                                     if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsAll[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
                                 }
                             echo "</div></div>";

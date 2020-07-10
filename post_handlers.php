@@ -329,7 +329,7 @@ function htx_update_column() {
                     try {
                         $link->autocommit(FALSE); //turn on transactions
                         $table_name = $wpdb->prefix . 'htx_settings';
-                        $stmt1 = $link->prepare("UPDATE `$table_name` SET settingName = ?, value = ?, sorting = ?, active = ? WHERE id = ?");
+                        $stmt1 = $link->prepare("UPDATE `$table_name` SET settingName = ?, value = ?, sorting = ?, active = ?, expence = ? WHERE id = ?");
                         if(!$stmt1)
                             throw new Exception($link->error);
                         for ($i=0; $i < $settingAmount; $i++) {
@@ -337,7 +337,7 @@ function htx_update_column() {
                             // Id for line
                             $lineId = intval($_POST['settingId-'.$i]);
                             if (intval($_POST['settingActive-'.$lineId]) != 0 AND intval($_POST['settingActive-'.$lineId]) != 1) $active = 1; else $active = trim($_POST['settingActive-'.$lineId]);
-                            $stmt1->bind_param("ssiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, $lineId);
+                            $stmt1->bind_param("ssiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
                             $stmt1->execute();
                         }
 

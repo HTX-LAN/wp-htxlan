@@ -153,6 +153,9 @@ function HTXJS_updateColumn(setting) {
     $(".settingValue").each(function() {
         form[$(this).attr('name')] = $(this).val();
     });
+    $(".settingExpence").each(function() {
+        form[$(this).attr('name')] = $(this).val();
+    });
     $(".settingSorting").each(function() {
         form[$(this).attr('name')] = $(this).val();
     });
