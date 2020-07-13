@@ -336,7 +336,7 @@ function htx_update_column() {
                             // Update every setting
                             // Id for line
                             $lineId = intval($_POST['settingId-'.$i]);
-                            if (intval($_POST['settingActive-'.$lineId]) != 0 AND intval($_POST['settingActive-'.$lineId]) != 1) $active = 1; else $active = trim($_POST['settingActive-'.$lineId]);
+                            if (intval($_POST['settingActive-'.$lineId]) != 0) $active = 1; else $active = 0;
                             $stmt1->bind_param("ssiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
                             $stmt1->execute();
                         }

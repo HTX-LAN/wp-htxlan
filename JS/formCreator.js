@@ -145,7 +145,7 @@ function HTXJS_updateColumn(setting) {
         form[$(this).attr('name')] = $(this).val();
     });
     $(".settingActive").each(function() {
-        form[$(this).attr('name')] = $(this).val();
+        form[$(this).attr('name')] = $(this).is(":checked") ? 0 : 1;
     });
     $(".settingName").each(function() {
         form[$(this).attr('name')] = $(this).val();
