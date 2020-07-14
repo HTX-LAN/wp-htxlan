@@ -232,12 +232,12 @@ function HTXJS_addSetting(setting, type) {
 }
 
 // Function to uncheck the other function box
-function unCheckFunctionCheckbox(id) {
+function HTXJS_unCheckFunctionCheckbox(id) {
     document.getElementById('function-'+id).checked = false;
 }
 
 // Disable required checkbox, if disable is checked
-function settingDisabledCheckbox(param) {
+function HTXJS_settingDisabledCheckbox(param) {
     if (param == 'enable') {
         if (document.getElementById('settingDisabled').checked == true) document.getElementById('settingRequired').checked = false;
     } else {

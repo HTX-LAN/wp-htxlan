@@ -166,62 +166,64 @@
                             echo "</td>";
                         }
                     } else {
-                        echo "<td>";
-                        while($row2 = $result2->fetch_assoc()) {
-                            // Checks if dropdown or other where value is an id
-                            if (in_array($row2['name'], $settingNameBacks)) {
-                                // Writing data from id, if dropdown or radio
-                                if ($columnType[$index] == "checkbox") {
-                                    $valueArray = explode(",", $row2['value']);
-                                    if (count($valueArray) > 0) {
-                                        for ($j=0; $j < count($valueArray); $j++) {
-                                            echo htmlspecialchars($settingName[$valueArray[$j]]);
+                        if (!in_array($columnType[$index], $nonUserInput)) {
+                            echo "<td>";
+                            while($row2 = $result2->fetch_assoc()) {
+                                // Checks if dropdown or other where value is an id
+                                if (in_array($row2['name'], $settingNameBacks)) {
+                                    // Writing data from id, if dropdown or radio
+                                    if ($columnType[$index] == "checkbox") {
+                                        $valueArray = explode(",", $row2['value']);
+                                        if (count($valueArray) > 0) {
+                                            for ($j=0; $j < count($valueArray); $j++) {
+                                                echo htmlspecialchars($settingName[$valueArray[$j]]);
 
-                                            // Writing price
-                                            if (in_array('price_intrance', $specialName[$index])) {
-                                                $price = $price + floatval($settingValue[$valueArray[$j]]);
+                                                // Writing price
+                                                if (in_array('price_intrance', $specialName[$index])) {
+                                                    $price = $price + floatval($settingValue[$valueArray[$j]]);
 
-                                            }
-                                            // Writing extra price
-                                            if (in_array('price_extra', $specialName[$index])) {
-                                                $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
-                                            }
-                                            // Insert comma, if the value is not the last
-                                            if (count($valueArray) != ($j + 1)) {
-                                                echo ", ";
+                                                }
+                                                // Writing extra price
+                                                if (in_array('price_extra', $specialName[$index])) {
+                                                    $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
+                                                }
+                                                // Insert comma, if the value is not the last
+                                                if (count($valueArray) != ($j + 1)) {
+                                                    echo ", ";
+                                                }
                                             }
                                         }
+                                    } else {
+                                        echo htmlspecialchars($settingName[$row2['value']]);
+
+                                        // Writing price
+                                        if (in_array('price_intrance', $specialName[$index])) {
+                                            $price = $price + floatval($settingValue[$row2['value']]);
+
+                                        }
+                                        // Writing extra price
+                                        if (in_array('price_extra', $specialName[$index])) {
+                                            $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
+                                        }
                                     }
+
                                 } else {
-                                    echo htmlspecialchars($settingName[$row2['value']]);
-
-                                    // Writing price
-                                    if (in_array('price_intrance', $specialName[$index])) {
-                                        $price = $price + floatval($settingValue[$row2['value']]);
-
-                                    }
-                                    // Writing extra price
-                                    if (in_array('price_extra', $specialName[$index])) {
-                                        $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
-                                    }
-                                }
-
-                            } else {
-                                // Checks column type
-                                if (!in_array($columnType[$index], $nonUserInput)) {
-                                    // Writing data from table
-                                    echo htmlspecialchars($row2['value']);
-                                    // Writing price
-                                    if (in_array('price_intrance', $specialName[$index])) {
-                                        $price = $price + floatval($row2['value']);
-                                    }
-                                    if (in_array('price_intrance', $specialName[$index])) {
-                                        $priceExtra = $priceExtra + floatval($row2['value']);
+                                    // Checks column type
+                                    if (!in_array($columnType[$index], $nonUserInput)) {
+                                        // Writing data from table
+                                        echo htmlspecialchars($row2['value']);
+                                        // Writing price
+                                        if (in_array('price_intrance', $specialName[$index])) {
+                                            $price = $price + floatval($row2['value']);
+                                        }
+                                        if (in_array('price_intrance', $specialName[$index])) {
+                                            $priceExtra = $priceExtra + floatval($row2['value']);
+                                        }
                                     }
                                 }
                             }
+                            echo "</td>";
                         }
-                        echo "</td>";
                     }
                     $stmt2->close();
                 }

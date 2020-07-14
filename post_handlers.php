@@ -163,8 +163,8 @@ function htx_new_column() {
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['inputType']) && isset($_POST['tableId'])) {
         if(!current_user_can("manage_options"))
             return;
-        $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox");
-        $possibleInputWithSettingCat = array("dropdown", "radio", "checkbox");
+        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox");
+        $possibleInputWithSettingCat = array("dropdown", "user dropdown", "radio", "checkbox");
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
         $response = new stdClass();
         header('Content-type: application/json');
@@ -494,7 +494,7 @@ function htx_add_setting() {
         if(!current_user_can("manage_options"))
             return;
         $response = new stdClass();
-        $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox");
+        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox");
         header('Content-type: application/json');
         try {
             global $wpdb;

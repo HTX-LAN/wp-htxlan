@@ -46,7 +46,7 @@
                         // Convert values to the right format
                         // Getting column info
                         $table_name = $wpdb->prefix . 'htx_column';
-                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ?");
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ?");
                         $stmt->bind_param("i", $tableId);
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -92,6 +92,60 @@
                                     }
                                     $inputValue = implode(",", $specialPostArrayStart);
                                 } else $inputValue = "";
+                            } else if($columnType[$i] == 'user dropdown') {
+                                // Check if new user dropdown setting is made
+                                if (isset($_POST[$columnNameBack[$i].'-extra'])) {
+                                    $userDropdown = 1;
+                                    
+                                    $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra'])));
+                                    
+                                    // Getting setting cat id
+                                    $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? and settingNameBack = ?");
+                                    if(!$stmt2)
+                                        throw new Exception($link->error);
+                                    $stmt2->bind_param("is", $tableId, $columnNameBack[$i]);
+                                    $stmt2->execute();
+                                    $result = $stmt2->get_result();
+                                    if($result->num_rows === 0) throw new Exception('No setting cat'); else {
+                                        while($row = $result->fetch_assoc()) {
+                                            $settingCatId = $row['id'];
+                                        }
+                                    }
+                                    $stmt2->close();
+
+                                    // Getting already existing settings
+                                    $table_name2 = $wpdb->prefix . 'htx_settings';
+                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ?");
+                                    if(!$stmt2)
+                                        throw new Exception($link->error);
+                                    $stmt2->bind_param("i", $settingCatId);
+                                    $stmt2->execute();
+                                    $result = $stmt2->get_result();
+                                    if($result->num_rows === 0) $userDropdown = '1'; else {
+                                        while($row = $result->fetch_assoc()) {
+                                            // Check if setting exist
+                                            if ($row['settingName'] == $inputValue) {
+                                                $inputValue = $row['id'];
+                                                $userDropdown = 0;
+                                            }
+                                        }
+                                    }
+                                    $stmt2->close();
+
+                                    if ($userDropdown == 1) {
+                                        // New user setting does not exist -> create it
+                                        $table_name2 = $wpdb->prefix . 'htx_settings';
+                                        $stmt2 = $link->prepare("INSERT INTO `$table_name2` (settingName, value, settingId, active, sorting) VALUES (?, ?, ?, 1, 10)");
+                                        if(!$stmt2)
+                                            throw new Exception($link->error);
+                                        $stmt2->bind_param("ssi", $inputValue, $inputValue, $settingCatId);
+                                        $stmt2->execute();
+                                        $inputValue = intval($link->insert_id);
+                                        $stmt2->close();
+                                    }
+                                } else
+                                    $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
                             } else {
                                 $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
                             }
@@ -106,8 +160,8 @@
                         $link->autocommit(TRUE); //turn off transactions + commit queued queries
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
-                        // throw $e;
-                        return "<span style='color: red'>Tilmeldingen blev ikke tilføjet</span>";
+                        throw $e;
+                        return "<span style='color: red'>Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen</span>";
                     }
 
                     // Error handling (Needs to be more specifik)

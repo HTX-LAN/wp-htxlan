@@ -65,7 +65,7 @@
         echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
 
         // Possible input types in array
-        $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox"); #Missing: checkboxes with text input (for ex team names per game basis), range
+        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox"); #Missing: checkboxes with text input (for ex team names per game basis), range
 
         // Possible formats types in array
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel'); #Missing "tel", but needs more backend work - needs pattern attribute to work
@@ -76,9 +76,9 @@
         $possibleFunctionsNonInput = array('price_intrance', 'price_extra');
         $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris');
         $possibleUniceFunctions = array('price_intrance', 'price_extra');
-        $possibleUniceFunction = array("onchange='unCheckFunctionCheckbox(\"1\")'","onchange='unCheckFunctionCheckbox(\"0\")'");
-        $possibleFunctionsAll = array('NULL');
-        $possibleFunctionsAllName = array('Ingen');
+        $possibleUniceFunction = array("onchange='HTXJS_unCheckFunctionCheckbox(\"1\")'","onchange='HTXJS_unCheckFunctionCheckbox(\"0\")'");
+        $possibleFunctionsAll = array('teams');
+        $possibleFunctionsAllName = array('Hold menu');
 
         // Make div
         echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
@@ -133,6 +133,47 @@
                 // Show based on column type
                 switch ($columnType) {
                     case "dropdown":
+                        // Getting settings category
+                        $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
+                        $stmt2->bind_param("ii", $tableId,  $settingCat);
+                        $stmt2->execute();
+                        $result2 = $stmt2->get_result();
+                        if($result2->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen"; break;} else {
+                            while($row2 = $result2->fetch_assoc()) {
+                                $setting_cat_settingId = $row2['id'];
+                            }
+                        }
+                        $stmt2->close();
+
+                        // Disabled handling
+                        if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
+
+                        // Writing first part of dropdown
+                        echo "<select name='$columnNameBack' class='dropdown $disabledClass' disabled>";
+
+                        // Getting dropdown content
+                        $table_name2 = $wpdb->prefix . 'htx_settings';
+                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
+                        $stmt2->bind_param("i", $setting_cat_settingId);
+                        $stmt2->execute();
+                        $result2 = $stmt2->get_result();
+                        if($result2->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen"; break;} else {
+                            while($row2 = $result2->fetch_assoc()) {
+                                // Getting data
+                                $setting_settingName = $row2['settingName'];
+                                $setting_id = $row2['id'];
+
+                                // Write data
+                                echo "<option>".$setting_settingName."</option>";
+                            }
+                        }
+                        $stmt2->close();
+
+                        // Finishing dropdown
+                        echo "</select>";
+                    break;
+                    case "user dropdown":
                         // Getting settings category
                         $table_name2 = $wpdb->prefix . 'htx_settings_cat';
                         $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
@@ -342,12 +383,12 @@
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
-                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
                             if ($required == 1) echo "checked";
                             echo "></div>";
                             // Disabled
                             echo "<input type='hidden' name='disabled' value='0'>";
-                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='HTXJS_settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
                             if ($disabled == 1) echo "checked";
                             echo "></div>";
                             // Dropdown options
@@ -407,6 +448,91 @@
                             $stmt2->close();
                             echo "</div>";
                         break;
+                        case "user dropdown":
+                            echo "<div class='formCreator_edit_container formCreator_flexColumn'>";
+                            // Name
+                            echo "<div><label for='settingName'>Navn </label> <input type='text' id='settingName' class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
+                            // Column type
+                            echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
+                            // Special name
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctionsAll); $i++) {
+                                    if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    if (in_array($possibleFunctionsAll[$i],$possibleUniceFunctions)) $unice = $possibleUniceFunction[$i]; else $unice = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsAll[$i]' $unice $selected>
+                                    <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
+                            // Sorting
+                            echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Required
+                            echo "<input type='hidden' name='required' value='0'>";
+                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            if ($required == 1) echo "checked";
+                            echo "></div>";
+                            // Disabled
+                            echo "<input type='hidden' name='disabled' value='0'>";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='HTXJS_settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            if ($disabled == 1) echo "checked";
+                            echo "></div>";
+                            // Dropdown options
+                            echo "<h4>Dropdown muligheder</h4>";
+
+                            // Getting dropdown setting category
+                            $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND id = ?");
+                            $stmt2->bind_param("is", $tableId, $settingCat);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            if($result2->num_rows === 0) echo "<p>Ingen indstillinger for dropdown</p>"; else {
+                                while($row2 = $result2->fetch_assoc()) {
+                                    $row2['id'];
+                                    $row2['settingName'];
+                                    $row2['special'];
+                                    $row2['specialName'];
+                                    $row2['settingType'];
+                                    // Getting dropdown settings
+                                    $table_name3 = $wpdb->prefix . 'htx_settings';
+                                    $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ?");
+                                    $stmt3->bind_param("i", $row2['id']);
+                                    $stmt3->execute();
+                                    $result3 = $stmt3->get_result();
+                                    $i = 0;
+                                    if($result3->num_rows === 0) echo "<div><p>Ingen radio muligheder</p></div>"; else {
+                                        echo "<div>OBS! der vil blive tilføjet flere muligheder af brugere på hjemmesiden</div>";
+                                        while($row3 = $result3->fetch_assoc()) {
+                                            $row3['id'];
+                                            $row3['settingName'];
+                                            $rowSettingId = $row3['value'];
+
+                                            echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox settingName' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
+                                            echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox settingValue' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
+                                            if (!in_array($possibleFunctionsNonInput[1], $specialName)) $expenceDisabled = 'hidden'; else $expenceDisabled = '';
+                                            echo "<div class='$expenceDisabled'><label for='extraSettingExpence-$i'>Udgift</label> <input type='text' id='extraSettingExpence-$i' class='inputBox settingExpence' name='settingExpence-".$row3['id']."' value='".$row3['expence']."''></div>";
+                                            echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox settingSorting' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
+                                            echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox settingActive' name='settingActive-".$row3['id']."' value='0'";
+                                            if ($row3['active'] == 0) echo "checked";
+                                            echo "></div>";
+                                            echo "<input class='inputBox hidden settingId' name='settingId-$i' value='".$row3['id']."'>";
+                                            echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                            echo "<div style='width: 100%;margin-bottom:1.75rem;'><button type='submit' name='deleteSetting' value='".$row3['id']."' class='btn deleteBtn' onclick='HTXJS_deleteSetting(" . $row3['id'] . ")'>Slet</button></div>";
+
+                                            $i++;
+                                        }
+
+                                    }
+                                    $stmt3->close();
+                                    echo "<input class='inputBox hidden' id='settingsTrue' value='1'>";
+                                    echo "<input class='inputBox hidden' id='settingsAmount' value='$i'>";
+                                    echo "<input class='inputBox hidden' id='settingsId' value='". $row2['id']."'>";
+                                    echo "<input class='inputBox hidden' id='columnType' value='$columnType'>";
+                                    echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
+                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"dropdown\")'>Tilføj</button></div>";
+                                }
+                            }
+                            $stmt2->close();
+                            echo "</div>";
+                        break;
                         case "radio":
                             echo "<div class='formCreator_edit_container formCreator_flexRow'>";
                             // Name
@@ -426,12 +552,12 @@
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
-                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
                             if ($required == 1) echo "checked";
                             echo "></div>";
                             // Disabled
                             echo "<input type='hidden' name='disabled' value='0'>";
-                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='HTXJS_settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
                             if ($disabled == 1) echo "checked";
                             echo "></div>";
                             // Dropdown options
@@ -511,12 +637,12 @@
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
-                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
                             if ($required == 1) echo "checked";
                             echo "></div>";
                             // Disabled
                             echo "<input type='hidden' name='disabled' value='0'>";
-                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='HTXJS_settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
                             if ($disabled == 1) echo "checked";
                             echo "></div>";
                             // Dropdown options
@@ -604,12 +730,12 @@
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
-                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
                             if ($required == 1) echo "checked";
                             echo "></div>";
                             // Disabled
                             echo "<input type='hidden' name='disabled' value='0'>";
-                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='HTXJS_settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
                             if ($disabled == 1) echo "checked";
                             echo "></div>";
                         break;
@@ -664,12 +790,12 @@
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
-                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
                             if ($required == 1) echo "checked";
                             echo "></div>";
                             // Disabled
                             echo "<input type='hidden' name='disabled' value='0'>";
-                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='HTXJS_settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
                             if ($disabled == 1) echo "checked";
                             echo "></div>";
                         break;

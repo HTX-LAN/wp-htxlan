@@ -12,6 +12,25 @@
     --transition-speed-table: calc(var(--transition-speed)/2);
     --transition-speed-inputfield: calc(var(--transition-speed)/4);
     --transition-speed-freight: 1200ms;
+    --brand-primary: #ffa3ba;
+    --brand-secondary: #8AE1FF;
+    --brand-secondary-light: #c5f0ff;
+    --text-hover-primary:#003b4f;
+    --text-hover-secundary: #005876;
+    --text-hover-tertiary: #0093c4;
+    --border-primary: 1px Solid lightgray;
+    --border-primary-color: lightgray;
+    --submit-color-primary: #70ff41;
+    --submit-color-primary-secondary: #9cff7c;
+    --submit-color-secondary: #baffa3;
+    --delete-color-primary: #ff0000;
+    --delete-color-secondary: #ff4e4e;
+    --cancel-color-primary: #ffa500;
+    --cancel-color-secondary: #ffc14e;
+    --cancel-color-secondary-secondary: #d6b577;
+    --cancel-color-tertiary: #ffd689;
+    --cancel-color-quaternary: #ffeac4;
+    --cancel-color-quaternary-secondary: #f1e6d2;
     text-decoration: none;
 }
 
@@ -129,6 +148,8 @@ input[type="color"] {
 }
 .updateBtn {
     background-color: var(--submit-color-secondary);
+    color: black;
+    text-transform: unset;
 }
 .updateBtn:hover {
     background-color: var(--submit-color-primary);

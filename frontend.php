@@ -121,7 +121,56 @@
                         $html .= "</select>";
                     }
                     $stmt->close();
+                    $html .= "</p>";
+                break;
+                case "user dropdown":
+                    $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
+                    // Getting settings category
+                    $table_name = $wpdb->prefix . 'htx_settings_cat';
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? LIMIT 1");
+                    $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
+                        while($row = $result->fetch_assoc()) {
+                            $setting_cat_settingId = $row['id'];
+                        }
+                    }
+                    $stmt->close();
 
+                    // Getting dropdown content
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? ORDER BY sorting AND settingName");
+                    $stmt->bind_param("i", $setting_cat_settingId);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    if($result->num_rows === 0)  {return $html .= "Der er på nuværende tidspunkt ingen mulige valg her <input type='hidden' name='name='$columnNameBack[$i]' value=''>";} else {
+                        // Writing first part of dropdown
+                        $html .= "<select name='$columnNameBack[$i]' id='extraUserSettingDropdown-$i' class='dropdown $disabledClass' $isRequired>";
+
+                        // Writing dropdown options
+                        while($row = $result->fetch_assoc()) {
+                            // Getting data
+                            $setting_settingName = $row['settingName'];
+                            $setting_id = $row['id'];
+
+                            // Set as selected from post
+                            if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'selected'; else $postSelected = '';
+
+                            // Write data
+                            $html .= "<option value='$setting_id' $postSelected>".$setting_settingName."</option>";
+                        }
+
+                        // Finishing dropdown
+                        $html .= "</select>";
+
+                        // Possible to add a new input
+                        $html .= "<small><i><label>Andet: </label>";
+                        $html .= "<input name='$columnNameBack[$i]-extra' type='$format[$i]' id='extraUserSetting-$i' 
+                        class='inputBox  $disabledClass' style='width: unset; margin-top: 5px;' value='".htmlspecialchars($_POST[$columnNameBack[$i].'-extra'])."'></small>";
+                    }
+                    $stmt->close();
+                    $html .= "</p>";
                 break;
                 case "radio":
                     $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
@@ -162,7 +211,7 @@
                         $stmt3->close();
                     }
                     $stmt->close();
-
+                    $html .= "</p>";
                 break;
                 case "checkbox":
                     $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
@@ -205,7 +254,7 @@
                         $stmt3->close();
                     }
                     $stmt->close();
-
+                    $html .= "</p>";
                 break;
                 case "text area":
                     $html .= "<h5>$columnNameFront[$i]</h5>";
@@ -228,7 +277,7 @@
         $html .= "<p>$postError</p>";
 
         // Ending form with submit and reset buttons
-        $html .= "<p><button type='submit' name='submit' value='new'>Tilmeld</button> <button type='reset' name='reset'>Nulstil</button></p>";
+        $html .= "<p><button type='submit' name='submit' value='new'>Tilmeld</button> <button type='reset' name='reset'>Nulstil</button></p></form>";
 
         // Success handling - Give information via popup window, that the regristration have been saved
 
