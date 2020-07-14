@@ -538,7 +538,7 @@
                         <td colspan='9' style='background-color: unset;'></td>
                     </tr>
                     <tr>
-                        <th colspan='5'><h2 style='margin: 0px;'>Udgifter</h2></th>
+                        <th colspan='9'><h2 style='margin: 0px;'>Udgifter</h2></th>
                     </tr>";
                     for ($index=0; $index < count($settingCatExtraId); $index++) {
                         echo "<tr>

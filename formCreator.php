@@ -71,14 +71,14 @@
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel'); #Missing "tel", but needs more backend work - needs pattern attribute to work
 
         // Possible functions
-        $possibleFunctions = array('price_intrance', 'price_extra');
-        $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris');
+        $possibleFunctions = array('price_intrance', 'price_extra','teams');
+        $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris','Hold valg');
         $possibleFunctionsNonInput = array('price_intrance', 'price_extra');
         $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris');
         $possibleUniceFunctions = array('price_intrance', 'price_extra');
         $possibleUniceFunction = array("onchange='HTXJS_unCheckFunctionCheckbox(\"1\")'","onchange='HTXJS_unCheckFunctionCheckbox(\"0\")'");
         $possibleFunctionsAll = array('teams');
-        $possibleFunctionsAllName = array('Hold menu');
+        $possibleFunctionsAllName = array('Hold valg');
 
         // Make div
         echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
@@ -372,11 +372,11 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
-                                    if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    if (in_array($possibleFunctionsNonInput[$i],$possibleUniceFunctions)) $unice = $possibleUniceFunction[$i]; else $unice = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsNonInput[$i]' $unice $selected>
-                                    <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
+                                for ($i=0; $i < count($possibleFunctions); $i++) {
+                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    if (in_array($possibleFunctions[$i],$possibleUniceFunctions)) $unice = $possibleUniceFunction[$i]; else $unice = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $unice $selected>
+                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Sorting
@@ -541,11 +541,11 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
-                                    if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    if (in_array($possibleFunctionsNonInput[$i],$possibleUniceFunctions)) $unice = $possibleUniceFunction[$i]; else $unice = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsNonInput[$i]' $unice $selected>
-                                    <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
+                                for ($i=0; $i < count($possibleFunctions); $i++) {
+                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    if (in_array($possibleFunctions[$i],$possibleUniceFunctions)) $unice = $possibleUniceFunction[$i]; else $unice = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $unice $selected>
+                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Sorting
@@ -626,11 +626,11 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
                             // Special name
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctionsNonInput); $i++) {
-                                    if (in_array($possibleFunctionsNonInput[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    if (in_array($possibleFunctionsNonInput[$i],$possibleUniceFunctions)) $unice = $possibleUniceFunction[$i]; else $unice = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsNonInput[$i]' $unice $selected>
-                                    <label for='function-$i'>$possibleFunctionsNonInputName[$i]</label></div>";
+                                for ($i=0; $i < count($possibleFunctions); $i++) {
+                                    if (in_array($possibleFunctions[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    if (in_array($possibleFunctions[$i],$possibleUniceFunctions)) $unice = $possibleUniceFunction[$i]; else $unice = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctions[$i]' $unice $selected>
+                                    <label for='function-$i'>$possibleFunctionsName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Sorting
@@ -720,7 +720,7 @@
                             echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
                                 for ($i=0; $i < count($possibleFunctionsAll); $i++) {
                                     if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsNonInput[$i]' $selected>
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsAll[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
                                 }
                             echo "</div></div>";
