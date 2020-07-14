@@ -28,7 +28,6 @@ Også kaldet: *Tilmelder liste*
 Denne side viser alle tilmeldte
 - [x] Se tilmeldinger baseret på form
 - [x] Vise den rigtige dropdown værdi i tabel
-- [ ] Ikke vise text områder som
 - [x] Muligt at registrer person som betalt
 - [x] Muligt at registrer person som ankommet
 - [x] Muligt at slette tilmelding
@@ -50,13 +49,13 @@ Form creator, er hvor hver form ændres og sættes op
   - [x] Tilføje elementer til dropdown inputs
   - [x] Tilføj text område input
   - [x] Tilføj radio input
-  - [ ] Tilføj checkbox input
-  - [ ] Tilføj teams input
+  - [x] Tilføj checkbox input
+  - [x] Tilføj dropdown med mulighed for at brugere kan tilføje elementer til
   - [x] Sætte input som *required*
   - [x] Deaktiver input, således at inputet ikke kan skrives i *Kan optimeres*
   - [x] Slette input felt
   - [ ] Vis input i form baseret på andet inputs indhold
-  - [ ] Input påvirker pris for deltager
+  - [x] Input påvirker pris for deltager
   - [ ] Element som viser samlet pris inden formular kan blive indsendt
 
 ### Økonomi
