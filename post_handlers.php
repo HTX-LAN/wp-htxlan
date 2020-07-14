@@ -165,7 +165,7 @@ function htx_new_column() {
             return;
         $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox");
         $possibleInputWithSettingCat = array("dropdown", "radio", "checkbox");
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month');
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
         $response = new stdClass();
         header('Content-type: application/json');
         try {
@@ -317,7 +317,7 @@ function htx_update_column() {
         try {
             global $wpdb;
             $link = database_connection();
-            $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month');
+            $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
             $setting = $_POST['setting'];
 
             // Update column settings

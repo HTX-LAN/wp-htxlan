@@ -68,7 +68,7 @@
         $possibleInput = array("inputbox", "dropdown", "text area", "radio", "checkbox"); #Missing: checkboxes with text input (for ex team names per game basis), range
 
         // Possible formats types in array
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month'); #Missing "tel", but needs more backend work - needs pattern attribute to work
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel'); #Missing "tel", but needs more backend work - needs pattern attribute to work
 
         // Possible functions
         $possibleFunctions = array('price_intrance', 'price_extra');

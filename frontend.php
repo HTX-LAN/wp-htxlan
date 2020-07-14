@@ -213,7 +213,11 @@
                 break;
                 default:
                     $html .= "<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                    $html .= "<input name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired></p>";
+                    $html .= "<input name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]'";
+                    if ($format[$i] == 'tel') $html .= "pattern='[0-9]{8}'";
+                    $html .= " class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
+                    if ($format[$i] == 'tel') $html .= "<small>Format: 12345678</small>";
+                    $html .= "</p>";
             }
 
         }
