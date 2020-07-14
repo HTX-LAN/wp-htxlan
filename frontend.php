@@ -107,9 +107,10 @@
                     if($result->num_rows === 0)  {return $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value=''>";} else {
                         // Price function
                         if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunction'; else $priceClass = '';
+                        if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
                         
                         // Writing first part of dropdown
-                        $html .= "\n<select name='$columnNameBack[$i]' class='dropdown $disabledClass $priceClass' $isRequired>";
+                        $html .= "\n<select name='$columnNameBack[$i]' class='dropdown $disabledClass $priceClass' $priceFunction $isRequired>";
 
                         // Writing dropdown options
                         while($row = $result->fetch_assoc()) {
@@ -155,6 +156,7 @@
                     $stmt->execute();
                     $result = $stmt->get_result();
                     if($result->num_rows === 0)  {return $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her <input type='hidden' name='name='$columnNameBack[$i]' value=''>";} else {
+                        
                         // Writing first part of dropdown
                         $html .= "\n<select name='$columnNameBack[$i]' id='extraUserSettingDropdown-$i' class='dropdown $disabledClass' $isRequired>";
 
@@ -214,9 +216,10 @@
 
                                 // Price function
                                 if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunctionRadio'; else $priceClass = '';
+                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
 
                                 // Write data
-                                $html .= "\n<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' value='$setting_id' class='inputBox  $disabledClass $priceClass' $postSelected>
+                                $html .= "\n<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' value='$setting_id' class='inputBox  $disabledClass $priceClass' $priceFunction $postSelected>
                                 <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label><br>";
 
                                 // Price for javascript
@@ -261,10 +264,17 @@
                                 // Set as selected from post
                                 if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
 
+                                // Price function
+                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunctionCheckbox'; else $priceClass = '';
+                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
+
                                 // Write data
-                                $html .= "\n<div class='checkboxDiv'><input type='checkbox' id='$columnNameBack[$i]-$setting_id' name='".$columnNameBack[$i]."[]' value='$setting_id' $postSelected>
+                                $html .= "\n<div class='checkboxDiv'><input type='checkbox' id='$columnNameBack[$i]-$setting_id' class='$priceClass' name='".$columnNameBack[$i]."[]' $priceFunction value='$setting_id' $postSelected>
                                 <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label></div>";
 
+                                // Price for javascript
+                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
+                                    $html .= "\n<script>price['$setting_id']=".$row3['value'].";</script>";
                             }
                             $html .= "\n</div>";
                         }
@@ -279,7 +289,7 @@
                 break;
                 case "price":
                     $html .= "\n<h5>$columnNameFront[$i]</h5>";
-                    $html .= "\n<p>$placeholderText[$i] <span id='priceLine'>PRICE HERE</span> $format[$i]</p>";
+                    $html .= "\n<p>$placeholderText[$i] <span id='priceLine' onload=\"HTXJS_price_update()\">0</span> $format[$i]</p>";
                 break;
                 default:
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
