@@ -163,9 +163,10 @@ function htx_new_column() {
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['inputType']) && isset($_POST['tableId'])) {
         if(!current_user_can("manage_options"))
             return;
-        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox");
+        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price");
         $possibleInputWithSettingCat = array("dropdown", "user dropdown", "radio", "checkbox");
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
+        $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
         $response = new stdClass();
         header('Content-type: application/json');
         try {
@@ -318,6 +319,7 @@ function htx_update_column() {
             global $wpdb;
             $link = database_connection();
             $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
+            $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
             $setting = $_POST['setting'];
 
             // Update column settings
@@ -353,7 +355,7 @@ function htx_update_column() {
 
             if (!isset($_POST['placeholder'])) $placeholderText = ""; else $placeholderText = trim($_POST['placeholder']);
             if ($_POST['disabled'] == 1) $required = 0; else $required = $_POST['required']; #Disabeling the option for both required and hidden input
-            if (in_array(trim($_POST['format']), $possibleFormat)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
+            if (in_array(trim($_POST['format']), $possibleFormat) OR in_array(trim($_POST['format']), $possiblePrice)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
             if (trim($_POST['name']) == "") throw new Exception("No name given.");
             $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_column';
@@ -494,7 +496,7 @@ function htx_add_setting() {
         if(!current_user_can("manage_options"))
             return;
         $response = new stdClass();
-        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox");
+        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price");
         header('Content-type: application/json');
         try {
             global $wpdb;
@@ -505,7 +507,7 @@ function htx_add_setting() {
             $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ississ", $_POST['setting'], $settingName, $value, $special, $specialName, $settingType);
             $settingName = "new setting"; $value="new setting"; $special=0; $specialName="";
-            if (in_array($_POST['columnType'], $possibleInput)) $settingType=htmlspecialchars($_POST['columnType']); else $settingType="dropdown";
+            if (in_array($_POST['columnType'], $possibleInput)) $settingType = htmlspecialchars($_POST['columnType']); else $settingType="dropdown";
             $stmt->execute();
             $stmt->close();
             $link->autocommit(TRUE); //turn off transactions + commit queued queries
