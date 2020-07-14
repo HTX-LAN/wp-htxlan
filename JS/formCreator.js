@@ -33,7 +33,7 @@ function HTXJS_deleteForm(formid) {
                 location.search = "page=" + getParameterByName("page");
             } else {
                 informationwindowInsert(3, "Kunne ikke slette formularen.");
-                console.log(data.error);
+                console.error(data.error);
             }
         });
     }
@@ -56,7 +56,7 @@ function HTXJS_updateForm(formid) {
             informationwindowInsert(1, "Formularen blev opdateret.");
         } else {
             informationwindowInsert(3, "Kunne ikke opdatere formularen.");
-            console.log(data.error);
+            console.error(data.error);
         }
     });
 }
@@ -76,7 +76,7 @@ function HTXJS_createForm() {
             informationwindowInsert(1, "Formularen blev oprettet.");
         } else {
             informationwindowInsert(3, "Kunne ikke oprette en ny formular.");
-            console.log(data.error);
+            console.error(data.error);
         }
     });
 }
@@ -91,10 +91,11 @@ function HTXJS_addColumn(formid) {
         informationwindowremove(id);
         if(data.success) {
             informationwindowInsert(1, "Ny række blev oprettet.");
-            location.reload();
+            // location.reload();
+            console.log(data);
         } else {
             informationwindowInsert(3, "Kunne ikke oprette ny række.");
-            console.log(data.error);
+            console.error(data.error);
         }
     });
 }
@@ -112,7 +113,7 @@ function HTXJS_updateSorting(setting) {
             location.reload();
         } else {
             informationwindowInsert(3, "Kunne ikke opdatere sorteringen.");
-            console.log(data.error);
+            console.error(data.error);
         }
     });
 }
@@ -166,7 +167,7 @@ function HTXJS_updateColumn(setting) {
             informationwindowInsert(1, "Rækken blev opdateret");
         } else {
             informationwindowInsert(3, "Kunne ikke opdatere rækken.");
-            console.log(data.error);
+            console.error(data.error);
         }
     });
 }
@@ -191,7 +192,7 @@ function HTXJS_deleteColumn(setting) {
             location.search = "page=" + getParameterByName("page") + "&form=" + getParameterByName("form");
         } else {
             informationwindowInsert(3, "Kunne ikke slette rækken.");
-            console.log(data.error);
+            console.error(data.error);
         }
     });
 }
@@ -208,7 +209,7 @@ function HTXJS_deleteSetting(setting) {
             informationwindowInsert(1, "Valgmuligheden blev slettet");
         } else {
             informationwindowInsert(3, "Valgmuligheden kunne ikke slettes.");
-            console.log(data.error);
+            console.error(data.error);
         }
     });
 }
@@ -226,7 +227,7 @@ function HTXJS_addSetting(setting, type) {
             informationwindowInsert(1, "Valgmuligheden blev tilføjet");
         } else {
             informationwindowInsert(3, "Valgmuligheden kunne ikke tilføjes.");
-            console.log(data.error);
+            console.error(data.error);
         }
     });
 }

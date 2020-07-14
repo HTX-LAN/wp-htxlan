@@ -312,7 +312,7 @@
         $stmt->close();
 
         // Create new row
-        echo "<h4>Tilføj ny række</h4>";
+        echo "<h3 style='border-top: grey solid 1px; padding-top: 0.75rem;'>Tilføj ny række</h3>";
         // Drop down with possible types of input field
         echo "<label>Input type: </label><br><select id='inputType'>";
         for ($i=0; $i < count($possibleInput); $i++) {
@@ -690,7 +690,7 @@
                                             echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox settingActive' name='settingActive-".$row3['id']."' value='0'";
                                             if ($row3['active'] == 0) echo "checked";
                                             echo "></div>";
-                                            echo "<input class='inputBox hidden' name='settingId-$i' value='".$row3['id']."'>";
+                                            echo "<input class='inputBox hidden settingId' name='settingId-$i' value='".$row3['id']."'>";
                                             echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
                                             echo "<div style='width: 100%;margin-bottom:1.75rem;'><button type='submit' name='deleteSetting' value='".$row3['id']."' class='btn deleteBtn' onclick='HTXJS_deleteSetting(" . $row3['id'] . ")'>Slet</button></div>";
 

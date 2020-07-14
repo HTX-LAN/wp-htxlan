@@ -179,6 +179,7 @@ function htx_new_column() {
                 $userInputType = $_POST['inputType'];
             else 
                 $userInputType = $possibleInput[0];
+
             // Check if table exist
             $tableId = intval($_POST['tableId']);
 
@@ -203,13 +204,13 @@ function htx_new_column() {
             if($result->num_rows === 0) {} else {
                 while($row = $result->fetch_assoc()) {
                     $sorting = $row['sorting'];
-                  }
-                  
+                  }    
             }
             $stmt->close();
 
             // Break if the user input is not known
             if (!in_array($userInputType, $possibleInput)) throw new Exception('Invalid input type');
+
             // Define values for new element
             $columnNameFront = "New element"; $format=$possibleFormat[0]; $columnType=$userInputType; $special=0; $specialName="";
             $placeholderText = ""; $required = 0; $settingCat = 0; $sorting = $sorting+1;
@@ -251,12 +252,24 @@ function htx_new_column() {
                 $stmt->execute();
                 $stmt->close();
 
-                $table_name = $wpdb->prefix . 'htx_column';
+                $table_name = $wpdb->prefix . 'htx_column';                
                 $stmt = $link->prepare("UPDATE $table_name SET settingCat = ? WHERE id = ?");
                 if(!$stmt)
                     throw new Exception($link->error);
                 $stmt->bind_param("ii", $settingCat, $lastId);
                 $stmt->execute();
+                $stmt->close();
+            }
+            // Check if price already exist
+            if ($userInputType == 'price'){
+                $table_name = $wpdb->prefix . 'htx_column';
+                $stmt = $link->prepare("SELECT * FROM $table_name WHERE tableId = ? and columnType = 'price'");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("i", $tableId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) {} else {throw new Exception('Price element already exist');}
                 $stmt->close();
             }
 

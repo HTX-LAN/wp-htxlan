@@ -13,7 +13,7 @@ function informationwindowInsert(cat,text,speciel) {
         cattext = "Advarsel";
     } else if (cat == 3) {
         cat = "error";
-        cattext = "Error!";
+        cattext = "Fejl!";
     } else {
         return 0;
     }

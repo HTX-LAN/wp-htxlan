@@ -44,6 +44,7 @@
 
         // Price handling array
         $possiblePriceFunctions = array("price_intrance", "price_extra");
+        $priceSet = false;
 
         // Post handling
         $postError = HTX_frontend_post($tableId);
@@ -288,8 +289,11 @@
                     $html .= "\n<p>$placeholderText[$i]</p>";
                 break;
                 case "price":
-                    $html .= "\n<h5>$columnNameFront[$i]</h5>";
-                    $html .= "\n<p>$placeholderText[$i] <span id='priceLine' onload=\"HTXJS_price_update()\">0</span> $format[$i]</p>";
+                    if ($priceSet == false) {
+                        $html .= "\n<h5>$columnNameFront[$i]</h5>";
+                        $html .= "\n<p>$placeholderText[$i] <span id='priceLine' onload=\"HTXJS_price_update()\">0</span> $format[$i]</p><script>setTimeout(() => {HTXJS_price_update()}, 500);</script>";
+                        $priceSet = true;
+                    }
                 break;
                 default:
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
