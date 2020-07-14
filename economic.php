@@ -273,6 +273,7 @@
                                             $settingExtraIds[$g][] = $row['id'];
                                             $settingExtraName[$g][$row['id']] = $row['settingName'];
                                             $settingExtraValue[$g][$row['id']] = $row['value'];
+                                            $settingExtraExpence[$g][$row['id']] = $row['expence'];
                                         }
                                         $stmt2->close();
                                         // Getting users submittet values for Extra
@@ -288,6 +289,7 @@
                                         } else {
                                             // Fetching and storing values in arrays
                                             while($row = $result2->fetch_assoc()) {
+                                                // Income
                                                 $userSubmittetExtraIds[$g][] = $row['userId'];
                                                 $userSubmittetExtraValue[$g][$row['userId']] = $row['value'];
                                                 for ($i=0; $i < count($settingExtraIds[$g]); $i++) { 
@@ -296,6 +298,7 @@
                                                     } else $userSubmittetExtra[$g][$settingExtraIds[$g][$i]][] = "";
                                                 }
                                             }
+                                            
                                             $stmt2->close();
                                             $g++;
                                         }
@@ -525,7 +528,94 @@
                 </tr>";
 
 
-                // Udgifter (on hold)
+                // Udgifter
+                // Extra row
+                $AllExtraNonPayedTotalExpenceSum = 0;
+                $AllExtraCashTotalExpenceSum = 0;
+                $AllExtraMobileTotalExpenceSum = 0;
+                if ($EconomicExtraError == 0) {
+                    echo "<tr style='background-color: unset; height: 2rem;'>
+                        <td colspan='9' style='background-color: unset;'></td>
+                    </tr>
+                    <tr>
+                        <th colspan='5'><h2 style='margin: 0px;'>Udgifter</h2></th>
+                    </tr>";
+                    for ($index=0; $index < count($settingCatExtraId); $index++) {
+                        echo "<tr>
+                                <th colspan='9'>$settingCatExtraName[$index]</th>
+                            </tr>";
+                        for ($i=0; $i < count($settingExtraIds[$index]); $i++) {
+                            // Calculating amounts and value for every setting in element
+                            $extraNonPayedExpenceAmount[$index][$i] = count(array_intersect($userSubmittetExtra[$index][$settingExtraIds[$index][$i]],$usersPayedFalseIds));
+                            $extraNonPayedExpenceSum[$index][$i] = $extraNonPayedAmount[$index][$i]*$settingExtraExpence[$index][$settingExtraIds[$index][$i]];
+                            $extraCashExpenceAmount[$index][$i] = count(array_intersect($userSubmittetExtra[$index][$settingExtraIds[$index][$i]],$usersPayedCashIds));
+                            $extraCashExpenceSum[$index][$i] = $extraCashAmount[$index][$i]*$settingExtraExpence[$index][$settingExtraIds[$index][$i]];
+                            $extraMobileExpenceAmount[$index][$i] = count(array_intersect($userSubmittetExtra[$index][$settingExtraIds[$index][$i]],$usersPayedMobileIds));
+                            $extraMobileExpenceSum[$index][$i] = $extraMobileAmount[$index][$i]*$settingExtraExpence[$index][$settingExtraIds[$index][$i]];
+
+                            // Getting line total
+                            $extraExpenceSum[$index][$i] = $extraNonPayedExpenceSum[$index][$i]+$extraCashExpenceSum[$index][$i]+$extraMobileExpenceSum[$index][$i];
+                            $extraExpenceAmount[$index][$i] = $extraNonPayedExpenceAmount[$index][$i]+$extraCashExpenceAmount[$index][$i]+$extraMobileExpenceAmount[$index][$i];
+
+                            echo "<tr class='InfoTableRow'>
+                                <td>".$settingExtraName[$index][$settingExtraIds[$index][$i]]."</td>
+                                <td>".$extraNonPayedExpenceSum[$index][$i]."</td>
+                                <td>".$extraCashExpenceSum[$index][$i]."</td>
+                                <td>".$extraMobileExpenceSum[$index][$i]."</td>
+                                <td>".$extraExpenceSum[$index][$i]."</td>
+                                <td>".$extraNonPayedExpenceAmount[$index][$i]."</td>
+                                <td>".$extraCashExpenceAmount[$index][$i]."</td>
+                                <td>".$extraMobileExpenceAmount[$index][$i]."</td>
+                                <td>".$extraExpenceAmount[$index][$i]."</td>
+                            </tr>";
+                        }
+                        // Getting sums for sum row
+                        $ExtraNonPayedTotalExpenceSum[$index] = array_sum($extraNonPayedExpenceSum[$index]);
+                        $ExtraNonPayedTotalExpenceAmount[$index] = array_sum($extraNonPayedExpenceAmount[$index]);
+                        $ExtraCashTotalExpenceSum[$index] = array_sum($extraCashExpenceSum[$index]);
+                        $ExtraCashTotalExpenceAmount[$index] = array_sum($extraCashExpenceAmount[$index]);
+                        $ExtraMobileTotalExpenceSum[$index] = array_sum($extraMobileExpenceSum[$index]);
+                        $ExtraMobileTotalExpenceAmount[$index] = array_sum($extraMobileExpenceAmount[$index]);
+                        $ExtraTotalExpenceSum[$index] = array_sum($extraExpenceSum[$index]);
+                        $ExtraTotalExpenceAmount[$index] = array_sum($extraExpenceAmount[$index]);
+
+                        echo "<tr class='InfoTableRow'>
+                            <td><b>I alt</b></td>
+                            <td>$ExtraNonPayedTotalExpenceSum[$index]</td>
+                            <td>$ExtraCashTotalExpenceSum[$index]</td>
+                            <td>$ExtraMobileTotalExpenceSum[$index]</td>
+                            <td>$ExtraTotalExpenceSum[$index]</td>
+                            <td>$ExtraNonPayedTotalExpenceAmount[$index]</td>
+                            <td>$ExtraCashTotalExpenceAmount[$index]</td>
+                            <td>$ExtraMobileTotalExpenceAmount[$index]</td>
+                            <td>$ExtraTotalExpenceAmount[$index]</td>
+                        </tr>";
+                    }
+                    $AllExtraNonPayedTotalExpenceSum = $AllExtraNonPayedTotalExpenceSum+array_sum($ExtraNonPayedTotalExpenceSum);
+                    $AllExtraCashTotalExpenceSum = $AllExtraCashTotalExpenceSum+array_sum($ExtraCashTotalExpenceSum);
+                    $AllExtraMobileTotalExpenceSum = $AllExtraMobileTotalExpenceSum+array_sum($ExtraMobileTotalExpenceSum);
+
+                    $totalExpenceNonPayed = $AllExtraNonPayedTotalExpenceSum;
+                    $totalExpenceCash = $AllExtraCashTotalExpenceSum;
+                    $totalExpenceMobile = $AllExtraMobileTotalExpenceSum;
+                    $totalExpencePayed = $totalExpenceCash + $totalExpenceMobile;
+                    $totalExpence = $totalExpencePayed + $totalExpenceNonPayed;
+
+
+                    echo "<tr style='background-color: unset; height: 2rem;'>
+                        <td colspan='9' style='background-color: unset;'></td>
+                    </tr>
+                    <tr class='InfoTableRow'>
+                        <td><b>I alt</b></td>
+                        <td>$totalExpenceNonPayed</td>
+                        <td>$totalExpenceCash</td>
+                        <td>$totalExpenceMobile</td>
+                        <td>$totalExpence</td>
+                    </tr>
+                    <tr style='background-color: unset; height: 2rem;'>
+                        <td colspan='9' style='background-color: unset;'></td>
+                    </tr>";
+                }
                 /*echo "<tr>
                     <th colspan='5'><h2 style='margin: 0px;'>Udgifter</h2></th>
                 </tr>
@@ -565,9 +655,9 @@
                 echo "</tbody>
                 </table><br>";
 
-                $TotalNonPayed = $totalIncomeNonPayed;
-                $TotalPayed = $totalIncomePayed;
-                $Total = $totalIncome;
+                $TotalNonPayed = $totalIncomeNonPayed-$totalExpenceNonPayed;
+                $TotalPayed = $totalIncomePayed-$totalExpencePayed;
+                $Total = $totalIncome-$totalExpence;
 
                 echo "<table class='InfoTable' style='width: unset'><thead>
                 <tr>
