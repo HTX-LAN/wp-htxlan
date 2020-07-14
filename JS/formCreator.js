@@ -230,3 +230,18 @@ function HTXJS_addSetting(setting, type) {
         }
     });
 }
+
+// Function to uncheck the other function box
+function unCheckFunctionCheckbox(id) {
+    document.getElementById('function-'+id).checked = false;
+}
+
+// Disable required checkbox, if disable is checked
+function settingDisabledCheckbox(param) {
+    if (param == 'enable') {
+        if (document.getElementById('settingDisabled').checked == true) document.getElementById('settingRequired').checked = false;
+    } else {
+        if (document.getElementById('settingRequired').checked == true) document.getElementById('settingDisabled').checked = false;
+    }
+
+}
