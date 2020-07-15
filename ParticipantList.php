@@ -83,7 +83,7 @@
             $stmt3->close();
 
             // Non user editable inputs saved
-            $nonUserInput = array('text area');
+            $nonUserInput = array('text area', 'price');
 
             // Pre main column
             echo "<th></th>";

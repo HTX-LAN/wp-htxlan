@@ -28,6 +28,9 @@
         // Style
         wp_enqueue_style( 'frontendForm', "/wp-content/plugins/WPPlugin-HTXLan/CSS/form.css");
 
+        // Script
+        wp_enqueue_script( 'frontend_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/frontend.js");
+
         // Ajax and icons
         $html = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>';
         $html .= '<link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">';

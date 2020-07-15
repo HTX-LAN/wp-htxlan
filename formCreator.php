@@ -65,10 +65,13 @@
         echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
 
         // Possible input types in array
-        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox"); #Missing: checkboxes with text input (for ex team names per game basis), range
+        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price"); #Missing: checkboxes with text input (for ex team names per game basis), range
 
         // Possible formats types in array
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel'); #Missing "tel", but needs more backend work - needs pattern attribute to work
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
+
+        // Possible prices types in array
+        $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
 
         // Possible functions
         $possibleFunctions = array('price_intrance', 'price_extra','teams');
@@ -293,6 +296,10 @@
                     case "text area":
                         echo "<p>$placeholderText</p>";
                     break;
+                    case "price":
+                        if ($format == 'text') $format = 'DKK';
+                        echo "<p>$placeholderText PRICE HERE $format</p>";
+                    break;
                     default:
                         // Input preview
                         echo "<input type='$format' value='$placeholderText' class='inputBox' disabled>";
@@ -305,7 +312,7 @@
         $stmt->close();
 
         // Create new row
-        echo "<h4>Tilføj ny række</h4>";
+        echo "<h3 style='border-top: grey solid 1px; padding-top: 0.75rem;'>Tilføj ny række</h3>";
         // Drop down with possible types of input field
         echo "<label>Input type: </label><br><select id='inputType'>";
         for ($i=0; $i < count($possibleInput); $i++) {
@@ -683,7 +690,7 @@
                                             echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox settingActive' name='settingActive-".$row3['id']."' value='0'";
                                             if ($row3['active'] == 0) echo "checked";
                                             echo "></div>";
-                                            echo "<input class='inputBox hidden' name='settingId-$i' value='".$row3['id']."'>";
+                                            echo "<input class='inputBox hidden settingId' name='settingId-$i' value='".$row3['id']."'>";
                                             echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
                                             echo "<div style='width: 100%;margin-bottom:1.75rem;'><button type='submit' name='deleteSetting' value='".$row3['id']."' class='btn deleteBtn' onclick='HTXJS_deleteSetting(" . $row3['id'] . ")'>Slet</button></div>";
 
@@ -759,6 +766,37 @@
                             echo "<div class='hidden'><label for='settingSpecial'>Funktion navn </label> <input id='settingSpecial' class='inputBox' class='special' name='specialName' value=''></div>";
                             // Format (hidden)
                             echo "<div class='hidden'><label for='settingFormat'>Format </label> <input id='settingFormat' class='inputBox' name='format' value='text'></div>";
+                            // Required (hidden)
+                            echo "<input type='hidden' name='required' value='0'>";
+                            echo "<div class='hidden'><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            if ($required == 1) echo "checked";
+                            echo "></div>";
+                        break;
+                        case "price":
+                            echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+                            // Name
+                            echo "<div><label for='settingName'>Overskrift </label> <input type='text' id='settingName' class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
+                            // Column type
+                            echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
+                            // price
+                            echo "<div><label for='settingFormat'>Text efter pris </label> <br><select id='settingFormat' class='inputBox' name='format'>";
+                            for ($i=0; $i < count($possiblePrice); $i++) {
+                                if ($possiblePrice[$i] == $format) $selected = "selected"; else $selected = "";
+                                echo "<option value='$possiblePrice[$i]' $selected>$possiblePrice[$i]</option>";
+                            }
+                            echo "</select></div>";
+                            // Placeholder text
+                            echo "<div><label for='settingPlaceholder'>Tekst </label><br><textarea id='settingPlaceholder' class='textArea' name='placeholderText'>$placeholderText</textarea></div>";
+                            // Sorting
+                            echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Disabled
+                            echo "<input type='hidden' name='disabled' value='0'>";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            if ($disabled == 1) echo "checked";
+                            echo "></div>";
+
+                            // Special name (hidden)
+                            echo "<div class='hidden'><label for='settingSpecial'>Funktion navn </label> <input id='settingSpecial' class='inputBox' class='special' name='specialName' value=''></div>";
                             // Required (hidden)
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div class='hidden'><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' type='checkbox' class='inputCheckbox' name='required' value='1'";
