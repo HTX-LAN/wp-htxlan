@@ -115,13 +115,49 @@
                 while($row = $result->fetch_assoc()) {
                     $tournamentNames[$i][] = $row['settingName'];
                     $tournamentIds[$i][] = $row['id'];
+                    $tournamentNamesWId[$i][$row['id']] = $row['settingName'];
                 }
                 $stmt->close();
             }
         }
         
-
         // Get teams
+        for ($i=0; $i < count($teamsColumnIds); $i++) { 
+            $table_name = $wpdb->prefix . 'htx_settings_cat';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 and tableId = ? and settingNameBack = ?");
+            $stmt->bind_param("ii", $tableId, $teamsColumnIds[$i]);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {
+                echo "Der er ingen turneringer";
+                $stmt->close();
+                $Error = true;
+                die; #Ending page, becuase of error
+            } else {
+                while($row = $result->fetch_assoc()) {
+                    $teamsCatId[$i] = $row['id'];
+                }
+                $stmt->close();
+            }
+            $table_name = $wpdb->prefix . 'htx_settings';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 and settingId = ?");
+            $stmt->bind_param("i", $teamsCatId[$i]);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {
+                echo "Der er ingen turneringer";
+                $stmt->close();
+                $Error = true;
+                die; #Ending page, becuase of error
+            } else {
+                while($row = $result->fetch_assoc()) {
+                    $teamsNames[$i][] = $row['settingName'];
+                    $teamsIds[$i][] = $row['id'];
+                    $teamsNamesWId[$i][$row['id']] = $row['settingName'];
+                }
+                $stmt->close();
+            }
+        }
 
         // Get people on team
 
@@ -158,7 +194,48 @@
                             <td>Klasse</td>
                             <td>Discord</td>
                             <td>Ingame navn</td>
-                        </tr>
+                        </tr>";
+                $table_name = $wpdb->prefix . 'htx_form_users';
+                $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 and tableId = ?");
+                $stmt->bind_param("i", $tableId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) {
+                    echo "Der er ingen turneringer";
+                    $stmt->close();
+                    $Error = true;
+                    die; #Ending page, becuase of error
+                } else {
+                    echo "<tr>";
+                    while($row = $result->fetch_assoc()) {
+                        $teamsCatId[$i] = $row['id'];
+                        
+                        for ($j=0; $j < count($teamsColumnIds); $j++) { 
+                            $table_name2 = $wpdb->prefix . 'htx_form';
+                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
+                            $stmt2->bind_param("iii", $tableId, $row['id'], $teamsColumnIds[$j]);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            if($result2->num_rows === 0) {
+                                $stmt2->close();
+                            } else {
+                                while($row2 = $result2->fetch_assoc()) {
+                                    echo "<td>";
+                                    echo $row2['value'];
+                                    echo "</td>";
+                                }
+                                $stmt2->close();
+                            }
+                        }
+                        
+                        
+                    }
+                    echo "</tr>";
+                    $stmt->close();
+                }  
+                
+
+                echo "
                     </tbody>
                     <td colspan='9' style='background-color: unset; height: 2rem;'></td>
                 </table>";
