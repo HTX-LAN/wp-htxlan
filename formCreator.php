@@ -74,10 +74,10 @@
         $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
 
         // Possible functions
-        $possibleFunctions = array('price_intrance', 'price_extra','teams');
-        $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris','Hold valg');
-        $possibleFunctionsNonInput = array('price_intrance', 'price_extra');
-        $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris');
+        $possibleFunctions = array('price_intrance', 'price_extra', 'tournament','teams');
+        $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris', 'Turneringer' ,'Hold valg');
+        $possibleFunctionsNonInput = array('price_intrance', 'price_extra', 'tournament');
+        $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris', 'Turneringer');
         $possibleUniceFunctions = array('price_intrance', 'price_extra');
         $possibleUniceFunction = array("onchange='HTXJS_unCheckFunctionCheckbox(\"1\")'","onchange='HTXJS_unCheckFunctionCheckbox(\"0\")'");
         $possibleFunctionsAll = array('teams');

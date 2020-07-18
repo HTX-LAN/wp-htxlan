@@ -166,6 +166,14 @@ input[type="color"] {
 .cancelBtn:hover {
     background-color: var(--cancel-color-primary);
 }
+.normalBtn {
+    background-color: var(--text-hover-tertiary);
+    color: white;
+}
+.normalBtn:hover {
+    background-color: var(--text-hover-secundary);
+    color: white;
+}
 /*Not saved style*/
 /*edited*/
 

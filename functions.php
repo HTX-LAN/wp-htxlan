@@ -82,13 +82,14 @@
                         $stmt = $link->prepare("INSERT INTO `$table_name` (name, value, userId, tableId) VALUES (?, ?, ?, ?)");
                         $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
                         for ($i=0; $i < count($columnNameBack); $i++) {
+                            $specialPostArrayStart = array();
                             $inputName = $columnNameBack[$i];
 
                             // Does a speciel implode a data, when it is a checkbox
                             if ($columnType[$i] == 'checkbox') {
                                 if(!empty($_POST[$columnNameBack[$i]])) {
                                     foreach($_POST[$columnNameBack[$i]] as $specials) {
-                                        $specialPostArrayStart[] = $specials;
+                                        $specialPostArrayStart[] = $specials; #Missing validation
                                     }
                                     $inputValue = implode(",", $specialPostArrayStart);
                                 } else $inputValue = "";
@@ -116,7 +117,7 @@
 
                                     // Getting already existing settings
                                     $table_name2 = $wpdb->prefix . 'htx_settings';
-                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ?");
+                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? ORDER BY sorting DESC");
                                     if(!$stmt2)
                                         throw new Exception($link->error);
                                     $stmt2->bind_param("i", $settingCatId);
@@ -129,14 +130,17 @@
                                                 $inputValue = $row['id'];
                                                 $userDropdown = 0;
                                             }
+                                            $defaultInputValue = $row['id'];
                                         }
                                     }
                                     $stmt2->close();
 
+                                    if ($inputValue == "" OR $inputValue === "" or $inputValue == null OR $inputValue == NULL) {$userDropdown = 0; $inputValue = $defaultInputValue;}
+
                                     if ($userDropdown == 1) {
                                         // New user setting does not exist -> create it
                                         $table_name2 = $wpdb->prefix . 'htx_settings';
-                                        $stmt2 = $link->prepare("INSERT INTO `$table_name2` (settingName, value, settingId, active, sorting) VALUES (?, ?, ?, 1, 10)");
+                                        $stmt2 = $link->prepare("INSERT INTO `$table_name2` (settingName, value, settingId, active, sorting, type) VALUES (?, ?, ?, 1, 10, 'user dropdown')");
                                         if(!$stmt2)
                                             throw new Exception($link->error);
                                         $stmt2->bind_param("ssi", $inputValue, $inputValue, $settingCatId);
