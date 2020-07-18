@@ -32,6 +32,7 @@
         add_submenu_page('HTXLan', 'HTX LAN tildmelder liste', 'Tilmelder liste', 'manage_options', 'HTX_lan_participants_list', 'HTX_lan_participants_list_function');
         add_submenu_page('HTXLan', 'HTX LAN form oprettor', 'Form creator', 'manage_options', 'HTX_lan_create_form', 'HTX_lan_create_function');
         add_submenu_page('HTXLan', 'HTX LAN økonomi', 'Økonomi', 'manage_options', 'HTX_lan_economic', 'HTX_lan_economic_function');
+        add_submenu_page('HTXLan', 'HTX LAN turnerings hold', 'Turnerings hold', 'manage_options', 'HTX_lan_teams', 'HTX_lan_teams_function');
     }
 
 
@@ -78,6 +79,10 @@
     function HTX_lan_economic_function(){
         // Økonomi side, som har alting med økonomi at gøre
         require "economic.php";
+    }
+
+    function HTX_lan_teams_function(){
+        require "teams.php";
     }
 
 ?>

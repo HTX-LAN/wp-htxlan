@@ -97,7 +97,7 @@
                                 if (isset($_POST[$columnNameBack[$i].'-extra'])) {
                                     $userDropdown = 1;
                                     
-                                    $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra'])));
+                                    $inputValue = strtolower(htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))));
                                     
                                     // Getting setting cat id
                                     $table_name2 = $wpdb->prefix . 'htx_settings_cat';
@@ -125,7 +125,7 @@
                                     if($result->num_rows === 0) $userDropdown = '1'; else {
                                         while($row = $result->fetch_assoc()) {
                                             // Check if setting exist
-                                            if ($row['settingName'] == $inputValue) {
+                                            if (strtolower($row['settingName']) == $inputValue) {
                                                 $inputValue = $row['id'];
                                                 $userDropdown = 0;
                                             }
