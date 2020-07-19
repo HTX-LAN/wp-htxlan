@@ -135,8 +135,6 @@
                                     }
                                     $stmt2->close();
 
-                                    if ($inputValue == "" OR $inputValue === "" or $inputValue == null OR $inputValue == NULL) {$userDropdown = 0; $inputValue = $defaultInputValue;}
-
                                     if ($userDropdown == 1) {
                                         // New user setting does not exist -> create it
                                         $table_name2 = $wpdb->prefix . 'htx_settings';
