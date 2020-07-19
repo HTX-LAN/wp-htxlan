@@ -141,7 +141,7 @@
                                         $stmt2 = $link->prepare("INSERT INTO `$table_name2` (settingName, value, settingId, active, sorting, type) VALUES (?, ?, ?, 1, 10, 'user dropdown')");
                                         if(!$stmt2)
                                             throw new Exception($link->error);
-                                        $stmt2->bind_param("ssi", $inputValue, $inputValue, $settingCatId);
+                                        $stmt2->bind_param("ssi", htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))), htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))), $settingCatId);
                                         $stmt2->execute();
                                         $inputValue = intval($link->insert_id);
                                         $stmt2->close();
