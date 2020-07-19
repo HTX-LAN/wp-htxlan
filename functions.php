@@ -95,7 +95,7 @@
                                 } else $inputValue = "";
                             } else if($columnType[$i] == 'user dropdown') {
                                 // Check if new user dropdown setting is made
-                                if (isset($_POST[$columnNameBack[$i].'-extra'])) {
+                                if (isset($_POST[$columnNameBack[$i].'-extra']) AND $_POST[$columnNameBack[$i].'-extra'] != "" AND $_POST[$columnNameBack[$i].'-extra'] != null AND $_POST[$columnNameBack[$i].'-extra'] != NULL) {
                                     $userDropdown = 1;
                                     
                                     $inputValue = strtolower(htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))));
