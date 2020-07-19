@@ -62,7 +62,11 @@
     $stmt->bind_param("i", $tableId);
     $stmt->execute();
     $result = $stmt->get_result();
-    if($result->num_rows === 0) {echo "Der er ingen turneringer";$stmt->close();$Error = true;} else {
+    if($result->num_rows === 0) {
+        echo "Der er ingen turneringer";
+        $stmt->close();
+        $Error = true;
+    } else {
         while($row = $result->fetch_assoc()) {
             // Tournament
             $tempArray = explode(",", $row['specialName']);
@@ -78,7 +82,7 @@
                 $teamsColumnName[] = $row['columnNameFront'];
                 $teamsColumnbackend[] = $row['columnNameBack'];
                 $teamsColumnSettingCat[] = $row['settingCat'];
-                $teamsTournament[] = $row['placeholderText'];
+                $teamsTournament[] = $row['teams'];
             }
             
         }
@@ -191,6 +195,8 @@
 
     $headsShown = array('firstName', 'lastName', 'email', 'discordTag'); #This controls the shown elements on screen
 
+    if (!isset($headsShown) OR count($headsShown) < 0) $headsShown = array('firstName', 'lastName', 'email', 'discordTag');
+
     for ($i=0; $i < count($headsShown); $i++) { 
         // Gettiing every column
         $table_name3 = $wpdb->prefix . 'htx_column';
@@ -199,7 +205,6 @@
         $stmt3->execute();
         $result3 = $stmt3->get_result();
         if($result3->num_rows === 0) {
-            echo "No such column";
         } else {
             while($row3 = $result3->fetch_assoc()) {
                 $columnNameFront[] = $row3['columnNameFront'];
@@ -234,6 +239,7 @@
                         </tr>
                     </thead>
                     <tbody>";
+                if (in_array($teamsTournament[$index], $tournamentIds[$i])){  
                     echo "<tr>
                     <th>Holdnavn</th>";
                     // Writing every column and insert into table head
@@ -243,146 +249,277 @@
                             echo "<th>$columnNameFront[$iHeaders]</th>";
                         }
                     }
-                    echo "</tr>";
-                    echo "<tr colspan='9' style='background-color: unset; height: 0.5rem;'></tr>";
-                for ($team=0; $team < count($teamsIds[$index]); $team++) { 
-                    for ($j=0; $j < count($teamsColumnIds); $j++) { 
-                        if ($teamsTournament[$j] == $tournamentIds[$i][$index]) {
-                            $table_name = $wpdb->prefix . 'htx_form';
-                            $stmt = $link->prepare("SELECT DISTINCT userId FROM `$table_name` where active = 1 and tableId = ? and name = ? and value = ? ORDER BY value ASC");
-                            $stmt->bind_param("iii", $tableId, $teamsColumnIds[$j], $teamsIds[$index][$team]);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
-                            if($result->num_rows === 0) {
-                                $stmt->close();
-                                echo "
-                                <tr>
-                                    <th colspan='$TopColumnAmount'>".$teamsNames[$index][$team]."</th>
-                                </tr>
-                                <tr>
-                                    <td colspan='$TopColumnAmount'>Ingen tilmeldte endnu</td>
-                                </tr>";
+                    echo "</tr>";  
+                    echo "<tr colspan='9' style='background-color: unset; height: 0.5rem;'></tr>";            
+                    for ($team=0; $team < count($teamsIds[$index]); $team++) { 
+                        for ($j=0; $j < count($teamsColumnIds); $j++) { 
+                            if ($teamsTournament[$j] == $tournamentIds[$i][$index]) {
+                                $table_name = $wpdb->prefix . 'htx_form';
+                                $stmt = $link->prepare("SELECT DISTINCT userId FROM `$table_name` where active = 1 and tableId = ? and name = ? and value = ? ORDER BY value ASC");
+                                $stmt->bind_param("iii", $tableId, $teamsColumnIds[$j], $teamsIds[$index][$team]);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                if($result->num_rows === 0) {
+                                    $stmt->close();
+                                    echo "
+                                    <tr>
+                                        <th colspan='$TopColumnAmount'>".$teamsNames[$index][$team]."</th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan='$TopColumnAmount'>Ingen tilmeldte endnu</td>
+                                    </tr>";
+                                } else {
+                                    echo "
+                                    <tr>
+                                        <th colspan='$TopColumnAmount'>".$teamsNames[$index][$team]."</th>
+                                    </tr>";
+                                    $whileCount = 0;
+                                    $noUser = 0;
+                                    while($row = $result->fetch_assoc()) {                                
+                                        $tmpExplode = array();
+            
+                                        $table_name2 = $wpdb->prefix . 'htx_form';
+                                        $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
+                                        $stmt2->bind_param("iii", $tableId, $row['userId'], $tournamentColumnIds[$i]);
+                                        $stmt2->execute();
+                                        $result2 = $stmt2->get_result();
+                                        if($result2->num_rows === 0) {
+                                            $stmt2->close();
+                                            $tmpExplode = false;
+                                            $noUser = $noUser + 1;
+                                        } else {
+                                            while($row2 = $result2->fetch_assoc()) {                                    
+                                                $tmpExplode = array_merge($tmpExplode, array_filter(explode(",", $row2['value'])));
+                                            }
+                                            $stmt2->close();
+                                        }
+            
+                                        if ($tmpExplode != false){
+                                            if (in_array($tournamentIds[$i][$index], $tmpExplode)) {
+                                                echo "<tr>";
+            
+                                                $table_name2 = $wpdb->prefix . 'htx_form';
+                                                $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
+                                                $stmt2->bind_param("iii", $tableId, $row['userId'], $teamsColumnIds[$j]);
+                                                $stmt2->execute();
+                                                $result2 = $stmt2->get_result();
+                                                if($result2->num_rows === 0) {
+                                                    $stmt2->close();
+                                                } else {
+                                                    echo "<td>";
+                                                    while($row2 = $result2->fetch_assoc()) {
+                                                        if ($teamsNamesWId[$i][$row2['value']] == "") 
+                                                            echo $teamsNames[$i][0];
+                                                        else
+                                                            echo $teamsNamesWId[$i][$row2['value']];
+                                                        $newTeam = $teamsNamesWId[$i][$row2['value']];
+                                                    }
+                                                    echo "</td>";
+                                                    $stmt2->close();
+                                                }
+                                                // Other information
+                                                for ($indexWrite=0; $indexWrite < count($columnNameBack); $indexWrite++) {
+                                                    // Getting data for specefied column
+                                                    $table_name3 = $wpdb->prefix . 'htx_form';
+                                                    $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE tableid = ? AND userId = ? AND name = ?");
+                                                    $stmt3->bind_param("iis", $tableId, $row['userId'], $columnNameBack[$indexWrite]);
+                                                    $stmt3->execute();
+                                                    $result3 = $stmt3->get_result();
+                                                    if($result3->num_rows === 0) {
+                                                        if (!in_array($columnType[$indexWrite], $nonUserInput)) {
+                                                            echo "<td>";
+                                                            echo "<i style='color: red'>-</i>";
+                                                            echo "</td>";
+                                                        }
+                                                    } else {
+                                                        if (!in_array($columnType[$indexWrite], $nonUserInput)) {
+                                                            echo "<td>";
+                                                            while($row3 = $result3->fetch_assoc()) {
+                                                                // Checks if dropdown or other where value is an id
+                                                                if (in_array($row3['name'], $settingNameBacks)) {
+                                                                    // Writing data from id, if dropdown or radio
+                                                                    if ($columnType[$indexWrite] == "checkbox") {
+                                                                        $valueArray = explode(",", $row3['value']);
+                                                                        if (count($valueArray) > 0) {
+                                                                            for ($jWrite=0; $jWrite < count($valueArray); $jWrite++) {
+                                                                                echo htmlspecialchars($settingName[$valueArray[$jWrite]]);
+                                                                                // Insert comma, if the value is not the last
+                                                                                if (count($valueArray) != ($jWrite + 1)) {
+                                                                                    echo ", ";
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        echo htmlspecialchars($settingName[$row3['value']]);
+                                                                    }
+
+                                                                } else {
+                                                                    // Checks column type
+                                                                    if (!in_array($columnType[$indexWrite], $nonUserInput)) {
+                                                                        // Writing data from table
+                                                                        echo htmlspecialchars($row3['value']);
+                                                                    }
+                                                                }
+                                                            }
+                                                            echo "</td>";
+                                                        }
+                                                    }
+                                                    $stmt3->close();
+                                                }
+                                                echo "</tr>";
+                                            } else
+                                                $noUser = $noUser + 1;
+                                        }
+                                        $whileCount = $whileCount + 1;
+                                    }
+                                    $stmt->close();
+                                    if ($whileCount == $noUser)
+                                        echo "<tr>
+                                            <td colspan='7'>Ingen tilmeldte endnu</td>
+                                        </tr>";
+                                        
+                                }
+                                echo "<tr colspan='9' style='background-color: unset; height: 1rem;'></tr>";
+                            }
+                        }
+                    }
+                } else {
+                    echo "<tr>";
+                    // Writing every column and insert into table head
+                    for ($iHeaders=0; $iHeaders < count($columnNameBack); $iHeaders++) {
+                        // Check if input should not be shown
+                        if (!in_array($columnType[$iHeaders], $nonUserInput)) {
+                            echo "<th>$columnNameFront[$iHeaders]</th>";
+                        }
+                    }
+                    echo "</tr>";  
+                    // No teams, only players
+
+                    $table_name = $wpdb->prefix . 'htx_form';
+                    $stmt = $link->prepare("SELECT DISTINCT userId FROM `$table_name` where active = 1 and tableId = ? and name = ?");
+                    $stmt->bind_param("ii", $tableId, $tournamentColumnIds[$i]);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    if($result->num_rows === 0) {
+                        $stmt->close();
+                        echo "
+                        <tr>
+                            <td colspan='$TopColumnAmount'>Ingen tilmeldte endnu</td>
+                        </tr>";
+                    } else {
+                        $whileCount = 0;
+                        $noUser = 0;
+                        while($row = $result->fetch_assoc()) {                                
+                            $tmpExplode = array();
+
+                            $table_name2 = $wpdb->prefix . 'htx_form';
+                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
+                            $stmt2->bind_param("iii", $tableId, $row['userId'], $tournamentColumnIds[$i]);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            if($result2->num_rows === 0) {
+                                $stmt2->close();
+                                $tmpExplode = false;
+                                $noUser = $noUser + 1;
                             } else {
-                                echo "
-                                <tr>
-                                    <th colspan='$TopColumnAmount'>".$teamsNames[$index][$team]."</th>
-                                </tr>";
-                                $whileCount = 0;
-                                $noUser = 0;
-                                while($row = $result->fetch_assoc()) {                                
-                                    $tmpExplode = array();
-        
+                                while($row2 = $result2->fetch_assoc()) {                                    
+                                    $tmpExplode = array_merge($tmpExplode, array_filter(explode(",", $row2['value'])));
+                                }
+                                $stmt2->close();
+                            }
+
+                            if ($tmpExplode != false){
+                                if (in_array($tournamentIds[$i][$index], $tmpExplode)) {
+                                    echo "<tr>";
+
                                     $table_name2 = $wpdb->prefix . 'htx_form';
                                     $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
-                                    $stmt2->bind_param("iii", $tableId, $row['userId'], $tournamentColumnIds[$i]);
+                                    $stmt2->bind_param("iii", $tableId, $row['userId'], $teamsColumnIds[$j]);
                                     $stmt2->execute();
                                     $result2 = $stmt2->get_result();
                                     if($result2->num_rows === 0) {
                                         $stmt2->close();
-                                        $tmpExplode = false;
-                                        $noUser = $noUser + 1;
                                     } else {
-                                        while($row2 = $result2->fetch_assoc()) {                                    
-                                            $tmpExplode = array_merge($tmpExplode, array_filter(explode(",", $row2['value'])));
+                                        echo "<td>";
+                                        while($row2 = $result2->fetch_assoc()) {
+                                            if ($teamsNamesWId[$i][$row2['value']] == "") 
+                                                echo $teamsNames[$i][0];
+                                            else
+                                                echo $teamsNamesWId[$i][$row2['value']];
+                                            $newTeam = $teamsNamesWId[$i][$row2['value']];
                                         }
+                                        echo "</td>";
                                         $stmt2->close();
                                     }
-        
-                                    if ($tmpExplode != false){
-                                        if (in_array($tournamentIds[$i][$index], $tmpExplode)) {
-                                            echo "<tr>";
-        
-                                            $table_name2 = $wpdb->prefix . 'htx_form';
-                                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
-                                            $stmt2->bind_param("iii", $tableId, $row['userId'], $teamsColumnIds[$j]);
-                                            $stmt2->execute();
-                                            $result2 = $stmt2->get_result();
-                                            if($result2->num_rows === 0) {
-                                                $stmt2->close();
-                                            } else {
+                                    // Other information
+                                    for ($indexWrite=0; $indexWrite < count($columnNameBack); $indexWrite++) {
+                                        // Getting data for specefied column
+                                        $table_name3 = $wpdb->prefix . 'htx_form';
+                                        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE tableid = ? AND userId = ? AND name = ?");
+                                        $stmt3->bind_param("iis", $tableId, $row['userId'], $columnNameBack[$indexWrite]);
+                                        $stmt3->execute();
+                                        $result3 = $stmt3->get_result();
+                                        if($result3->num_rows === 0) {
+                                            if (!in_array($columnType[$indexWrite], $nonUserInput)) {
                                                 echo "<td>";
-                                                while($row2 = $result2->fetch_assoc()) {
-                                                    if ($teamsNamesWId[$i][$row2['value']] == "") 
-                                                        echo $teamsNames[$i][0];
-                                                    else
-                                                        echo $teamsNamesWId[$i][$row2['value']];
-                                                    $newTeam = $teamsNamesWId[$i][$row2['value']];
-                                                }
+                                                echo "<i style='color: red'>-</i>";
                                                 echo "</td>";
-                                                $stmt2->close();
                                             }
-                                            // Other information
-                                            for ($indexWrite=0; $indexWrite < count($columnNameBack); $indexWrite++) {
-                                                // Getting data for specefied column
-                                                $table_name3 = $wpdb->prefix . 'htx_form';
-                                                $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE tableid = ? AND userId = ? AND name = ?");
-                                                $stmt3->bind_param("iis", $tableId, $row['userId'], $columnNameBack[$indexWrite]);
-                                                $stmt3->execute();
-                                                $result3 = $stmt3->get_result();
-                                                if($result3->num_rows === 0) {
-                                                    if (!in_array($columnType[$indexWrite], $nonUserInput)) {
-                                                        echo "<td>";
-                                                        echo "<i style='color: red'>-</i>";
-                                                        echo "</td>";
-                                                    }
-                                                } else {
-                                                    if (!in_array($columnType[$indexWrite], $nonUserInput)) {
-                                                        echo "<td>";
-                                                        while($row3 = $result3->fetch_assoc()) {
-                                                            // Checks if dropdown or other where value is an id
-                                                            if (in_array($row3['name'], $settingNameBacks)) {
-                                                                // Writing data from id, if dropdown or radio
-                                                                if ($columnType[$indexWrite] == "checkbox") {
-                                                                    $valueArray = explode(",", $row3['value']);
-                                                                    if (count($valueArray) > 0) {
-                                                                        for ($jWrite=0; $jWrite < count($valueArray); $jWrite++) {
-                                                                            echo htmlspecialchars($settingName[$valueArray[$jWrite]]);
-                                                                            // Insert comma, if the value is not the last
-                                                                            if (count($valueArray) != ($jWrite + 1)) {
-                                                                                echo ", ";
-                                                                            }
-                                                                        }
+                                        } else {
+                                            if (!in_array($columnType[$indexWrite], $nonUserInput)) {
+                                                echo "<td>";
+                                                while($row3 = $result3->fetch_assoc()) {
+                                                    // Checks if dropdown or other where value is an id
+                                                    if (in_array($row3['name'], $settingNameBacks)) {
+                                                        // Writing data from id, if dropdown or radio
+                                                        if ($columnType[$indexWrite] == "checkbox") {
+                                                            $valueArray = explode(",", $row3['value']);
+                                                            if (count($valueArray) > 0) {
+                                                                for ($jWrite=0; $jWrite < count($valueArray); $jWrite++) {
+                                                                    echo htmlspecialchars($settingName[$valueArray[$jWrite]]);
+                                                                    // Insert comma, if the value is not the last
+                                                                    if (count($valueArray) != ($jWrite + 1)) {
+                                                                        echo ", ";
                                                                     }
-                                                                } else {
-                                                                    echo htmlspecialchars($settingName[$row3['value']]);
-                                                                }
-
-                                                            } else {
-                                                                // Checks column type
-                                                                if (!in_array($columnType[$indexWrite], $nonUserInput)) {
-                                                                    // Writing data from table
-                                                                    echo htmlspecialchars($row3['value']);
                                                                 }
                                                             }
+                                                        } else {
+                                                            echo htmlspecialchars($settingName[$row3['value']]);
                                                         }
-                                                        echo "</td>";
+
+                                                    } else {
+                                                        // Checks column type
+                                                        if (!in_array($columnType[$indexWrite], $nonUserInput)) {
+                                                            // Writing data from table
+                                                            echo htmlspecialchars($row3['value']);
+                                                        }
                                                     }
                                                 }
-                                                $stmt3->close();
+                                                echo "</td>";
                                             }
-                                            echo "</tr>";
-                                        } else
-                                            $noUser = $noUser + 1;
+                                        }
+                                        $stmt3->close();
                                     }
-                                    $whileCount = $whileCount + 1;
-                                }
-                                $stmt->close();
-                                if ($whileCount == $noUser)
-                                    echo "<tr>
-                                        <td colspan='7'>Ingen tilmeldte endnu</td>
-                                    </tr>";
-                                    
+                                    echo "</tr>";
+                                } else
+                                    $noUser = $noUser + 1;
                             }
-                            echo "<tr colspan='9' style='background-color: unset; height: 1rem;'></tr>";
+                            $whileCount = $whileCount + 1;
                         }
+                        $stmt->close();
+                        if ($whileCount == $noUser)
+                            echo "<tr>
+                                <td colspan='7'>Ingen tilmeldte endnu</td>
+                            </tr>";
+                            
                     }
                 }
                   
                 
 
                 echo "
-                    </tbody>
                     <tr colspan='9' style='background-color: unset; height: 2rem;'></tr>
+                    </tbody>
                 </table>";
             }
         }
