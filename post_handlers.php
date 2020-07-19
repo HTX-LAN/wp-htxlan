@@ -372,7 +372,7 @@ function htx_update_column() {
             if (trim($_POST['name']) == "") throw new Exception("No name given.");
             $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_column';
-            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ? WHERE id = ?");
+            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ? WHERE id = ?");
             if(!$stmt1)
                 throw new Exception($link->error);
             if(!empty($_POST['specialName'])) {
@@ -385,7 +385,7 @@ function htx_update_column() {
                 $speciealPost = 0;
                 $specialPostArray = "";
             }
-            $stmt1->bind_param("ssisiiisi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, $_POST['disabled'], $placeholderText, $setting);
+            $stmt1->bind_param("ssisiiissi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, $_POST['disabled'], $placeholderText, $_POST['teams'], $setting);
             // Updating special, and inserting as array
 
             $stmt1->execute();

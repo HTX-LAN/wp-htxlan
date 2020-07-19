@@ -367,6 +367,7 @@
                     $special = $row['special'];
                     $specialName = explode(",", $row['specialName']);
                     $placeholderText = $row['placeholderText'];
+                    $teams = $row['teams'];
                     $sorting = $row['sorting'];
                     $disabled = $row['disabled'];
                     $required = $row['required'];
@@ -404,6 +405,19 @@
                             echo "</div></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Choose what tournament team should go to
+                            if (in_array('teams', $specialName)) {
+                                echo "<div>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <select id='settingTeams' class='inputBox' name='teams'>";
+                                for ($i=0; $i < count($torunamentId); $i++) { 
+                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
+                                    echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
+                                }
+                                echo "</select></div>";
+                            } else {
+                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
+                            }
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
@@ -491,13 +505,15 @@
                             // Choose what tournament team should go to
                             if (in_array('teams', $specialName)) {
                                 echo "<div>
-                                    <label for='settingPlaceholder'>Vælg turnering hold skal vælges til </label>
-                                    <select id='settingPlaceholder' class='inputBox' name='placeholderText'>";
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <select id='settingTeams' class='inputBox' name='teams'>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
-                                    if ($torunamentId[$i] == $format) $selected = "selected"; else $selected = "";
+                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
                                     echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
                                 }
                                 echo "</select></div>";
+                            } else {
+                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
                             }
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
@@ -584,6 +600,19 @@
                             echo "</div></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Choose what tournament team should go to
+                            if (in_array('teams', $specialName)) {
+                                echo "<div>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <select id='settingTeams' class='inputBox' name='teams'>";
+                                for ($i=0; $i < count($torunamentId); $i++) { 
+                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
+                                    echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
+                                }
+                                echo "</select></div>";
+                            } else {
+                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
+                            }
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
@@ -669,6 +698,19 @@
                             echo "</div></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Choose what tournament team should go to
+                            if (in_array('teams', $specialName)) {
+                                echo "<div>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <select id='settingTeams' class='inputBox' name='teams'>";
+                                for ($i=0; $i < count($torunamentId); $i++) { 
+                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
+                                    echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
+                                }
+                                echo "</select></div>";
+                            } else {
+                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
+                            }
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
@@ -762,6 +804,19 @@
                             echo "<div><label for='settingPlaceholder'>Placeholder tekst </label><input type='$format' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Choose what tournament team should go to
+                            if (in_array('teams', $specialName)) {
+                                echo "<div>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <select id='settingTeams' class='inputBox' name='teams'>";
+                                for ($i=0; $i < count($torunamentId); $i++) { 
+                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
+                                    echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
+                                }
+                                echo "</select></div>";
+                            } else {
+                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
+                            }
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
@@ -853,6 +908,19 @@
                             echo "</div></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Choose what tournament team should go to
+                            if (in_array('teams', $specialName)) {
+                                echo "<div>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <select id='settingTeams' class='inputBox' name='teams'>";
+                                for ($i=0; $i < count($torunamentId); $i++) { 
+                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
+                                    echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
+                                }
+                                echo "</select></div>";
+                            } else {
+                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
+                            }
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
