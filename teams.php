@@ -78,6 +78,7 @@
                 $teamsColumnName[] = $row['columnNameFront'];
                 $teamsColumnbackend[] = $row['columnNameBack'];
                 $teamsColumnSettingCat[] = $row['settingCat'];
+                $teamsTournament[] = $row['placeholderText'];
             }
             
         }
@@ -163,81 +164,119 @@
 
         // Write page
     }
-
     if (!$Error) {
         for ($i=0; $i < count($tournamentColumnIds); $i++) { 
-
             echo "<h2>$tournamentColumnName[$i]</h2>";
             for ($index=0; $index < count($tournamentNames[$i]); $index++) { 
                 echo "
                 <table class='InfoTable' style='width: unset'>
                     <thead>
                         <tr>
-                            <th colspan='7'><h2 style='margin: 0px;'>".$tournamentNames[$i][$index]."</h2></th>
-                        </tr>
-                        <tr>
-                            <th>Holdnavn</th>
-                            <th>Spiller navn</th>
-                            <th>Email</th>
-                            <th>Skole</th>
-                            <th>Klasse</th>
-                            <th>Discord</th>
-                            <th>Ingame navn</th>
+                            <th colspan='7'><h2 style='margin: 0px;'>".$tournamentNames[$i][$index]." - $index</h2></th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>Holdnavn</td>
-                            <td>Spiller navn</td>
-                            <td>Email</td>
-                            <td>Skole</td>
-                            <td>Klasse</td>
-                            <td>Discord</td>
-                            <td>Ingame navn</td>
-                        </tr>";
-                $table_name = $wpdb->prefix . 'htx_form_users';
-                $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 and tableId = ?");
-                $stmt->bind_param("i", $tableId);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                if($result->num_rows === 0) {
-                    echo "Der er ingen turneringer";
-                    $stmt->close();
-                    $Error = true;
-                    die; #Ending page, becuase of error
-                } else {
-                    echo "<tr>";
-                    while($row = $result->fetch_assoc()) {
-                        $teamsCatId[$i] = $row['id'];
-                        
-                        for ($j=0; $j < count($teamsColumnIds); $j++) { 
-                            $table_name2 = $wpdb->prefix . 'htx_form';
-                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
-                            $stmt2->bind_param("iii", $tableId, $row['id'], $teamsColumnIds[$j]);
-                            $stmt2->execute();
-                            $result2 = $stmt2->get_result();
-                            if($result2->num_rows === 0) {
-                                $stmt2->close();
+                    <tbody>";
+                    echo "<tr>
+                        <th>Holdnavn</th>
+                        <th>Spiller navn</th>
+                        <th>Email</th>
+                        <th>Skole</th>
+                        <th>Klasse</th>
+                        <th>Discord</th>
+                        <th>Ingame navn</th>
+                    </tr>";
+                    echo "<tr colspan='9' style='background-color: unset; height: 0.5rem;'></tr>";
+                for ($team=0; $team < count($teamsIds[$index]); $team++) { 
+                    for ($j=0; $j < count($teamsColumnIds); $j++) { 
+                        if ($teamsTournament[$j] == $tournamentIds[$i][$index]) {
+                            $table_name = $wpdb->prefix . 'htx_form';
+                            $stmt = $link->prepare("SELECT DISTINCT userId FROM `$table_name` where active = 1 and tableId = ? and name = ? and value = ? ORDER BY value ASC");
+                            $stmt->bind_param("iii", $tableId, $teamsColumnIds[$j], $teamsIds[$index][$team]);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            if($result->num_rows === 0) {
+                                $stmt->close();
+                                echo "
+                                <tr>
+                                    <th colspan='7'>".$teamsNames[$index][$team]."</th>
+                                </tr>
+                                <tr>
+                                    <td colspan='7'>Ingen tilmeldte endnu</td>
+                                </tr>";
                             } else {
-                                while($row2 = $result2->fetch_assoc()) {
-                                    echo "<td>";
-                                    echo $row2['value'];
-                                    echo "</td>";
+                                echo "
+                                <tr>
+                                    <th colspan='7'>".$teamsNames[$index][$team]."</th>
+                                </tr>";
+                                $whileCount = 0;
+                                $noUser = 0;
+                                while($row = $result->fetch_assoc()) {                                
+                                    $tmpExplode = array();
+        
+                                    $table_name2 = $wpdb->prefix . 'htx_form';
+                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
+                                    $stmt2->bind_param("iii", $tableId, $row['userId'], $tournamentColumnIds[$i]);
+                                    $stmt2->execute();
+                                    $result2 = $stmt2->get_result();
+                                    if($result2->num_rows === 0) {
+                                        $stmt2->close();
+                                        $tmpExplode = false;
+                                        $noUser = $noUser + 1;
+                                    } else {
+                                        while($row2 = $result2->fetch_assoc()) {                                    
+                                            $tmpExplode = array_merge($tmpExplode, array_filter(explode(",", $row2['value'])));
+                                        }
+                                        $stmt2->close();
+                                    }
+        
+                                    if ($tmpExplode != false){
+                                        if (in_array($tournamentIds[$i][$index], $tmpExplode)) {
+                                            echo "<tr>";
+        
+                                            $table_name2 = $wpdb->prefix . 'htx_form';
+                                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
+                                            $stmt2->bind_param("iii", $tableId, $row['userId'], $teamsColumnIds[$j]);
+                                            $stmt2->execute();
+                                            $result2 = $stmt2->get_result();
+                                            if($result2->num_rows === 0) {
+                                                $stmt2->close();
+                                            } else {
+                                                echo "<td>";
+                                                while($row2 = $result2->fetch_assoc()) {
+                                                    if ($teamsNamesWId[$i][$row2['value']] == "") 
+                                                        echo $teamsNames[$i][0];
+                                                    else
+                                                        echo $teamsNamesWId[$i][$row2['value']];
+                                                    $newTeam = $teamsNamesWId[$i][$row2['value']];
+                                                }
+                                                echo "</td>";
+                                                $stmt2->close();
+                                            }
+                                            
+
+                                            echo "</tr>";
+                                        } else
+                                            $noUser = $noUser + 1;
+                                    }
+                                    $whileCount = $whileCount + 1;
                                 }
-                                $stmt2->close();
+                                $stmt->close();
+                                if ($whileCount == $noUser)
+                                    echo "<tr>
+                                        <td colspan='7'>Ingen tilmeldte endnu</td>
+                                    </tr>";
+                                    
                             }
+                            echo "<tr colspan='9' style='background-color: unset; height: 1rem;'></tr>";
                         }
-                        
-                        
                     }
-                    echo "</tr>";
-                    $stmt->close();
-                }  
+                }
+                  
                 
 
                 echo "
                     </tbody>
-                    <td colspan='9' style='background-color: unset; height: 2rem;'></td>
+                    <tr colspan='9' style='background-color: unset; height: 2rem;'></tr>
                 </table>";
             }
         }
