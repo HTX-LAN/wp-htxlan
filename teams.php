@@ -188,26 +188,33 @@
             $settingValue[$row3['id']] = $row3['value'];
         }
     }
-    // Gettiing every colimn
-    $table_name3 = $wpdb->prefix . 'htx_column';
-    $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE tableid = ?");
-    $stmt3->bind_param("i", $tableId);
-    $stmt3->execute();
-    $result3 = $stmt3->get_result();
-    if($result3->num_rows === 0) {return HTX_frontend_sql_notworking();} else {
-        while($row3 = $result3->fetch_assoc()) {
-            $columnNameFront[] = $row3['columnNameFront'];
-            $columnNameBack[] = $row3['columnNameBack'];
-            $format[] = $row3['format'];
-            $columnType[] = $row3['columnType'];
-            $special[] = $row3['special'];
-            $specialName[] = explode(",", $row3['specialName']);
-            $placeholderText[] = $row3['placeholderText'];
-            $sorting[] = $row3['sorting'];
-            $required[] = $row3['required'];
+
+    $headsShown = array('firstName', 'lastName', 'email', 'discordTag'); #This controls the shown elements on screen
+
+    for ($i=0; $i < count($headsShown); $i++) { 
+        // Gettiing every column
+        $table_name3 = $wpdb->prefix . 'htx_column';
+        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE tableid = ? and columnNameBack = ?");
+        $stmt3->bind_param("is", $tableId, $headsShown[$i]);
+        $stmt3->execute();
+        $result3 = $stmt3->get_result();
+        if($result3->num_rows === 0) {
+            echo "No such column";
+        } else {
+            while($row3 = $result3->fetch_assoc()) {
+                $columnNameFront[] = $row3['columnNameFront'];
+                $columnNameBack[] = $row3['columnNameBack'];
+                $format[] = $row3['format'];
+                $columnType[] = $row3['columnType'];
+                $special[] = $row3['special'];
+                $specialName[] = explode(",", $row3['specialName']);
+                $placeholderText[] = $row3['placeholderText'];
+                $sorting[] = $row3['sorting'];
+                $required[] = $row3['required'];
+            }
         }
+        $stmt3->close();
     }
-    $stmt3->close();
 
     // Non user editable inputs saved
     $nonUserInput = array('text area', 'price');
