@@ -51,7 +51,8 @@
         echo "</select></form><br></p>";
 
         // Start of table with head
-        echo "<div class='formGroup_container'><div class='formGroup formGroup_scroll_left'><table class='InfoTable'><thead><tr>";
+        echo "<div class='formGroup_container'><div class='formGroup formGroup_scroll_left'>
+            <table class='InfoTable' id='participantListTable'><thead><tr>";
 
         // Getting information from database
         // Users
@@ -89,10 +90,12 @@
             echo "<th></th>";
 
             // Writing every column and insert into table head
+            $columnNumber = 1;
             for ($i=0; $i < count($columnNameBack); $i++) {
                 // Check if input should not be shown
                 if (!in_array($columnType[$i], $nonUserInput)) {
-                    echo "<th>$columnNameFront[$i]</th>";
+                    echo "<th onClick='sortTable(1,$columnNumber,\"participantListTable\")'>$columnNameFront[$i]</th>";
+                    $columnNumber++;
                 }
             }
             // Writing extra lines

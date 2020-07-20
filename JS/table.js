@@ -1,33 +1,25 @@
-/*Column hover effect - from http://jsfiddle.net/q3HHt/123/*/
+/*Column hover effect - from http://jsfiddle.net/q3HHt/123/ */
 /*For td*/
 $('td').hover(function() {
     var t = parseInt($(this).index()) + 1;
-    if (t > 1) {
-        $(this).parents('table').find('td:nth-child(' + t + ')').addClass('highlighted');
-        $(this).parents('table').find('th:nth-child(' + t + ')').addClass('highlighted');
-    }
+    $(this).parents('table').find('td:nth-child(' + t + ')').addClass('highlighted');
+    $(this).parents('table').find('th:nth-child(' + t + ')').addClass('highlighted');
 },
 function() {
     var t = parseInt($(this).index()) + 1;
-    if (t > 1) {
-        $(this).parents('table').find('td:nth-child(' + t + ')').removeClass('highlighted');
-        $(this).parents('table').find('th:nth-child(' + t + ')').removeClass('highlighted');
-    }
+    $(this).parents('table').find('td:nth-child(' + t + ')').removeClass('highlighted');
+    $(this).parents('table').find('th:nth-child(' + t + ')').removeClass('highlighted');
 });
 /*for th*/
 $('th').hover(function() {
     var t = parseInt($(this).index()) + 1;
-    if (t > 1) {
-        $(this).parents('table').find('td:nth-child(' + t + ')').addClass('highlighted');
-        $(this).parents('table').find('th:nth-child(' + t + ')').addClass('highlighted');
-    }
+    $(this).parents('table').find('td:nth-child(' + t + ')').addClass('highlighted');
+    $(this).parents('table').find('th:nth-child(' + t + ')').addClass('highlighted');
 },
 function() {
     var t = parseInt($(this).index()) + 1;
-    if (t > 1) {
-        $(this).parents('table').find('td:nth-child(' + t + ')').removeClass('highlighted');
-        $(this).parents('table').find('th:nth-child(' + t + ')').removeClass('highlighted');
-    }
+    $(this).parents('table').find('td:nth-child(' + t + ')').removeClass('highlighted');
+    $(this).parents('table').find('th:nth-child(' + t + ')').removeClass('highlighted');
 });
 
 // Delete submission
@@ -42,7 +34,20 @@ function confirmDelete(id) {
 //  sortTable(f,n)
 //  f : 1 ascending order, -1 descending order
 //  n : n-th child(<td>) of <tr>
+var tableSorted = {};
 function sortTable(f,n, tableId){
+    // Reverts order, if already runs once, with the same n and tableId, reverse order
+    if (typeof tableSorted[n+tableId] == 'undefined') {
+        tableSorted[n+tableId] = f;
+    } else {
+        if (tableSorted[n+tableId] == 1) {
+            tableSorted[n+tableId] = -1;
+            f = -1;
+        } else {
+            tableSorted[n+tableId] = 1;
+            f = 1;
+        }
+    }
     var rows = $('#'+tableId+' tbody  tr').get();
 
     rows.sort(function(a, b) {
