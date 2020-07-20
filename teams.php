@@ -53,7 +53,111 @@
     }
 
     // Possible to edit what to show on this page
-    echo "<button class='btn normalBtn' style='margin-bottom: 2rem;'>Ændre viste felter</button><br>";
+    echo "<button class='btn normalBtn' style='margin-bottom: 1rem;' onclick='showTeamColumnSettings()'>Ændre viste felter</button><br>";
+
+    // Get already choosen elements - If no elements are present use default
+    $userId = get_current_user_id();
+    // $headsShown = array('firstName', 'lastName', 'email', 'discordTag'); #This controls the shown elements on screen - Default elements
+
+    // Gets all columns
+    $table_name = $wpdb->prefix . 'htx_column';
+    $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
+    $stmt->bind_param("i", $tableId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if($result->num_rows === 0) {
+        $stmt->close();
+        $columns = array();
+    } else {
+        while($row = $result->fetch_assoc()) {
+            $columns[] = $row['columnNameBack'];
+        }
+    }
+
+    $table_name = $wpdb->prefix . 'htx_settings';
+    $stmt = $link->prepare("SELECT * FROM `$table_name` where settingName = ? AND NOT value = '' AND active = 1 AND type = 'teamsUserPreference' LIMIT 1");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if($result->num_rows === 0) {
+        $stmt->close();
+        $headsShown = array();
+        $userSetting = false;
+    } else {
+        while($row = $result->fetch_assoc()) {
+            $headsShown = explode(",", $row['value']);
+            if (count(array_intersect($columns, $headsShown)) != count($headsShown)) $headsShown = array();
+        }
+        $userSetting = true;
+    }
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        switch  ($_POST['post']) {
+            case 'updateUserPreference':
+                if(!current_user_can("manage_options")){
+                    echo "User can not do that!";
+                    break;
+                }
+            $tempArray = array();
+            $tempSrting = "";
+            for ($i=0; $i < count($_POST['shownColumns']); $i++) { 
+                if (in_array($_POST['shownColumns'][$i], $columns)) {
+                    $tempArray[] = $_POST['shownColumns'][$i];
+                }
+            }
+            if (count(array_intersect($columns, $tempArray)) == count($tempArray)) {
+                $headsShown = $tempArray;
+                $headsShownString = implode(",",$headsShown);
+
+                // Update database
+                if ($userSetting == false) {
+                    // Make new record in database
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type) VALUES (?, ?, 'teamsUserPreference')");
+                    $stmt->bind_param("is", $userId, $headsShownString);
+                    $stmt->execute();
+                    $stmt->close();
+                } else {
+                    // Update record
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("UPDATE `$table_name` SET value = ? WHERE settingName = ?");
+                    $stmt->bind_param("si", $headsShownString, $userId);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+            }
+
+            break;
+        }
+    }
+
+    // Page for showing possible columns to show
+    wp_enqueue_style( 'teams_style', "/wp-content/plugins/WPPlugin-HTXLan/CSS/teams.css");
+    wp_enqueue_script( 'teams_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/teams.js");
+    echo "<div id='columnShownEditPage' class='columnShownEditPage_closed'>";
+    echo "<h2>Viste kolonner</h2>";
+    echo "<form method='POST'>";
+    // Columns:
+    $table_name = $wpdb->prefix . 'htx_column';
+    $stmt = $link->prepare("SELECT * FROM `$table_name` where (active = 1 and tableId = ?) AND (NOT columnType = 'text area' OR columnType = 'price')");
+    $stmt->bind_param("i", $tableId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if($result->num_rows === 0) {
+        echo "Der er ingen elementer i form";
+        $stmt->close();
+        $Error = true;
+        die; #Ending page, becuase of error
+    } else {
+        while($row = $result->fetch_assoc()) {
+            if (in_array($row['columnNameBack'], $headsShown)) $selected = 'checked="checked"'; else $selected = '';
+            echo "<input type='checkbox' id='checkBox-".$row['columnNameBack']."' name='shownColumns[]' value='".$row['columnNameBack']."' $selected><label for='checkBox-".$row['columnNameBack']."'>".$row['columnNameFront']."</label><br>";
+        }
+    }
+    echo "<button type='submit' class='btn updateBtn' name='post' value='updateUserPreference'>Opdater</button>";
+    echo "</form>";
+    echo "</div>";
+    
 
     // Get torunaments
     $table_name = $wpdb->prefix . 'htx_column';
@@ -217,9 +321,7 @@
         }
     }
 
-    $headsShown = array('firstName', 'lastName', 'email', 'discordTag'); #This controls the shown elements on screen
-
-    if (!isset($headsShown) OR count($headsShown) < 0) $headsShown = array('firstName', 'lastName', 'email', 'discordTag');
+    if (!isset($headsShown) OR count($headsShown) <= 0) $headsShown = array('firstName', 'lastName', 'email', 'discordTag');
 
     for ($i=0; $i < count($headsShown); $i++) { 
         // Gettiing every column
