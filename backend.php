@@ -31,8 +31,37 @@
         //add_submenu_page($parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function);
         add_submenu_page('HTXLan', 'HTX LAN tildmelder liste', 'Tilmelder liste', 'manage_options', 'HTX_lan_participants_list', 'HTX_lan_participants_list_function');
         add_submenu_page('HTXLan', 'HTX LAN form oprettor', 'Form creator', 'manage_options', 'HTX_lan_create_form', 'HTX_lan_create_function');
-        add_submenu_page('HTXLan', 'HTX LAN økonomi', 'Økonomi', 'manage_options', 'HTX_lan_economic', 'HTX_lan_economic_function');
-        add_submenu_page('HTXLan', 'HTX LAN turnerings hold', 'Turnerings hold', 'manage_options', 'HTX_lan_teams', 'HTX_lan_teams_function');
+
+        // Only show pages, when an element has specific special name in it in it
+        // Getting start information for database connection
+        global $wpdb;
+        // Connecting to database, with custom variable
+        $link = database_connection();
+        $table_name = $wpdb->prefix . 'htx_column';
+        $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 and specialName != '' ");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows === 0) {
+            $stmt->close();
+        } else {
+            $torunament = false;
+            $economic = false;
+            while($row = $result->fetch_assoc()) {
+                // Tournament
+                $tempArray = explode(",", $row['specialName']);
+
+                if (in_array('tournament', $tempArray) AND $torunament == false) {
+                    add_submenu_page('HTXLan', 'HTX LAN turnerings hold', 'Turnerings hold', 'manage_options', 'HTX_lan_teams', 'HTX_lan_teams_function');
+                    $torunament = true;
+                }
+                if (in_array('price_extra', $tempArray) OR in_array('price_intrance', $tempArray)) {
+                    if ($economic == false) {
+                        add_submenu_page('HTXLan', 'HTX LAN økonomi', 'Økonomi', 'manage_options', 'HTX_lan_economic', 'HTX_lan_economic_function');
+                        $economic = true;
+                    }
+                }
+            }
+        }
     }
 
 
