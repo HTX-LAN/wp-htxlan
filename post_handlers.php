@@ -262,14 +262,16 @@ function htx_new_column() {
             }
             // Check if price already exist
             if ($userInputType == 'price'){
+                $text = 'price';
                 $table_name = $wpdb->prefix . 'htx_column';
-                $stmt = $link->prepare("SELECT * FROM $table_name WHERE tableId = ? and columnType = 'price'");
+                $stmt = $link->prepare("SELECT * FROM $table_name WHERE tableId = ? and columnType = ?");
                 if(!$stmt)
                     throw new Exception($link->error);
-                $stmt->bind_param("i", $tableId);
+                $stmt->bind_param("is", $tableId, $text);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                if($result->num_rows === 0) {} else {throw new Exception('Price element already exist');}
+                if((($result->num_rows)-1) === 0) {} else
+                    throw new Exception('Price element already exist');
                 $stmt->close();
             }
 

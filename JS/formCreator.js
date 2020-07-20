@@ -92,7 +92,6 @@ function HTXJS_addColumn(formid) {
         if(data.success) {
             informationwindowInsert(1, "Ny række blev oprettet.");
             location.reload();
-            console.log(data);
         } else {
             informationwindowInsert(3, "Kunne ikke oprette ny række.");
             console.error(data.error);
