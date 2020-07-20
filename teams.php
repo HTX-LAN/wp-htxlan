@@ -716,9 +716,7 @@
         $sortTable = array_unique($sortTable);
         // Sort table if needed
         for ($i=0; $i < count($sortTable); $i++) { 
-            echo "<script>setTimeout(() => {sortTable(1, 0, \"teamsTable-".$sortTable[$i]."\")}, 200);</script>";
+            echo "<script>setTimeout(() => {sortTable(1, 0, \"teamsTable-".$sortTable[$i]."\")}, 300);</script>";
         }
     }
-
-
 ?>
