@@ -41,9 +41,7 @@
         $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 and specialName != '' ");
         $stmt->execute();
         $result = $stmt->get_result();
-        if($result->num_rows === 0) {
-            $stmt->close();
-        } else {
+        if($result->num_rows === 0) {} else {
             $torunament = false;
             $economic = false;
             while($row = $result->fetch_assoc()) {
@@ -62,6 +60,7 @@
                 }
             }
         }
+        $stmt->close();
     }
 
 
