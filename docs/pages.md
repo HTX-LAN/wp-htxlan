@@ -75,11 +75,12 @@ Denne side viser økonomi for event
 - [ ] Muligt at tilføje custom indtægt
 - [ ] Muligt at tilføje custom udgift
 
-### Turneringer *(Ikke begyndt)*
+### Turneringer
 Side med alle informationer til turneringer
-- [ ] Turneringer / spil
-- [ ] Hold per turneringer
-- [ ] Deltager på hver hold
+- [x] Turneringer / spil
+- [x] Hold per turneringer
+- [x] Deltager på hver hold
+
 - [ ] Kamp liste
 - [ ] Resultater for kampe
 
