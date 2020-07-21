@@ -35,7 +35,7 @@ function confirmDelete(id) {
 //  f : 1 ascending order, -1 descending order
 //  n : n-th child(<td>) of <tr>
 var tableSorted = {};
-function sortTable(f,n, tableId){
+function sortTable(f, n, tableId, arrow, rowId){
     // Reverts order, if already runs once, with the same n and tableId, reverse order
     if (typeof tableSorted[n+tableId] == 'undefined') {
         tableSorted[n+tableId] = f;
@@ -48,6 +48,14 @@ function sortTable(f,n, tableId){
             f = 1;
         }
     }
+    if (arrow == true){
+        $(".sortingCell_"+rowId).each(function() {
+            $(this).html("");
+        });
+    }
+    if (f == -1) arrowIcon = 'keyboard_arrow_down'; else arrowIcon = 'keyboard_arrow_up';
+    document.getElementById('sortingSymbol_'+rowId+'_'+n).innerHTML = arrowIcon;
+
     var rows = $('#'+tableId+' tbody  tr').get();
 
     rows.sort(function(a, b) {

@@ -365,13 +365,17 @@
                         </tr>";
 
                     if ($teamColumnId[$i][$index] == false) {
-                        echo "<tr class='InfoTableRow'>";
+                        echo "<tr class='InfoTableRow sortingRow' id='sortingRow-".$tournamentIds[$i][$index]."'>";
                         // Writing every column and insert into table head
                         $columnNumber = 0;
                         for ($iHeaders=0; $iHeaders < count($columnNameBack); $iHeaders++) {
                             // Check if input should not be shown
                             if (!in_array($columnType[$iHeaders], $nonUserInput)) {
-                                echo "<th onClick='sortTable(1,$columnNumber,\"teamsTable-".$tournamentIds[$i][$index]."\")' title='Sorter efter denne kolonne' style='cursor: pointer'>$columnNameFront[$iHeaders]</th>";
+                                echo "<th onClick='sortTable(1,$columnNumber,\"teamsTable-".$tournamentIds[$i][$index]."\",true,\"".$tournamentIds[$i][$index]."\")' 
+                                title='Sorter efter denne kolonne' style='cursor: pointer'>
+                                    $columnNameFront[$iHeaders]
+                                    <span class='material-icons arrowInline sortingCell_".$tournamentIds[$i][$index]."' id='sortingSymbol_".$tournamentIds[$i][$index]."_$columnNumber'></span>
+                                </th>";
                                 $columnNumber++;
                             }
                         }
@@ -471,14 +475,17 @@
                             }
                         }
                     } else {
-                        echo "<tr>
-                        <th onClick='sortTable(1,0,\"teamsTable-".$tournamentIds[$i][$index]."\")' title='Sorter efter denne kolonne' style='cursor: pointer'>Holdnavn</th>";
+                        echo "<tr class='InfoTableRow sortingRow' id='sortingRow-".$tournamentIds[$i][$index]."'>
+                        <th onClick='sortTable(1,0,\"teamsTable-".$tournamentIds[$i][$index]."\",true,\"".$tournamentIds[$i][$index]."\")' title='Sorter efter denne kolonne' style='cursor: pointer'>Holdnavn<span class='material-icons arrowInline sortingCell_".$tournamentIds[$i][$index]."' id='sortingSymbol_".$tournamentIds[$i][$index]."_0'></span></th>";
                         // Writing every column and insert into table head
                         $columnNumber = 1;
                         for ($iHeaders=0; $iHeaders < count($columnNameBack); $iHeaders++) {
                             // Check if input should not be shown
                             if (!in_array($columnType[$iHeaders], $nonUserInput)) {
-                                echo "<th onClick='sortTable(1,$columnNumber,\"teamsTable-".$tournamentIds[$i][$index]."\")' title='Sorter efter denne kolonne' style='cursor: pointer'>$columnNameFront[$iHeaders]</th>";
+                                echo "<th onClick='sortTable(1,$columnNumber,\"teamsTable-".$tournamentIds[$i][$index]."\",true,\"".$tournamentIds[$i][$index]."\")' title='Sorter efter denne kolonne' style='cursor: pointer'>
+                                    $columnNameFront[$iHeaders]
+                                    <span class='material-icons arrowInline sortingCell_".$tournamentIds[$i][$index]."' id='sortingSymbol_".$tournamentIds[$i][$index]."_$columnNumber'></span>
+                                </th>";
                                 $columnNumber++;
                             }
                         }
@@ -718,11 +725,12 @@
                 echo "<br>";
             }
         }
-
-        $sortTable = array_unique($sortTable);
-        // Sort table if needed
-        for ($i=0; $i < count($sortTable); $i++) { 
-            echo "<script>setTimeout(() => {sortTable(1, 0, \"teamsTable-".$sortTable[$i]."\")}, 300);</script>";
+        if (count($sortTable)>0){
+            $sortTable = array_unique($sortTable);
+            // Sort table if needed
+            for ($i=0; $i < count($sortTable); $i++) { 
+                echo "<script>setTimeout(() => {sortTable(1, 0, \"teamsTable-".$sortTable[$i]."\")}, 300);</script>";
+            }
         }
     }
 ?>

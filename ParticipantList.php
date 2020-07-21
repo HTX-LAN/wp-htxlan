@@ -94,7 +94,10 @@
             for ($i=0; $i < count($columnNameBack); $i++) {
                 // Check if input should not be shown
                 if (!in_array($columnType[$i], $nonUserInput)) {
-                    echo "<th onClick='sortTable(1,$columnNumber,\"participantListTable\")'>$columnNameFront[$i]</th>";
+                    echo "<th onClick='sortTable(1,$columnNumber,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer'>
+                        $columnNameFront[$i]
+                        <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_$columnNumber'></span>
+                    </th>";
                     $columnNumber++;
                 }
             }
