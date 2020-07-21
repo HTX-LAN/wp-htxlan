@@ -75,8 +75,8 @@
     }
 
     $table_name = $wpdb->prefix . 'htx_settings';
-    $stmt = $link->prepare("SELECT * FROM `$table_name` where settingName = ? AND NOT value = '' AND active = 1 AND type = 'teamsUserPreference' LIMIT 1");
-    $stmt->bind_param("i", $userId);
+    $stmt = $link->prepare("SELECT * FROM `$table_name` where settingName = ? AND NOT value = '' AND active = 1 AND type = 'teamsUserPreference' AND expence = ? LIMIT 1");
+    $stmt->bind_param("ii", $userId, $tableId);
     $stmt->execute();
     $result = $stmt->get_result();
     if($result->num_rows === 0) {
@@ -113,15 +113,15 @@
                 if ($userSetting == false) {
                     // Make new record in database
                     $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type) VALUES (?, ?, 'teamsUserPreference')");
-                    $stmt->bind_param("is", $userId, $headsShownString);
+                    $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type, expence) VALUES (?, ?, 'teamsUserPreference', ?)");
+                    $stmt->bind_param("isi", $userId, $headsShownString, $tableId);
                     $stmt->execute();
                     $stmt->close();
                 } else {
                     // Update record
                     $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("UPDATE `$table_name` SET value = ? WHERE settingName = ?");
-                    $stmt->bind_param("si", $headsShownString, $userId);
+                    $stmt = $link->prepare("UPDATE `$table_name` SET value = ? WHERE settingName = ? and expence = ?");
+                    $stmt->bind_param("sii", $headsShownString, $userId, $tableId);
                     $stmt->execute();
                     $stmt->close();
                 }
