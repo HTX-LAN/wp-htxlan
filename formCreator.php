@@ -410,6 +410,7 @@
                                 echo "<div>
                                     <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
+                                echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
                                     if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
                                     echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
@@ -507,6 +508,7 @@
                                 echo "<div>
                                     <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
+                                echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
                                     if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
                                     echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
@@ -605,6 +607,7 @@
                                 echo "<div>
                                     <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
+                                echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
                                     if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
                                     echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
@@ -703,6 +706,7 @@
                                 echo "<div>
                                     <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
+                                echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
                                     if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
                                     echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
