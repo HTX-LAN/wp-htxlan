@@ -22,7 +22,12 @@
     $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 ORDER BY favorit DESC, tableName ASC");
     $stmt->execute();
     $result = $stmt->get_result();
-    if($result->num_rows === 0) {echo "Ingen formularer - Opret nogen 🙂";$stmt->close();$Error = true;die;} else {
+    if($result->num_rows === 0) {
+        echo "Ingen formularer - Opret nogen 🙂";
+        $stmt->close();
+        $Error = true;
+        die;
+    } else {
         while($row = $result->fetch_assoc()) {
             $tableIds[] = $row['id'];
             $tableNames[] = $row['tableName'];
@@ -74,6 +79,7 @@
         }
     }
 
+    // Getting user preferrence
     $table_name = $wpdb->prefix . 'htx_settings';
     $stmt = $link->prepare("SELECT * FROM `$table_name` where settingName = ? AND NOT value = '' AND active = 1 AND type = 'teamsUserPreference' AND expence = ? LIMIT 1");
     $stmt->bind_param("ii", $userId, $tableId);
@@ -91,6 +97,7 @@
         $userSetting = true;
     }
 
+    // Post handling
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         switch  ($_POST['post']) {
             case 'updateUserPreference':
