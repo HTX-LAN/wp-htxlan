@@ -371,7 +371,7 @@
                         for ($iHeaders=0; $iHeaders < count($columnNameBack); $iHeaders++) {
                             // Check if input should not be shown
                             if (!in_array($columnType[$iHeaders], $nonUserInput)) {
-                                echo "<th onClick='sortTable(1,$columnNumber,\"teamsTable-".$tournamentIds[$i][$index]."\")'>$columnNameFront[$iHeaders]</th>";
+                                echo "<th onClick='sortTable(1,$columnNumber,\"teamsTable-".$tournamentIds[$i][$index]."\")' title='Sorter efter denne kolonne' style='cursor: pointer'>$columnNameFront[$iHeaders]</th>";
                                 $columnNumber++;
                             }
                         }
@@ -472,13 +472,13 @@
                         }
                     } else {
                         echo "<tr>
-                        <th onClick='sortTable(1,0,\"teamsTable-".$tournamentIds[$i][$index]."\")'>Holdnavn</th>";
+                        <th onClick='sortTable(1,0,\"teamsTable-".$tournamentIds[$i][$index]."\")' title='Sorter efter denne kolonne' style='cursor: pointer'>Holdnavn</th>";
                         // Writing every column and insert into table head
                         $columnNumber = 1;
                         for ($iHeaders=0; $iHeaders < count($columnNameBack); $iHeaders++) {
                             // Check if input should not be shown
                             if (!in_array($columnType[$iHeaders], $nonUserInput)) {
-                                echo "<th onClick='sortTable(1,$columnNumber,\"teamsTable-".$tournamentIds[$i][$index]."\")'>$columnNameFront[$iHeaders]</th>";
+                                echo "<th onClick='sortTable(1,$columnNumber,\"teamsTable-".$tournamentIds[$i][$index]."\")' title='Sorter efter denne kolonne' style='cursor: pointer'>$columnNameFront[$iHeaders]</th>";
                                 $columnNumber++;
                             }
                         }
