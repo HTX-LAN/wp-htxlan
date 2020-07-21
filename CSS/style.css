@@ -263,6 +263,14 @@
             .cancelBtn:hover {
                 background-color: var(--cancel-color-primary);
             }
+            .normalBtn {
+                background-color: var(--text-hover-tertiary);
+                color: white;
+            }
+            .normalBtn:hover {
+                background-color: var(--text-hover-secundary);
+                color: white;
+            }
         /*Not saved style*/
             /*edited*/
             
@@ -323,4 +331,12 @@
         width: unset !important;
         min-width: 50% !important;
         margin-right: 0px !important;
+    }
+
+    /* Arrow style in table */
+    span.arrowInline {
+        font-size: 15px;
+        vertical-align: middle;
+        position: relative;
+        top: -1px;
     }

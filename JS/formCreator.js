@@ -91,8 +91,7 @@ function HTXJS_addColumn(formid) {
         informationwindowremove(id);
         if(data.success) {
             informationwindowInsert(1, "Ny række blev oprettet.");
-            // location.reload();
-            console.log(data);
+            location.reload();
         } else {
             informationwindowInsert(3, "Kunne ikke oprette ny række.");
             console.error(data.error);
@@ -126,6 +125,7 @@ function HTXJS_updateColumn(setting) {
         name: $('#settingName').val(),
         format: $('#settingFormat option:selected').val(),
         placeholder: $('#settingPlaceholder').val(),
+        teams: $('#settingTeams').val(),
         required: $('#settingRequired').is(":checked") ? 1 : 0,
         disabled: $('#settingDisabled').is(":checked") ? 1 : 0,
         setting: setting,

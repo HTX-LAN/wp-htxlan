@@ -82,22 +82,23 @@
                         $stmt = $link->prepare("INSERT INTO `$table_name` (name, value, userId, tableId) VALUES (?, ?, ?, ?)");
                         $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
                         for ($i=0; $i < count($columnNameBack); $i++) {
+                            $specialPostArrayStart = array();
                             $inputName = $columnNameBack[$i];
 
                             // Does a speciel implode a data, when it is a checkbox
                             if ($columnType[$i] == 'checkbox') {
                                 if(!empty($_POST[$columnNameBack[$i]])) {
                                     foreach($_POST[$columnNameBack[$i]] as $specials) {
-                                        $specialPostArrayStart[] = $specials;
+                                        $specialPostArrayStart[] = $specials; #Missing validation
                                     }
                                     $inputValue = implode(",", $specialPostArrayStart);
                                 } else $inputValue = "";
                             } else if($columnType[$i] == 'user dropdown') {
                                 // Check if new user dropdown setting is made
-                                if (isset($_POST[$columnNameBack[$i].'-extra'])) {
+                                if (isset($_POST[$columnNameBack[$i].'-extra']) AND $_POST[$columnNameBack[$i].'-extra'] != "" AND $_POST[$columnNameBack[$i].'-extra'] != null AND $_POST[$columnNameBack[$i].'-extra'] != NULL) {
                                     $userDropdown = 1;
                                     
-                                    $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra'])));
+                                    $inputValue = strtolower(htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))));
                                     
                                     // Getting setting cat id
                                     $table_name2 = $wpdb->prefix . 'htx_settings_cat';
@@ -116,7 +117,7 @@
 
                                     // Getting already existing settings
                                     $table_name2 = $wpdb->prefix . 'htx_settings';
-                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ?");
+                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingId = ? ORDER BY sorting DESC");
                                     if(!$stmt2)
                                         throw new Exception($link->error);
                                     $stmt2->bind_param("i", $settingCatId);
@@ -125,10 +126,11 @@
                                     if($result->num_rows === 0) $userDropdown = '1'; else {
                                         while($row = $result->fetch_assoc()) {
                                             // Check if setting exist
-                                            if ($row['settingName'] == $inputValue) {
+                                            if (strtolower($row['settingName']) == $inputValue) {
                                                 $inputValue = $row['id'];
                                                 $userDropdown = 0;
                                             }
+                                            $defaultInputValue = $row['id'];
                                         }
                                     }
                                     $stmt2->close();
@@ -136,10 +138,10 @@
                                     if ($userDropdown == 1) {
                                         // New user setting does not exist -> create it
                                         $table_name2 = $wpdb->prefix . 'htx_settings';
-                                        $stmt2 = $link->prepare("INSERT INTO `$table_name2` (settingName, value, settingId, active, sorting) VALUES (?, ?, ?, 1, 10)");
+                                        $stmt2 = $link->prepare("INSERT INTO `$table_name2` (settingName, value, settingId, active, sorting, type) VALUES (?, ?, ?, 1, 10, 'user dropdown')");
                                         if(!$stmt2)
                                             throw new Exception($link->error);
-                                        $stmt2->bind_param("ssi", $inputValue, $inputValue, $settingCatId);
+                                        $stmt2->bind_param("ssi", htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))), htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))), $settingCatId);
                                         $stmt2->execute();
                                         $inputValue = intval($link->insert_id);
                                         $stmt2->close();

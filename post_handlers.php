@@ -262,14 +262,16 @@ function htx_new_column() {
             }
             // Check if price already exist
             if ($userInputType == 'price'){
+                $text = 'price';
                 $table_name = $wpdb->prefix . 'htx_column';
-                $stmt = $link->prepare("SELECT * FROM $table_name WHERE tableId = ? and columnType = 'price'");
+                $stmt = $link->prepare("SELECT * FROM $table_name WHERE tableId = ? and columnType = ?");
                 if(!$stmt)
                     throw new Exception($link->error);
-                $stmt->bind_param("i", $tableId);
+                $stmt->bind_param("is", $tableId, $text);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                if($result->num_rows === 0) {} else {throw new Exception('Price element already exist');}
+                if((($result->num_rows)-1) === 0) {} else
+                    throw new Exception('Price element already exist');
                 $stmt->close();
             }
 
@@ -372,7 +374,7 @@ function htx_update_column() {
             if (trim($_POST['name']) == "") throw new Exception("No name given.");
             $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_column';
-            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ? WHERE id = ?");
+            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ? WHERE id = ?");
             if(!$stmt1)
                 throw new Exception($link->error);
             if(!empty($_POST['specialName'])) {
@@ -385,7 +387,7 @@ function htx_update_column() {
                 $speciealPost = 0;
                 $specialPostArray = "";
             }
-            $stmt1->bind_param("ssisiiisi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, $_POST['disabled'], $placeholderText, $setting);
+            $stmt1->bind_param("ssisiiissi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, $_POST['disabled'], $placeholderText, $_POST['teams'], $setting);
             // Updating special, and inserting as array
 
             $stmt1->execute();

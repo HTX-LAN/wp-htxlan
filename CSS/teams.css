@@ -1,0 +1,26 @@
+/* Style sheet for teams page */
+#columnShownEditPage {
+    width: 25%;
+    height: 80vh;
+    background-color: lightgray;
+    top: 5%;
+    margin-top: 0px;
+    position: absolute;
+    z-index: 100;
+    margin-left: calc(75% - 2rem);
+    padding: 1rem;
+
+    overflow: hidden;
+    overflow-y: auto;
+
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+
+}
+#columnShownEditPage.columnShownEditPage_closed {
+
+    width: 0%;
+    padding: 0rem;
+    margin-left: 100%;
+    overflow: hidden;
+}
