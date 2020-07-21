@@ -640,7 +640,13 @@
                                             } else {
                                                 while($row = $result->fetch_assoc()) {   
                                                     if ($teamsIdsWcolumnId[$teamColumnId[$i][$index][$j]][$u] == $row['value']) {
+                                                        // echo $teamsIdsWcolumnId[$teamColumnId[$i][$index][$j]][$u];
                                                         $userIdsTeam[] = $row['userId'];
+                                                    } else {
+                                                        if ($u == 0) {
+                                                            // If user team have been deleted, then throw into first team on list
+                                                            if (!in_array($row['value'],$teamsIdsWcolumnId[$teamColumnId[$i][$index][$j]])) $userIdsTeam[] = $row['userId'];
+                                                        }
                                                     }
                                                 }
                                             }
