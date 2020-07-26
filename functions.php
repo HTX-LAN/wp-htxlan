@@ -33,6 +33,16 @@
                         Venligt prøv igen.<br>
                         Fejlen blev fundet ved: ";
                     $endSpan = "</span>";
+
+                    $redBorder1 = "<script>setTimeout(() => {
+                        document.getElementById('";
+                    $redBorder2 = "-input').setAttribute('style', 'border-color:red;color: red;');
+                        }, 300);</script>";
+
+                    $errorRequired = "<span style='color: red'>
+                        Venligst udfyld alle felter med *.
+                        </span>";
+
                     $errorEmail = "<span style='color: red'>Emailen findes allerede,
                         venligst kontakt en administrator,
                         hvis du vil lave om i din tilmelding</span>";
@@ -54,7 +64,7 @@
                         $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
                         // Check if mail is valid
                         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                            return $errorInvalidEmail;
+                            return $errorInvalidEmail.$redBorder1."3".$redBorder2;
                         }
 
                         // Check if mail exist
@@ -141,7 +151,7 @@
                             if ($columnType[$i] == 'checkbox') {
                                 if(!empty($_POST[$columnNameBack[$i]])) {
                                     foreach($_POST[$columnNameBack[$i]] as $specials) {
-                                        if (!in_array($specials,$columnSettingsId[$columnId[$i]])) return $errorSettings.$columnNameFront[$i].$endSpan;
+                                        if (!in_array($specials,$columnSettingsId[$columnId[$i]])) return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
                                         $specialPostArrayStart[] = $specials;
                                     }
                                     $inputValue = implode(",", $specialPostArrayStart);
@@ -201,14 +211,14 @@
                                     }
                                 } else {
                                     if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]))
-                                            return $errorSettings.$columnNameFront[$i].$endSpan;
+                                            return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
                                     $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
                                 }
                             } else {
                                 // Check if column has settings
                                 if (in_array($columnType[$i],$columnsWithSettings)) {
                                     if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]))
-                                        return $errorSettings.$columnNameFront[$i].$endSpan;
+                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
                                     else 
                                         $inputValue = htmlspecialchars(intval(trim($_POST[$columnNameBack[$i]])));
                                 } else {
@@ -219,7 +229,7 @@
                                         $email = filter_var($_POST[$columnNameBack[$i]], FILTER_SANITIZE_EMAIL);
                                         // Check if mail is valid
                                         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                                            return $errorInvalidEmail;
+                                            return $errorInvalidEmail.$redBorder1.$columnId[$i].$redBorder2;
                                         } else 
                                             $inputValue = $email;
                                     } else {
@@ -227,6 +237,7 @@
                                     }
                                 }
                             }
+                            if ($required[$i] == 1 AND $inputValue == "") return $errorRequired.$redBorder1.$columnId[$i].$redBorder2;
 
                             $stmt->execute();
                         }

@@ -62,6 +62,7 @@
         $result = $stmt->get_result();
         if($result->num_rows === 0) {return HTX_frontend_sql_notworking();} else {
             while($row = $result->fetch_assoc()) {
+                $columnId[] = $row['id'];
                 $columnNameFront[] = $row['columnNameFront'];
                 $columnNameBack[] = $row['columnNameBack'];
                 $format[] = $row['format'];
@@ -115,7 +116,7 @@
                         if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
                         
                         // Writing first part of dropdown
-                        $html .= "\n<select name='$columnNameBack[$i]' class='dropdown $disabledClass $priceClass' $priceFunction $isRequired>";
+                        $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' class='dropdown $disabledClass $priceClass' $priceFunction $isRequired>";
 
                         // Writing dropdown options
                         while($row = $result->fetch_assoc()) {
@@ -130,7 +131,7 @@
                             $html .= "\n<option value='$setting_id' $postSelected>".$setting_settingName."</option>";
 
                             if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
-                                $html .= "\n<script>price['$setting_id']=".$row['value'].";</script>";
+                                $html .= "\n<script>price['$setting_id']='".$row['value']."';</script>";
                         }
 
                         // Finishing dropdown
@@ -163,7 +164,7 @@
                     if($result->num_rows === 0)  {return $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her <input type='hidden' name='name='$columnNameBack[$i]' value=''>";} else {
                         
                         // Writing first part of dropdown
-                        $html .= "\n<select name='$columnNameBack[$i]' id='extraUserSettingDropdown-$i' class='dropdown $disabledClass' $isRequired>";
+                        $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' id='extraUserSettingDropdown-$i' class='dropdown $disabledClass' $isRequired>";
 
                         // Writing dropdown options
                         while($row = $result->fetch_assoc()) {
@@ -190,7 +191,7 @@
                     $html .= "\n</p>";
                 break;
                 case "radio":
-                    $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
+                    $html .= "\n<p class='$disabledClass'><label id='$columnId[$i]-input'>$columnNameFront[$i]$requiredStar</label><br>";
                     // Getting settings category
                     $table_name = $wpdb->prefix . 'htx_settings_cat';
                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
@@ -229,7 +230,7 @@
 
                                 // Price for javascript
                                 if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
-                                    $html .= "\n<script>price['$setting_id']=".$row3['value'].";</script>";
+                                    $html .= "\n<script>price['$setting_id']='".$row3['value']."';</script>";
 
                             }
                         }
@@ -239,7 +240,7 @@
                     $html .= "\n</p>";
                 break;
                 case "checkbox":
-                    $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label><br>";
+                    $html .= "\n<p class='$disabledClass'><label id='$columnId[$i]-input'>$columnNameFront[$i]$requiredStar</label><br>";
                     // Getting settings category
                     $table_name = $wpdb->prefix . 'htx_settings_cat';
                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
@@ -279,7 +280,7 @@
 
                                 // Price for javascript
                                 if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
-                                    $html .= "\n<script>price['$setting_id']=".$row3['value'].";</script>";
+                                    $html .= "\n<script>price['$setting_id']='".$row3['value']."';</script>";
                             }
                             $html .= "\n</div>";
                         }
@@ -289,19 +290,19 @@
                     $html .= "\n</p>";
                 break;
                 case "text area":
-                    $html .= "\n<h5>$columnNameFront[$i]</h5>";
+                    $html .= "\n<h5 id='$columnId[$i]-input'>$columnNameFront[$i]</h5>";
                     $html .= "\n<p>$placeholderText[$i]</p>";
                 break;
                 case "price":
                     if ($priceSet == false) {
-                        $html .= "\n<h5>$columnNameFront[$i]</h5>";
+                        $html .= "\n<h5 id='$columnId[$i]-input'>$columnNameFront[$i]</h5>";
                         $html .= "\n<p>$placeholderText[$i] <span id='priceLine' onload=\"HTXJS_price_update()\">0</span> $format[$i]</p><script>setTimeout(() => {HTXJS_price_update()}, 500);</script>";
                         $priceSet = true;
                     }
                 break;
                 default:
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                    $html .= "\n<input name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]'";
+                    $html .= "\n<input id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]'";
                     if ($format[$i] == 'tel') $html .= "\npattern='[0-9]{8}'";
                     $html .= "\n class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
                     if ($format[$i] == 'tel') $html .= "\n<small>Format: 12345678</small>";
