@@ -78,6 +78,8 @@
         $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris', 'Turneringer' ,'Hold valg');
         $possibleFunctionsNonInput = array('price_intrance', 'price_extra', 'tournament');
         $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris', 'Turneringer');
+        $possibleFunctionsInput = array('unique');
+        $possibleFunctionsInputName = array('Unikt for hver tilmelding');
         $possibleUniceFunctions = array('price_intrance', 'price_extra');
         $possibleUniceFunction = array("onchange='HTXJS_unCheckFunctionCheckbox(\"1\")'","onchange='HTXJS_unCheckFunctionCheckbox(\"0\")'");
         $possibleFunctionsAll = array('teams');
@@ -802,6 +804,11 @@
                                     if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
                                     echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsAll[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
+                                }
+                                for ($i=0; $i < count($possibleFunctionsInput); $i++) {
+                                    if (in_array($possibleFunctionsInput[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsInput[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsInputName[$i]</label></div>";
                                 }
                             echo "</div></div>";
                             // Placeholder text

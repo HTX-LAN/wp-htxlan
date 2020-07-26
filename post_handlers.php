@@ -339,32 +339,27 @@ function htx_update_column() {
 
             // Update column settings
             if (isset($_POST['settingsTrue']) AND $_POST['settingsTrue'] == "1") {
+                $link->autocommit(FALSE); //turn on transactions
                 // There are settings
                 // Getting number of settings - Checking settingsAmount is a number
                 if (isset($_POST['settingsAmount']) AND intval($_POST['settingsAmount']) > 0) {
                     $settingAmount = intval($_POST['settingsAmount']);
-                    try {
-                        $link->autocommit(FALSE); //turn on transactions
-                        $table_name = $wpdb->prefix . 'htx_settings';
-                        $stmt1 = $link->prepare("UPDATE `$table_name` SET settingName = ?, value = ?, sorting = ?, active = ?, expence = ? WHERE id = ?");
-                        if(!$stmt1)
-                            throw new Exception($link->error);
-                        for ($i=0; $i < $settingAmount; $i++) {
-                            // Update every setting
-                            // Id for line
-                            $lineId = intval($_POST['settingId-'.$i]);
-                            if (intval($_POST['settingActive-'.$lineId]) != 0) $active = 1; else $active = 0;
-                            $stmt1->bind_param("ssiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
-                            $stmt1->execute();
-                        }
-
-                        $stmt1->close();
-                        $link->autocommit(TRUE); //turn off transactions + commit queued queries
-                    } catch(Exception $e) {
-                        $link->rollback(); //remove all queries from queue if error (undo)
-                        throw $e;
+                    $link->autocommit(FALSE); //turn on transactions
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt1 = $link->prepare("UPDATE `$table_name` SET settingName = ?, value = ?, sorting = ?, active = ?, expence = ? WHERE id = ?");
+                    if(!$stmt1)
+                        throw new Exception($link->error);
+                    for ($i=0; $i < $settingAmount; $i++) {
+                        // Update every setting
+                        // Id for line
+                        $lineId = intval($_POST['settingId-'.$i]);
+                        if (intval($_POST['settingActive-'.$lineId]) != 0) $active = 1; else $active = 0;
+                        $stmt1->bind_param("ssiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
+                        $stmt1->execute();
                     }
 
+                    $stmt1->close();
+                    $link->autocommit(TRUE); //turn off transactions + commit queued queries
                 }
             }
 
@@ -372,7 +367,6 @@ function htx_update_column() {
             if ($_POST['disabled'] == 1) $required = 0; else $required = $_POST['required']; #Disabeling the option for both required and hidden input
             if (in_array(trim($_POST['format']), $possibleFormat) OR in_array(trim($_POST['format']), $possiblePrice)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
             if (trim($_POST['name']) == "") throw new Exception("No name given.");
-            $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_column';
             $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ? WHERE id = ?");
             if(!$stmt1)
