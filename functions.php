@@ -22,6 +22,23 @@
             switch  ($_POST['submit']) {
                 // New submission
                 case 'new':
+                    $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price");
+                    $columnsWithSettings = array("dropdown", "user dropdown", "radio", "checkbox");
+                    $nonUserInput = array("text area", "price");
+                    
+                    // Predefined error text
+
+                    $errorSettings = "<span style='color: red'>Der var en fejl ved en valgmulighed du valgte.<br>
+                        den pågældene valgmulighed er ikke længere tilgængelig.<br>
+                        Venligt prøv igen.<br>
+                        Fejlen blev fundet ved: ";
+                    $endSpan = "</span>";
+                    $errorEmail = "<span style='color: red'>Emailen findes allerede,
+                        venligst kontakt en administrator,
+                        hvis du vil lave om i din tilmelding</span>";
+                    $errorInvalidEmail = "<span style='color: red'>
+                        Den indtastede email er ikke gyldig.
+                        </span>";
                     try {
                         // Check that the form trying to submit to, is the right one
                         $table_name = $wpdb->prefix . 'htx_form_tables';
@@ -33,25 +50,31 @@
                         $stmt->close();
 
                         // Checking values
+                        // Sanatize email
+                        $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+                        // Check if mail is valid
+                        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                            return $errorInvalidEmail;
+                        }
+
                         // Check if mail exist
                         $table_name = $wpdb->prefix . 'htx_form_users';
                         $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
-                        $stmt->bind_param("si", htmlspecialchars(trim($_POST['email'])), $tableId);
+                        $stmt->bind_param("si", $email, $tableId);
                         $stmt->execute();
                         $result = $stmt->get_result();
-                        if($result->num_rows === 0) {} else return "Email already exist";
+                        if($result->num_rows === 0) {} else return $errorEmail;
                         $stmt->close();
-
-
                         // Convert values to the right format
                         // Getting column info
                         $table_name = $wpdb->prefix . 'htx_column';
-                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ?");
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? and active = 1");
                         $stmt->bind_param("i", $tableId);
                         $stmt->execute();
                         $result = $stmt->get_result();
                         if($result->num_rows === 0) return "Ingen kollonner"; else {
                             while($row = $result->fetch_assoc()) {
+                                $columnId[] = $row['id'];
                                 $columnNameFront[] = $row['columnNameFront'];
                                 $columnNameBack[] = $row['columnNameBack'];
                                 $format[] = $row['format'];
@@ -61,6 +84,35 @@
                                 $placeholderText[] = $row['placeholderText'];
                                 $sorting[] = $row['sorting'];
                                 $required[] = $row['required'];
+                                if (in_array($row['columnType'],$columnsWithSettings)) {
+                                    // Get settings for column
+                                    $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE settingNameBack = ? and tableId = ? and active = 1");
+                                    $stmt2->bind_param("si", $row['columnNameBack'], $tableId);
+                                    $stmt2->execute();
+                                    $result2 = $stmt2->get_result();
+                                    if($result2->num_rows === 0) {
+                                        // No cat for it
+                                    } else {
+                                        // Get settings
+                                        while($row2 = $result2->fetch_assoc()) {
+                                            $table_name3 = $wpdb->prefix . 'htx_settings';
+                                            $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? and active = 1");
+                                            $stmt3->bind_param("i", $row2['id']);
+                                            $stmt3->execute();
+                                            $result3 = $stmt3->get_result();
+                                            if($result3->num_rows === 0) {
+                                                // No settings
+                                            } else {
+                                                while($row3 = $result3->fetch_assoc()) {
+                                                    $columnSettingsId[$row['id']][] = $row3['id'];
+                                                }
+                                            }
+                                            $stmt3->close();
+                                        }
+                                    }
+                                    $stmt2->close();
+                                }
                             }
                         }
                         $stmt->close();
@@ -72,7 +124,7 @@
                         // Inserting user and getting id
                         $table_name = $wpdb->prefix . 'htx_form_users';
                         $stmt = $link->prepare("INSERT INTO `$table_name` (tableId, email) VALUES (?, ?)");
-                        $stmt->bind_param("is", $tableId, htmlspecialchars(trim($_POST['email'])));
+                        $stmt->bind_param("is", $tableId, htmlspecialchars(trim($email)));
                         $stmt->execute();
                         $formUserId = $link->insert_id;
                         $stmt->close();
@@ -89,7 +141,8 @@
                             if ($columnType[$i] == 'checkbox') {
                                 if(!empty($_POST[$columnNameBack[$i]])) {
                                     foreach($_POST[$columnNameBack[$i]] as $specials) {
-                                        $specialPostArrayStart[] = $specials; #Missing validation
+                                        if (!in_array($specials,$columnSettingsId[$columnId[$i]])) return $errorSettings.$columnNameFront[$i].$endSpan;
+                                        $specialPostArrayStart[] = $specials;
                                     }
                                     $inputValue = implode(",", $specialPostArrayStart);
                                 } else $inputValue = "";
@@ -146,15 +199,34 @@
                                         $inputValue = intval($link->insert_id);
                                         $stmt2->close();
                                     }
-                                } else
+                                } else {
+                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]))
+                                            return $errorSettings.$columnNameFront[$i].$endSpan;
                                     $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
+                                }
                             } else {
-                                $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
+                                // Check if column has settings
+                                if (in_array($columnType[$i],$columnsWithSettings)) {
+                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]))
+                                        return $errorSettings.$columnNameFront[$i].$endSpan;
+                                    else 
+                                        $inputValue = htmlspecialchars(intval(trim($_POST[$columnNameBack[$i]])));
+                                } else {
+                                    // Setting does not have settings, and are an user input
+                                    // Check if column format is email
+                                    if ($format[$i] == 'email') {
+                                        // Sanatize email
+                                        $email = filter_var($_POST[$columnNameBack[$i]], FILTER_SANITIZE_EMAIL);
+                                        // Check if mail is valid
+                                        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                            return $errorInvalidEmail;
+                                        } else 
+                                            $inputValue = $email;
+                                    } else {
+                                        $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
+                                    }
+                                }
                             }
-
-                            // Missing validation of phone number and mail adress
-
-                            // Missing validation of dropdown menu
 
                             $stmt->execute();
                         }

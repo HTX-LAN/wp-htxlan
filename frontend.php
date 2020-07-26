@@ -34,7 +34,7 @@
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
-        if($result->num_rows === 0) {return "<p>Dette er et specielt lavet plugin, som ikke er opsat rigtigt. Godt gået 😊</p>";} else {
+        if($result->num_rows === 0) {return "<p>Denne form virker desværre ikke, fordi den specificeret formular ikke findes.</p>";} else {
             while($row = $result->fetch_assoc()) {
                 $formName = $row['tableName'];
             }
@@ -48,6 +48,10 @@
 
         // Post handling
         $postError = HTX_frontend_post($tableId);
+
+        // Error handling block !Needs to be made to popup window
+        // if (isset($postError))
+        $html .= "\n<p>$postError</p>";
 
         // Getting and writing content to form
         // Getting column info
@@ -306,10 +310,6 @@
 
         }
         $html .= "\n<input name='tableId' value='$tableId' style='display: none'></p>";
-
-        // Error handling block !Needs to be made to popup window
-        // if (isset($postError))
-        $html .= "\n<p>$postError</p>";
 
         // Ending form with submit and reset buttons
         $html .= "\n<p><button type='submit' name='submit' value='new'>Tilmeld</button> <button type='reset' name='reset'>Nulstil</button></p></form>";
