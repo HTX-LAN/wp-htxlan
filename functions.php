@@ -232,6 +232,8 @@
                                             return $errorInvalidEmail.$redBorder1.$columnId[$i].$redBorder2;
                                         } else 
                                             $inputValue = $email;
+                                    } else if ($format[$i] == 'number') {
+                                        $inputValue = floatval(trim($_POST[$columnNameBack[$i]]));
                                     } else {
                                         $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
                                     }
@@ -246,7 +248,7 @@
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
                         throw $e;
-                        return "<span style='color: red'>Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen</span>";
+                        return "<span style='color: red'>Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support</span>";
                     }
 
                     // Error handling (Needs to be more specifik)
