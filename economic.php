@@ -272,7 +272,7 @@
                                         while($row = $result2->fetch_assoc()) {
                                             $settingExtraIds[$g][] = $row['id'];
                                             $settingExtraName[$g][$row['id']] = $row['settingName'];
-                                            $settingExtraValue[$g][$row['id']] = $row['value'];
+                                            $settingExtraValue[$g][$row['id']] = floatval($row['value']);
                                             $settingExtraExpence[$g][$row['id']] = $row['expence'];
                                         }
                                         $stmt2->close();
