@@ -88,6 +88,7 @@
 
             // Pre main column
             echo "<th></th>";
+            echo "<th>Id</th>";
 
             // Writing every column and insert into table head
             $columnNumber = 1;
@@ -157,6 +158,7 @@
 
                 echo "<tr class='InfoTableRow'>";
                 echo "<td><span class='material-icons' style='cursor: pointer'>edit</span></td>";
+                echo "<td>$userid[$i]</td>";
                 // For every column
                 for ($index=0; $index < count($columnNameBack); $index++) {
                     // Getting data for specefied column
