@@ -125,6 +125,7 @@
                 if (isset($_GET['setting']) AND $_GET['setting'] == $settingId) echo "highlighted";
                 echo "'><h4>$columnNameFront";
                 if ($required == 1) echo "<span style='color: red'>*</span>";
+                if (in_array('unique',$specialName)) echo " <i title='Dette input skal være unikt for hver tilmelding' style='cursor: help'>(unikt)</i>";
                 echo "</h4>";
 
                 // Edit button
@@ -820,6 +821,7 @@
                                 echo "<div>
                                     <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
+                                echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
                                     if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
                                     echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";

@@ -43,6 +43,11 @@
                         Venligst udfyld alle felter med *.
                         </span>";
 
+                    $errorUnique = "<span style='color: red'>Værdien i det røde felt skal være unik for hver person,<br>
+                        venligst indtast en unik værdi i det røde felt.<br>
+                        Hvis du mener at dette er en fejl, er du velkommen til at tage kontakt til os.<br><br>
+                        Felt med fejl: ";
+
                     $errorEmail = "<span style='color: red'>Emailen findes allerede,
                         venligst kontakt en administrator,
                         hvis du vil lave om i din tilmelding</span>";
@@ -64,6 +69,7 @@
                         $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
                         // Check if mail is valid
                         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                            $link->rollback(); //remove all queries from queue if error (undo)
                             return $errorInvalidEmail.$redBorder1."3".$redBorder2;
                         }
 
@@ -90,7 +96,7 @@
                                 $format[] = $row['format'];
                                 $columnType[] = $row['columnType'];
                                 $special[] = $row['special'];
-                                $specialName[] = $row['specialName'];
+                                $specialName[] = explode(",", $row['specialName']);
                                 $placeholderText[] = $row['placeholderText'];
                                 $sorting[] = $row['sorting'];
                                 $required[] = $row['required'];
@@ -147,11 +153,28 @@
                             $specialPostArrayStart = array();
                             $inputName = $columnNameBack[$i];
 
+                            // Check if input for column should be unique
+                            if (in_array('unique',$specialName[$i])) {
+                                $table_name2 = $wpdb->prefix . 'htx_form';
+                                $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND name = ? and value = ? and active = 1 LIMIT 1");
+                                $stmt2->bind_param("iss", $tableId, $columnNameBack[$i], htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]]))));
+                                $stmt2->execute();
+                                $result2 = $stmt2->get_result();
+                                if($result2->num_rows === 0) {} else {
+                                    $link->rollback(); //remove all queries from queue if error (undo)
+                                    return $errorUnique.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                }
+                                $stmt2->close();
+                            }
+
                             // Does a speciel implode a data, when it is a checkbox
                             if ($columnType[$i] == 'checkbox') {
                                 if(!empty($_POST[$columnNameBack[$i]])) {
                                     foreach($_POST[$columnNameBack[$i]] as $specials) {
-                                        if (!in_array($specials,$columnSettingsId[$columnId[$i]])) return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                        if (!in_array($specials,$columnSettingsId[$columnId[$i]])) {
+                                            $link->rollback(); //remove all queries from queue if error (undo)
+                                            return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                        }
                                         $specialPostArrayStart[] = $specials;
                                     }
                                     $inputValue = implode(",", $specialPostArrayStart);
@@ -210,16 +233,19 @@
                                         $stmt2->close();
                                     }
                                 } else {
-                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]))
-                                            return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]])) {
+                                        $link->rollback(); //remove all queries from queue if error (undo)
+                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                    }
                                     $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
                                 }
                             } else {
                                 // Check if column has settings
                                 if (in_array($columnType[$i],$columnsWithSettings)) {
-                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]))
+                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]])) {
+                                        $link->rollback(); //remove all queries from queue if error (undo)
                                         return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
-                                    else 
+                                    } else 
                                         $inputValue = htmlspecialchars(intval(trim($_POST[$columnNameBack[$i]])));
                                 } else {
                                     // Setting does not have settings, and are an user input
@@ -229,6 +255,7 @@
                                         $email = filter_var($_POST[$columnNameBack[$i]], FILTER_SANITIZE_EMAIL);
                                         // Check if mail is valid
                                         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                            $link->rollback(); //remove all queries from queue if error (undo)
                                             return $errorInvalidEmail.$redBorder1.$columnId[$i].$redBorder2;
                                         } else 
                                             $inputValue = $email;
@@ -239,7 +266,10 @@
                                     }
                                 }
                             }
-                            if ($required[$i] == 1 AND $inputValue == "") return $errorRequired.$redBorder1.$columnId[$i].$redBorder2;
+                            if ($required[$i] == 1 AND $inputValue == "") {
+                                $link->rollback(); //remove all queries from queue if error (undo)
+                                return $errorRequired.$redBorder1.$columnId[$i].$redBorder2;
+                            }
 
                             $stmt->execute();
                         }
@@ -248,7 +278,7 @@
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
                         throw $e;
-                        return "<span style='color: red'>Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support</span>";
+                        return "<span style='color: red'>Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support</span>"; 
                     }
 
                     // Error handling (Needs to be more specifik)

@@ -85,6 +85,7 @@
         for ($i=0; $i < count($columnNameFront); $i++) {
             // Setup for required label
             if ($required[$i] == 1) {$isRequired = "required"; $requiredStar = "<i style='color: red'>*</i>";} else {$isRequired = ""; $requiredStar = "";}
+            if (in_array('unique',$specialName[$i])) $requiredStar .= " <i title='Dette input skal være unikt for hver tilmelding' style='cursor: help'>(unikt)</i>"; else $requiredStar .= "";
             // Setup for disabled
             if ($disabled[$i] == 1) $disabledClass = "hidden"; else $disabledClass = "";
             // Main writing of input
