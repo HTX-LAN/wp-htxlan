@@ -338,7 +338,7 @@
 
                     // Success handling
                     // Clearing post
-                    // $_POST = array();
+                    $_POST = array();
                     // Writing success for user to see
                     return "<div class='form_success'>
                     <div class='form_success_icon'>
