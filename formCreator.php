@@ -66,7 +66,7 @@
 
         // Possible input types in array
         $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price", "spacing"); #Missing: checkboxes with text input (for ex team names per game basis), range
-
+        
         // Possible formats types in array
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
 
@@ -74,16 +74,16 @@
         $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
 
         // Possible functions
-        $possibleFunctions = array('price_intrance', 'price_extra', 'tournament','teams');
-        $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris', 'Turneringer' ,'Hold valg');
+        $possibleFunctions = array('price_intrance', 'price_extra', 'tournament','teams','show');
+        $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris', 'Turneringer' ,'Hold valg','Vis kun hvis krav er mødt');
         $possibleFunctionsNonInput = array('price_intrance', 'price_extra', 'tournament');
         $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris', 'Turneringer');
         $possibleFunctionsInput = array('unique');
         $possibleFunctionsInputName = array('Unikt for hver tilmelding');
         $possibleUniceFunctions = array('price_intrance', 'price_extra');
         $possibleUniceFunction = array("onchange='HTXJS_unCheckFunctionCheckbox(\"1\")'","onchange='HTXJS_unCheckFunctionCheckbox(\"0\")'");
-        $possibleFunctionsAll = array('teams');
-        $possibleFunctionsAllName = array('Hold valg');
+        $possibleFunctionsAll = array('teams','show');
+        $possibleFunctionsAllName = array('Hold valg','Vis kun hvis krav er mødt');
 
         // Make div
         echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
@@ -113,12 +113,37 @@
                 $format = $row['format'];
                 $columnType = $row['columnType'];
                 $special = $row['special'];
-                $specialName = explode(",",$row['specialName']);
+                $specialName = explode(",", $row['specialName']);
+                $specialNameExtra = $row['specialNameExtra'];
+                $specialNameExtra2 = explode(",", $row['specialNameExtra2']);
                 $placeholderText = $row['placeholderText'];
+                $formatExtra = $row['formatExtra'];
+                $teams = $row['teams'];
                 $sorting = $row['sorting'];
+                $disabled = $row['disabled'];
                 $required = $row['required'];
                 $settingCat = $row['settingCat'];
-                $disabled = $row['disabled'];
+
+                $allColumnInfo[] = array(
+                    "settingId" => $settingId,
+                    "settingTableId" => $settingTableId,
+                    "columnNameFront" => $columnNameFront,
+                    "columnNameBack" => $columnNameBack,
+                    "format" => $format,
+                    "columnType" => $columnType,
+                    "special" => $special,
+                    "specialName" => $specialName,
+                    "specialNameExtra" => $specialNameExtra,
+                    "specialNameExtra2" => $specialNameExtra2,
+                    "placeholderText" => $placeholderText,
+                    "formatExtra" => $formatExtra,
+                    "teams" => $teams,
+                    "sorting" => $sorting,
+                    "disabled" => $disabled,
+                    "required" => $required,
+                    "settingCat" => $settingCat,
+                );
+
 
                 // Write
                 echo "<div id='settingEdit-$settingTableId-$settingId' class='formCreator_edit_block ";
@@ -354,6 +379,82 @@
         if (isset($_GET['setting']) AND in_array($_GET['setting'],$settingIds)) {
             $setting = $_GET['setting'];
 
+            // Function for show if other element has special value
+            function HTX_formcreator_showElementIf($elementValues,$allElementValues,$tableId) {
+                // Getting start information for database connection
+                global $wpdb;
+                // Connecting to database, with custom variable
+                $link = database_connection();
+                if (in_array('show', $elementValues['specialName'])) {
+                    // print("<pre>".print_r($allElementValues,true)."</pre>");
+
+                    // Element types that can not be control elements
+                    $nonControllingElementTypes = array("text area", "price", "spacing");
+                    // Element types that have dropdown / pre written answers
+                    $elementTypesWithPreanswers = array( "dropdown", "user dropdown", "radio", "checkbox");
+                    // Choosing controlling element
+                    echo "<div>
+                        <label for='settingshow1'>Element som skal bestemme om dette element skal vises</label><br>
+                        <select id='settingshow1' class='inputBox' name='teams'>";
+                    echo "<option value=''>Ingen</option>";
+
+                    for ($i=0; $i < count($allElementValues); $i++) { 
+                        if ($allElementValues[$i]['settingId'] == $elementValues['specialNameExtra']) {
+                            $selected = "selected";
+                            $selectedElementId = $allElementValues[$i]['settingId'];
+                            $selectedElementN = $i;
+
+                        } else $selected = "";
+                        if (in_array($allElementValues[$i]['columnType'], $nonControllingElementTypes)) continue;
+                        if ($allElementValues[$i]['settingId'] == $elementValues['settingId']) continue;
+                        echo "<option value='".$allElementValues[$i]['settingId']."' $selected>".$allElementValues[$i]['columnNameFront']."</option>";
+                    }
+                    echo "</select></div>";
+
+                    if ($elementValues['specialNameExtra'] != "") {
+                        // Input that will show input
+                        if (in_array($allElementValues[$selectedElementN]['columnType'], $elementTypesWithPreanswers)){
+                            echo "<input type='hidden' id='settingShowValueKind' value='2'>";
+                            echo "<div style='padding-left: 1rem; margin:0px;margin-bottom:1rem;'>";
+                            echo "<label>Værdier der vil vise dette element</label>";
+                            $table_name2 = $wpdb->prefix . 'htx_settings_cat';
+                            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE tableId = ? AND  id = ? LIMIT 1");
+                            $stmt2->bind_param("ii", $tableId,  $allElementValues[$selectedElementN]['settingCat']);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            if($result2->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen";} else {
+                                while($row2 = $result2->fetch_assoc()) {
+                                    $setting_cat_settingId = $row2['id'];
+                                }
+
+                                // Getting radio content
+                                $table_name3 = $wpdb->prefix . 'htx_settings';
+                                $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
+                                $stmt3->bind_param("i", $setting_cat_settingId);
+                                $stmt3->execute();
+                                $result3 = $stmt3->get_result();
+                                if($result3->num_rows === 0) {echo "Ingen mulige valg, venligst tilføj nogen";} else {
+                                    while($row3 = $result3->fetch_assoc()) {
+                                        // Write data
+                                        if (in_array($row3['id'], $elementValues['specialNameExtra2'])) $selected = "checked"; else $selected = "";
+                                        echo "<div style='width: unset'><input type='checkbox' id='function-show-".$row3['id']."' class='settingShowValue' class='settingShowValue' name='settingShowValue' value='".$row3['id']."' $selected>
+                                        <label for='function-show-".$row3['id']."'>".$row3['settingName']."</label></div>";
+                                    }
+                                }
+                                $stmt3->close();
+                            }
+                            $stmt2->close();
+                            echo "</div>";
+                        } else {
+                            echo "<input type='hidden' id='settingShowValueKind' value='1'>";
+                            echo "<div><label for='settingShowValue'>Værdi der viser dette felt <span class='material-icons' style='font-size: 15px; cursor: help;'
+                            title='Værdier kan sepereres med comma \",\" uden mellemrum'>info</span></label> 
+                            <input type='text' id='settingShowValue' class='settingShowValue' class='inputBox' name='settingShowValue' value='".implode(",", $elementValues['specialNameExtra2'])."'></div>";
+                        }
+                    }
+                }
+            }
+
             // Make div
             echo "<div id='setting-form-$tableId'>";
             // Column info
@@ -373,6 +474,8 @@
                     $columnType = $row['columnType'];
                     $special = $row['special'];
                     $specialName = explode(",", $row['specialName']);
+                    $specialNameExtra = $row['specialNameExtra'];
+                    $specialNameExtra2 = explode(",", $row['specialNameExtra2']);
                     $placeholderText = $row['placeholderText'];
                     $formatExtra = $row['formatExtra'];
                     $teams = $row['teams'];
@@ -380,6 +483,27 @@
                     $disabled = $row['disabled'];
                     $required = $row['required'];
                     $settingCat = $row['settingCat'];
+
+                    // All information in one array
+                    $ColumnInfo = array(
+                        "settingId" => $settingId,
+                        "settingTableId" => $settingTableId,
+                        "columnNameFront" => $columnNameFront,
+                        "columnNameBack" => $columnNameBack,
+                        "format" => $format,
+                        "columnType" => $columnType,
+                        "special" => $special,
+                        "specialName" => $specialName,
+                        "specialNameExtra" => $specialNameExtra,
+                        "specialNameExtra2" => $specialNameExtra2,
+                        "placeholderText" => $placeholderText,
+                        "formatExtra" => $formatExtra,
+                        "teams" => $teams,
+                        "sorting" => $sorting,
+                        "disabled" => $disabled,
+                        "required" => $required,
+                        "settingCat" => $settingCat,
+                    );
 
                     // Write
                     if ($columnType != 'spacing')
@@ -417,7 +541,7 @@
                             // Choose what tournament team should go to
                             if (in_array('teams', $specialName)) {
                                 echo "<div>
-                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label><br>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
                                 echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
@@ -428,6 +552,8 @@
                             } else {
                                 echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
                             }
+                            // function - show if criteria is met
+                            HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
@@ -515,7 +641,7 @@
                             // Choose what tournament team should go to
                             if (in_array('teams', $specialName)) {
                                 echo "<div>
-                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label><br>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
                                 echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
@@ -526,6 +652,8 @@
                             } else {
                                 echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
                             }
+                            // function - show if criteria is met
+                            HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
@@ -614,7 +742,7 @@
                             // Choose what tournament team should go to
                             if (in_array('teams', $specialName)) {
                                 echo "<div>
-                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label><br>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
                                 echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
@@ -625,6 +753,8 @@
                             } else {
                                 echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
                             }
+                            // function - show if criteria is met
+                            HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
@@ -713,7 +843,7 @@
                             // Choose what tournament team should go to
                             if (in_array('teams', $specialName)) {
                                 echo "<div>
-                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label><br>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
                                 echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
@@ -724,6 +854,8 @@
                             } else {
                                 echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
                             }
+                            // function - show if criteria is met
+                            HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Required
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
@@ -833,12 +965,28 @@
                             } else {
                                 echo "<div><input type='hidden' id='settingTelformat' class='inputBox' name='telformat' value='[0-9]{8}'></div>";
                             }
+                            // Choose what tournament team should go to
+                            if (in_array('teams', $specialName)) {
+                                echo "<div>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label><br>
+                                    <select id='settingTeams' class='inputBox' name='teams'>";
+                                echo "<option value=''>Ingen</option>";
+                                for ($i=0; $i < count($torunamentId); $i++) { 
+                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
+                                    echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
+                                }
+                                echo "</select></div>";
+                            } else {
+                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
+                            }
+                            // function - show if criteria is met
+                            HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Choose what tournament team should go to
                             if (in_array('teams', $specialName)) {
                                 echo "<div>
-                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label><br>
                                     <select id='settingTeams' class='inputBox' name='teams'>";
                                 echo "<option value=''>Ingen</option>";
                                 for ($i=0; $i < count($torunamentId); $i++) { 
@@ -971,7 +1119,7 @@
                             // // Choose what tournament team should go to
                             // if (in_array('teams', $specialName)) {
                             //     echo "<div>
-                            //         <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                            //         <label for='settingTeams'>Vælg turnering hold skal vælges til </label><br>
                             //         <select id='settingTeams' class='inputBox' name='teams'>";
                             //     for ($i=0; $i < count($torunamentId); $i++) { 
                             //         if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
@@ -996,8 +1144,8 @@
 
                     echo "</div>";
                     // make submit button
-                    echo "<button type='submit' name='submit' value='updateSetting' class='btn updateBtn' style='margin-right: 0.5rem;' onclick='HTXJS_updateColumn(" . $settingId . ")'>Opdater</button>";
-                    echo "<button type='delete' name='submit' value='deleteColumn' class='btn deleteBtn' onclick='HTXJS_deleteColumn(" . $settingId . ")'>Slet</button>";
+                    echo "<button type='submit' name='submit' value='updateSetting' class='btn updateBtn' style='margin-right: 0.5rem;' onclick='HTXJS_updateColumn(" . $settingId . ", $tableId)'>Opdater</button>";
+                    echo "<button type='delete' name='submit' value='deleteColumn' class='btn deleteBtn' onclick='HTXJS_deleteColumn(" . $settingId . ", $tableId)'>Slet</button>";
                 }
             }
             $stmt->close();

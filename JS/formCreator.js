@@ -117,21 +117,24 @@ function HTXJS_updateSorting(setting) {
     });
 }
 
-function HTXJS_updateColumn(setting) {
+function HTXJS_updateColumn(setting, formid) {
     //TODO: Optimize this function
     var id = informationwindowInsert(2, "Arbejder på det...");
     var form = {
+        formid: formid,
         action: "htx_update_column",
         name: $('#settingName').val(),
         format: $('#settingFormat option:selected').val(),
         placeholder: $('#settingPlaceholder').val(),
         formatExtra: $('#settingTelformat').val(),
+        specialNameExtra: $('#settingshow1').val(),
         teams: $('#settingTeams').val(),
         required: $('#settingRequired').is(":checked") ? 1 : 0,
         disabled: $('#settingDisabled').is(":checked") ? 1 : 0,
         setting: setting,
         sorting: $('#settingSorting').val()
     };
+
     var specials = [];
     $('.special').each(function() {
         if($(this).is(":checked")) {
@@ -139,6 +142,26 @@ function HTXJS_updateColumn(setting) {
         }
     });
     form.specialName = specials;
+
+    if ($('#settingShowValueKind').val() == '1') {
+        // Inputbox
+        form.settingShowValue = $('#settingShowValue').val()
+        form.settingShowValueKind = $('#settingShowValueKind').val()
+        
+    } else if ($('#settingShowValueKind').val() == '2') {
+        // Checkbox
+        var settingShowValues = [];
+        form.settingShowValueKind = $('#settingShowValueKind').val()
+        $('.settingShowValue').each(function() {
+            if($(this).is(":checked")) {
+                settingShowValues.push($(this).val());
+            }
+        });
+        form.settingShowValue = settingShowValues;
+    } else {
+        form.settingShowValue = "";
+    }
+
     if($('#settingsTrue').length)
         form.settingsTrue = $('#settingsTrue').val();
     if($('#settingsAmount').length)
