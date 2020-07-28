@@ -139,6 +139,7 @@
                         $html .= "\n</select>";
                     }
                     $stmt->close();
+                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
                     $html .= "\n</p>";
                 break;
                 case "user dropdown":
@@ -189,6 +190,7 @@
                         class='inputBox  $disabledClass' style='width: unset; margin-top: 5px;' value='".htmlspecialchars($_POST[$columnNameBack[$i].'-extra'])."'></small>";
                     }
                     $stmt->close();
+                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
                     $html .= "\n</p>";
                 break;
                 case "radio":
@@ -238,6 +240,7 @@
                         $stmt3->close();
                     }
                     $stmt->close();
+                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
                     $html .= "\n</p>";
                 break;
                 case "checkbox":
@@ -288,6 +291,7 @@
                         $stmt3->close();
                     }
                     $stmt->close();
+                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
                     $html .= "\n</p>";
                 break;
                 case "text area":
@@ -307,6 +311,7 @@
                     if ($format[$i] == 'tel') $html .= "\npattern='[0-9]{8}'";
                     $html .= "\n class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
                     if ($format[$i] == 'tel') $html .= "\n<small>Format: 12345678</small>";
+                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
                     $html .= "\n</p>";
             }
 

@@ -28,32 +28,75 @@
                     
                     // Predefined error text
 
-                    $errorSettings = "<span style='color: red'>Der var en fejl ved en valgmulighed du valgte.<br>
-                        den pågældene valgmulighed er ikke længere tilgængelig.<br>
-                        Venligt prøv igen.<br>
-                        Fejlen blev fundet ved: ";
-                    $endSpan = "</span>";
+                    $errorSettings = "<div class='form_warning'>
+                        <div class='form_warning_icon'>
+                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                        </div>
+                        <div class='form_warning_text'>
+                            <span>
+                            Der var en fejl ved en valgmulighed du valgte.<br>
+                            den pågældene valgmulighed er ikke længere tilgængelig.<br>
+                            Venligt prøv igen.<br>
+                            Fejlen blev fundet ved: ";
+                    $errorSettingsSmall = "Det valgte input var ikke muligt.";
+
+                    $endSpan = "</span></div></div>";
 
                     $redBorder1 = "<script>setTimeout(() => {
-                        document.getElementById('";
-                    $redBorder2 = "-input').setAttribute('style', 'border-color:red;color: red;');
+                        inputId = '";
+                    $redBorder2 = "';
+                        elementInput = document.getElementById(inputId+'-input');
+                        elementInput.setAttribute('style', 'border-color:red;color: red;');
+                        text = '";
+                    $redBorder3 = "';
+                        elementText = document.getElementById(inputId+'-text');
+                        elementText.innerHTML = text;
                         }, 300);</script>";
 
-                    $errorRequired = "<span style='color: red'>
-                        Venligst udfyld alle felter med *.
-                        </span>";
+                    $errorRequired = "<div class='form_warning'>
+                        <div class='form_warning_icon'>
+                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                        </div>
+                        <div class='form_warning_text'>
+                            <span>
+                            Venligst udfyld alle felter med *.
+                            </span>";
+                    $errorRequiredSmall = "Dette felt skal udfyldes.";
 
-                    $errorUnique = "<span style='color: red'>Værdien i det røde felt skal være unik for hver person,<br>
-                        venligst indtast en unik værdi i det røde felt.<br>
-                        Hvis du mener at dette er en fejl, er du velkommen til at tage kontakt til os.<br><br>
-                        Felt med fejl: ";
+                    $errorUnique = "<div class='form_warning'>
+                        <div class='form_warning_icon'>
+                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                        </div>
+                        <div class='form_warning_text'>
+                            <span>Værdien i det røde felt skal være unik for hver person,<br>
+                            venligst indtast en unik værdi i det røde felt.<br>
+                            Hvis du mener at dette er en fejl, eller du skal lave om i din tilmelding, er du velkommen til at tage kontakt til os.<br><br>
+                            Felt med fejl: ";
+                    $errorUniqueSmall = "Dette felt skal være unikt for hver tilmelding.";
 
-                    $errorEmail = "<span style='color: red'>Emailen findes allerede,
-                        venligst kontakt en administrator,
-                        hvis du vil lave om i din tilmelding</span>";
-                    $errorInvalidEmail = "<span style='color: red'>
-                        Den indtastede email er ikke gyldig.
-                        </span>";
+                    $errorEmail = "<div class='form_warning'>
+                        <div class='form_warning_icon'>
+                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                        </div>
+                        <div class='form_warning_text'>
+                            <span>
+                                Emailen findes allerede,
+                                venligst kontakt en administrator,
+                                hvis du vil lave om i din tilmelding
+                            </span>
+                        </div></div>";
+                    $errorEmailSmall = "Denne email findes allerede.";
+
+                    $errorInvalidEmail = "<div class='form_warning'>
+                        <div class='form_warning_icon'>
+                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                        </div>
+                        <div class='form_warning_text'>
+                            <span>
+                                Den indtastede email er ikke gyldig.
+                            </span>
+                        </div></div>";
+                    $errorInvalidEmailSmall = "Denne email er ikke gyldig.";
                     try {
                         // Check that the form trying to submit to, is the right one
                         $table_name = $wpdb->prefix . 'htx_form_tables';
@@ -70,7 +113,7 @@
                         // Check if mail is valid
                         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                             $link->rollback(); //remove all queries from queue if error (undo)
-                            return $errorInvalidEmail.$redBorder1."3".$redBorder2;
+                            return $errorInvalidEmail.$redBorder1."3".$redBorder2.$errorInvalidEmailSmall.$redBorder3;
                         }
 
                         // Check if mail exist
@@ -162,7 +205,7 @@
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) {} else {
                                     $link->rollback(); //remove all queries from queue if error (undo)
-                                    return $errorUnique.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                    return $errorUnique.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorUniqueSmall.$redBorder3.$endSpan;
                                 }
                                 $stmt2->close();
                             }
@@ -173,7 +216,7 @@
                                     foreach($_POST[$columnNameBack[$i]] as $specials) {
                                         if (!in_array($specials,$columnSettingsId[$columnId[$i]])) {
                                             $link->rollback(); //remove all queries from queue if error (undo)
-                                            return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                            return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                         }
                                         $specialPostArrayStart[] = $specials;
                                     }
@@ -235,7 +278,7 @@
                                 } else {
                                     if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]])) {
                                         $link->rollback(); //remove all queries from queue if error (undo)
-                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                     }
                                     $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
                                 }
@@ -244,7 +287,7 @@
                                 if (in_array($columnType[$i],$columnsWithSettings)) {
                                     if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]])) {
                                         $link->rollback(); //remove all queries from queue if error (undo)
-                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$endSpan;
+                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                     } else 
                                         $inputValue = htmlspecialchars(intval(trim($_POST[$columnNameBack[$i]])));
                                 } else {
@@ -256,7 +299,7 @@
                                         // Check if mail is valid
                                         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                                             $link->rollback(); //remove all queries from queue if error (undo)
-                                            return $errorInvalidEmail.$redBorder1.$columnId[$i].$redBorder2;
+                                            return $errorInvalidEmail.$redBorder1.$columnId[$i].$redBorder2.$errorInvalidEmailSmall.$redBorder3;
                                         } else 
                                             $inputValue = $email;
                                     } else if ($format[$i] == 'number') {
@@ -268,7 +311,7 @@
                             }
                             if ($required[$i] == 1 AND $inputValue == "") {
                                 $link->rollback(); //remove all queries from queue if error (undo)
-                                return $errorRequired.$redBorder1.$columnId[$i].$redBorder2;
+                                return $errorRequired.$redBorder1.$columnId[$i].$redBorder2.$errorRequiredSmall.$endSpan;
                             }
 
                             $stmt->execute();
@@ -278,13 +321,29 @@
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
                         throw $e;
-                        return "<span style='color: red'>Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support</span>"; 
+                        return "<div class='form_warning'>
+                        <div class='form_warning_icon'>
+                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                        </div>
+                        <div class='form_warning_text'>
+                            <span>
+                                Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support
+                            </span>
+                        </div></div>";
                     }
 
                     // Error handling (Needs to be more specifik)
 
                     // Success handling
-                    return "<span style='color: green'>Tilmeldingen blev tilføjet</span>";
+                    return "<div class='form_success'>
+                    <div class='form_success_icon'>
+                        <span class='material-icons form_success_icon_span'>done_outline</span>
+                    </div>
+                    <div class='form_success_text'>
+                        <span>
+                            Tilmeldingen blev tilføjet
+                        </span>
+                    </div></div>";
                 break;
                 default: return "Noget gik galt🤔";
             }

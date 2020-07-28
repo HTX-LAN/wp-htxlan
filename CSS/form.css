@@ -221,3 +221,56 @@ input[type="color"] {
     border-width: 0.1rem;
     border-color:rgb(195, 195, 195); */
 }
+
+.form_warning {
+    display: flex;
+    flex-direction: row;
+
+    border-radius: 2rem;
+    background-color: red;
+
+    padding: 1rem;
+}
+.form_warning_icon {
+    color: white;
+    width: 4.5rem;
+    align-self: center;
+}
+.form_warning_icon_span {
+    font-size: 3rem;
+    margin-top: 5px;
+}
+.form_warning_text {
+    color: white;
+    align-self: center;
+}
+.form_warning_smalltext {
+    color: red;
+}
+
+.form_success {
+    display: flex;
+    flex-direction: row;
+
+    border-radius: 2rem;
+    background-color: var(--submit-color-primary);
+
+    padding: 1rem;
+}
+.form_success_icon {
+    color: white;
+    width: 4.5rem;
+    align-self: center;
+}
+.form_success_icon_span {
+    font-size: 3rem;
+    margin-top: 5px;
+}
+.form_success_text {
+    color: white;
+    font-weight: bolder;
+    align-self: center;
+}
+.form_success_smalltext {
+    color: var(--submit-color-primary);
+}
