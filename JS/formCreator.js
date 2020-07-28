@@ -34,10 +34,6 @@ function HTXJS_deleteForm(formid) {
             } else {
                 informationwindowInsert(3, "Kunne ikke slette formularen.");
                 console.error(data.error);
-                console.error(data);
-                console.log(ajaxurl);
-                console.log(formid);
-                console.log(action);
             }
         });
     }
