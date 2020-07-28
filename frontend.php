@@ -28,6 +28,9 @@
         // Standard load
         $html .= HTX_load_standard_frontend();
 
+        // Standard arrays
+        $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
+
         // Getting and writing form name
         $table_name = $wpdb->prefix . 'htx_form_tables';
         $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ?");
@@ -66,6 +69,7 @@
                 $columnNameFront[] = $row['columnNameFront'];
                 $columnNameBack[] = $row['columnNameBack'];
                 $format[] = $row['format'];
+                $formatExtra[] = $row['formatExtra'];
                 $columnType[] = $row['columnType'];
                 $special[] = $row['special'];
                 $specialName[] = explode(",", $row['specialName']);
@@ -300,6 +304,7 @@
                 break;
                 case "price":
                     if ($priceSet == false) {
+                        if (!in_array($format[$i], $possiblePrice)) $format[$i] = "";
                         $html .= "\n<h5 id='$columnId[$i]-input'>$columnNameFront[$i]</h5>";
                         $html .= "\n<p>$placeholderText[$i] <span id='priceLine' onload=\"HTXJS_price_update()\">0</span> $format[$i]</p><script>setTimeout(() => {HTXJS_price_update()}, 500);</script>";
                         $priceSet = true;
@@ -308,9 +313,9 @@
                 default:
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
                     $html .= "\n<input id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]'";
-                    if ($format[$i] == 'tel') $html .= "\npattern='[0-9]{8}'";
-                    $html .= "\n class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
-                    if ($format[$i] == 'tel') $html .= "\n<small>Format: 12345678</small>";
+                    if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]'";
+                    $html .= "class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
+                    if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
                     $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
                     $html .= "\n</p>";
             }

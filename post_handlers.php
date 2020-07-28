@@ -368,7 +368,7 @@ function htx_update_column() {
             if (in_array(trim($_POST['format']), $possibleFormat) OR in_array(trim($_POST['format']), $possiblePrice)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
             if (trim($_POST['name']) == "") throw new Exception("No name given.");
             $table_name = $wpdb->prefix . 'htx_column';
-            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ? WHERE id = ?");
+            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ?, formatExtra = ? WHERE id = ?");
             if(!$stmt1)
                 throw new Exception($link->error);
             if(!empty($_POST['specialName'])) {
@@ -381,7 +381,12 @@ function htx_update_column() {
                 $speciealPost = 0;
                 $specialPostArray = "";
             }
-            $stmt1->bind_param("ssisiiissi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, $_POST['disabled'], $placeholderText, $_POST['teams'], $setting);
+            if ($formatPost == 'tel') {
+                $formatExtra = htmlspecialchars(trim($_POST['formatExtra']));
+            } else {
+                $formatExtra = '';
+            }
+            $stmt1->bind_param("ssisiiisssi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, $_POST['disabled'], $placeholderText, $_POST['teams'], $formatExtra, $setting);
             // Updating special, and inserting as array
 
             $stmt1->execute();

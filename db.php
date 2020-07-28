@@ -117,6 +117,7 @@ if(!defined('ABSPATH')) {
             specialName TEXT,
             placeholderText TEXT,
             teams TEXT,
+            formatExtra TEXT,
             sorting INT,
             disabled INT DEFAULT 0,
             required INT,

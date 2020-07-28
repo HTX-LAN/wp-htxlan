@@ -125,6 +125,7 @@ function HTXJS_updateColumn(setting) {
         name: $('#settingName').val(),
         format: $('#settingFormat option:selected').val(),
         placeholder: $('#settingPlaceholder').val(),
+        formatExtra: $('#settingTelformat').val(),
         teams: $('#settingTeams').val(),
         required: $('#settingRequired').is(":checked") ? 1 : 0,
         disabled: $('#settingDisabled').is(":checked") ? 1 : 0,

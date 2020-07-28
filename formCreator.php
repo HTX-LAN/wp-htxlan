@@ -322,6 +322,7 @@
                     default:
                         // Input preview
                         echo "<input type='$format' value='$placeholderText' class='inputBox' disabled>";
+                        if ($format == 'tel') echo "<small>Format: $placeholderText</small>";
                     break;
                 }
                 // End write
@@ -370,6 +371,7 @@
                     $special = $row['special'];
                     $specialName = explode(",", $row['specialName']);
                     $placeholderText = $row['placeholderText'];
+                    $formatExtra = $row['formatExtra'];
                     $teams = $row['teams'];
                     $sorting = $row['sorting'];
                     $disabled = $row['disabled'];
@@ -814,7 +816,19 @@
                                 }
                             echo "</div></div>";
                             // Placeholder text
-                            echo "<div><label for='settingPlaceholder'>Placeholder tekst </label><input type='$format' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
+                            echo "<div><label for='settingPlaceholder'>";
+                            if ($format == 'tel') echo "Format tekst";
+                            else echo "placeholder tekst";
+                            echo "</label><input type='$format' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
+                            // Tel format
+                            if ($format == 'tel') {
+                                echo "<div><label for='settingTelformat'>Telefon format <span class='material-icons' style='font-size: 15px; cursor: help;'
+                                title='Telefon format kører på \"RegExp\"\nEksempler:\nFormat: [0-9]{8} visuelt: 11223344\nFormat: [0-9]{2} [0-9]{2} [0-9]{2} [0-9]{2} visuelt: 11 22 33 44\nFormat: [+][0-9]{2} [0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2} visuelt: +00 11-22-33-44\n\nHusk at opdatere \"Format tekst\", så det stemmer overens med \"Telefon format\"'
+                                >info</span></label>
+                                <input type='text' id='settingTelformat' class='inputBox' name='telformat' value='$formatExtra'></div>";
+                            } else {
+                                echo "<input type='hidden' id='settingTelformat' class='inputBox' name='telformat' value='[0-9]{8}'></div>";
+                            }
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Choose what tournament team should go to
@@ -900,51 +914,51 @@
                             echo "></div>";
                         break;
                         default:
-                            echo "<div class='formCreator_edit_container formCreator_flexRow'>";
-                            // Name
-                            echo "<div><label for='settingName'>Navn </label> <input type='text' id='settingName' class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
-                            // Format
-                            echo "<div><label for='settingFormat'>Format </label> <br><select id='settingFormat' class='inputBox' name='format'>";
-                            for ($i=0; $i < count($possibleFormat); $i++) {
-                                if ($possibleFormat[$i] == $format) $selected = "selected"; else $selected = "";
-                                echo "<option value='$possibleFormat[$i]' $selected>$possibleFormat[$i]</option>";
-                            }
-                            echo "</select></div>";
-                            // Column type
-                            echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
-                            // Special name
-                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
-                                for ($i=0; $i < count($possibleFunctionsAll); $i++) {
-                                    if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsAll[$i]' $selected>
-                                    <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
-                                }
-                            echo "</div></div>";
-                            // Sorting
-                            echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
-                            // Choose what tournament team should go to
-                            if (in_array('teams', $specialName)) {
-                                echo "<div>
-                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
-                                    <select id='settingTeams' class='inputBox' name='teams'>";
-                                for ($i=0; $i < count($torunamentId); $i++) { 
-                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
-                                    echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
-                                }
-                                echo "</select></div>";
-                            } else {
-                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
-                            }
-                            // Required
-                            echo "<input type='hidden' name='required' value='0'>";
-                            echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
-                            if ($required == 1) echo "checked";
-                            echo "></div>";
-                            // Disabled
-                            echo "<input type='hidden' name='disabled' value='0'>";
-                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='HTXJS_settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
-                            if ($disabled == 1) echo "checked";
-                            echo "></div>";
+                            // echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+                            // // Name
+                            // echo "<div><label for='settingName'>Navn </label> <input type='text' id='settingName' class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
+                            // // Format
+                            // echo "<div><label for='settingFormat'>Format </label> <br><select id='settingFormat' class='inputBox' name='format'>";
+                            // for ($i=0; $i < count($possibleFormat); $i++) {
+                            //     if ($possibleFormat[$i] == $format) $selected = "selected"; else $selected = "";
+                            //     echo "<option value='$possibleFormat[$i]' $selected>$possibleFormat[$i]</option>";
+                            // }
+                            // echo "</select></div>";
+                            // // Column type
+                            // echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
+                            // // Special name
+                            // echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                            //     for ($i=0; $i < count($possibleFunctionsAll); $i++) {
+                            //         if (in_array($possibleFunctionsAll[$i], $specialName)) $selected = "checked"; else $selected = "";
+                            //         echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsAll[$i]' $selected>
+                            //         <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
+                            //     }
+                            // echo "</div></div>";
+                            // // Sorting
+                            // echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // // Choose what tournament team should go to
+                            // if (in_array('teams', $specialName)) {
+                            //     echo "<div>
+                            //         <label for='settingTeams'>Vælg turnering hold skal vælges til </label>
+                            //         <select id='settingTeams' class='inputBox' name='teams'>";
+                            //     for ($i=0; $i < count($torunamentId); $i++) { 
+                            //         if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
+                            //         echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
+                            //     }
+                            //     echo "</select></div>";
+                            // } else {
+                            //     echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
+                            // }
+                            // // Required
+                            // echo "<input type='hidden' name='required' value='0'>";
+                            // echo "<div><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' onchange='HTXJS_settingDisabledCheckbox(\"disable\")'  type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            // if ($required == 1) echo "checked";
+                            // echo "></div>";
+                            // // Disabled
+                            // echo "<input type='hidden' name='disabled' value='0'>";
+                            // echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' onchange='HTXJS_settingDisabledCheckbox(\"enable\")' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            // if ($disabled == 1) echo "checked";
+                            // echo "></div>";
                         break;
                     }
 
