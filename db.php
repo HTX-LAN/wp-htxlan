@@ -214,6 +214,7 @@ if(!defined('ABSPATH')) {
             $sql = "CREATE TABLE $table_name (
             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
             settingId INT,
+            tableId INT,
             active INT NOT NULL DEFAULT 1,
             settingName TEXT,
             value TEXT,
@@ -230,9 +231,10 @@ if(!defined('ABSPATH')) {
             //Insert default values
             try {
                 $link->autocommit(FALSE); //turn on transactions
-                $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type, sorting) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("isssssi", $settingId, $settingName, $value, $special, $specialName, $settingType, $sorting);
+                $stmt = $link->prepare("INSERT INTO $table_name (settingId, tableId, settingName, value, special, specialName, type, sorting) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("iisssssi", $settingId, $tableId, $settingName, $value, $special, $specialName, $settingType, $sorting);
                 $settingId = 1;
+                $tableId = 1;
                 $settingName = "Billet type 1"; $value=10; $special=1; $specialName="price_intrance"; $settingType="dropdown"; $sorting = 1;
                 $stmt->execute();
                 $settingName = "Billet type 2"; $value=20; $special=1; $specialName="price_intrance"; $settingType="dropdown"; $sorting = 2;

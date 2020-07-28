@@ -489,7 +489,7 @@
                                     echo "<input class='inputBox hidden' id='settingsId' value='". $row2['id']."'>";
                                     echo "<input class='inputBox hidden' id='columnType' value='$columnType'>";
                                     echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
-                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"dropdown\")'>Tilføj</button></div>";
+                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"dropdown\", \"$tableId\")'>Tilføj</button></div>";
                                 }
                             }
                             $stmt2->close();
@@ -588,7 +588,7 @@
                                     echo "<input class='inputBox hidden' id='settingsId' value='". $row2['id']."'>";
                                     echo "<input class='inputBox hidden' id='columnType' value='$columnType'>";
                                     echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
-                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"dropdown\")'>Tilføj</button></div>";
+                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"dropdown\", \"$tableId\")'>Tilføj</button></div>";
                                 }
                             }
                             $stmt2->close();
@@ -687,7 +687,7 @@
                                     echo "<input class='inputBox hidden' id='settingsId' value='". $row2['id']."'>";
                                     echo "<input class='inputBox hidden' id='columnType' value='$columnType'>";
                                     echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
-                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"radio\")'>Tilføj</button></div>";
+                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"radio\", \"$tableId\")'>Tilføj</button></div>";
                                 }
                             }
                             $stmt2->close();
@@ -786,7 +786,7 @@
                                     echo "<input class='inputBox hidden' id='settingsId' value='". $row2['id']."'>";
                                     echo "<input class='inputBox hidden' id='columnType' value='$columnType'>";
                                     echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
-                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"checkbox\")'>Tilføj</button></div>";
+                                    echo "<div style='width: 100%;'><button type='submit' name='submit' value='addSetting' class='btn updateBtn' onclick='HTXJS_addSetting(" . $row2['id'] . ", \"checkbox\", \"$tableId\")'>Tilføj</button></div>";
                                 }
                             }
                             $stmt2->close();

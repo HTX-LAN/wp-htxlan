@@ -49,23 +49,79 @@ function htx_delete_form() {
         try {
             global $wpdb;
             $link = database_connection();
+            $tableId = intval($_POST['formid']);
+            $link->autocommit(FALSE); //turn on transactions
+
+            // Check if form exist
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) throw new Exception("Form does not exist");
+            $stmt->close();
+
+            // Delete table id
             $table_name = $wpdb->prefix . "htx_form_tables";
             $stmt = $link->prepare('DELETE FROM `' . $table_name . '` WHERE `id`=?');
             if(!$stmt)
-                throw new Exception($link->error);
-            $stmt->bind_param('i', $_POST['formid']);
+                throw new Exception("error at ".$table_name);
+            $stmt->bind_param('i', $tableId);
             $stmt->execute();
             $stmt->close();
+
+            // Delete submission to form
             $table_name = $wpdb->prefix . "htx_form";
             $stmt = $link->prepare('DELETE FROM `' . $table_name . '` WHERE `tableId`=?');
             if(!$stmt)
-                throw new Exception($link->error);
-            $stmt->bind_param('i', $_POST['formid']);
+                throw new Exception("error at ".$table_name);
+            $stmt->bind_param('i', $tableId);
             $stmt->execute();
             $stmt->close();
+
+            // Delete users for form
+            $table_name = $wpdb->prefix . "htx_form_users";
+            $stmt = $link->prepare('DELETE FROM `' . $table_name . '` WHERE `tableId`=?');
+            if(!$stmt)
+                throw new Exception("error at ".$table_name);
+            $stmt->bind_param('i', $tableId);
+            $stmt->execute();
+            $stmt->close();
+
+            // Delete settings categories to form
+            $table_name = $wpdb->prefix . "htx_settings_cat";
+            $stmt = $link->prepare('DELETE FROM  '.$table_name.' WHERE `tableId`=?');
+            if(!$stmt)
+                throw new Exception("error at ".$table_name."\n".$link->error);
+            $stmt->bind_param('i', $tableId);
+            $stmt->execute();
+            $stmt->close();
+
+            // Delete settings for form
+            $table_name = $wpdb->prefix . "htx_settings";
+            $stmt = $link->prepare('DELETE FROM `' . $table_name . '` WHERE `tableId`=?');
+            if(!$stmt)
+                throw new Exception("error at ".$table_name);
+            $stmt->bind_param('i', $tableId);
+            $stmt->execute();
+            $stmt->close();
+
+            // Delete columns/form element for form
+            $table_name = $wpdb->prefix . "htx_column";
+            $stmt = $link->prepare('DELETE FROM `' . $table_name . '` WHERE `tableId`=?');
+            if(!$stmt)
+                throw new Exception("error at ".$table_name);
+            $stmt->bind_param('i', $tableId);
+            $stmt->execute();
+            $stmt->close();
+            
+            $link->autocommit(TRUE); //turn off transactions + commit queued queries
             $link->close();
             $response->success = true;
         } catch(Exception $e) {
+            $link->rollback(); //remove all queries from queue if error (undo)
             $response->success = false;
             $response->error = $e->getMessage();
         }
@@ -241,8 +297,8 @@ function htx_new_column() {
                 // Insert standard first setting
                 $table_name = $wpdb->prefix . 'htx_settings';
                 $link->autocommit(FALSE); //turn on transactions
-                $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ississ", $settingCat, $settingName, $value, $special, $specialName, $settingType);
+                $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("iississ",$tableId, $settingCat, $settingName, $value, $special, $specialName, $settingType);
                 $settingName = "new setting"; $value="new setting"; 
                 $settingType=$userInputType;
                 $stmt->execute();
@@ -350,7 +406,7 @@ function htx_update_column() {
                         // Id for line
                         $lineId = intval($_POST['settingId-'.$i]);
                         if (intval($_POST['settingActive-'.$lineId]) != 0) $active = 1; else $active = 0;
-                        $stmt1->bind_param("ssiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
+                        $stmt1->bind_param("issiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
                         $stmt1->execute();
                     }
 
@@ -512,10 +568,23 @@ function htx_add_setting() {
             global $wpdb;
             $link = database_connection();
 
+            // Check if table exist
+            $tableId = intval($_POST['tableId']);
+
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ? AND active = 1");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) throw new Exception("Form does not exist");
+            $stmt->close();
+
             $table_name = $wpdb->prefix . 'htx_settings';
             $link->autocommit(FALSE); //turn on transactions
-            $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ississ", $_POST['setting'], $settingName, $value, $special, $specialName, $settingType);
+            $stmt = $link->prepare("INSERT INTO $table_name (tableId, settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("iississ", $tableId, $_POST['setting'], $settingName, $value, $special, $specialName, $settingType);
             $settingName = "new setting"; $value="new setting"; $special=0; $specialName="";
             if (in_array($_POST['columnType'], $possibleInput)) $settingType = htmlspecialchars($_POST['columnType']); else $settingType="dropdown";
             $stmt->execute();
@@ -530,21 +599,6 @@ function htx_add_setting() {
         }
         echo json_encode($response);
         wp_die();
-    }
-
-    try {
-        $table_name = $wpdb->prefix . 'htx_settings';
-        $link->autocommit(FALSE); //turn on transactions
-        $stmt = $link->prepare("INSERT INTO $table_name (settingId, settingName, value, special, specialName, type) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ississ", $idNewSetting, $settingName, $value, $special, $specialName, $settingType);
-        $settingName = "new setting"; $value="new setting"; $special=0; $specialName="";
-        if (in_array($_POST['columnType'], $possibleInput)) $settingType=htmlspecialchars($_POST['columnType']); else $settingType="dropdown";
-        $stmt->execute();
-        $stmt->close();
-        $link->autocommit(TRUE); //turn off transactions + commit queued queries
-    } catch(Exception $e) {
-        $link->rollback(); //remove all queries from queue if error (undo)
-        throw $e;
     }
 }
 

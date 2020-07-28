@@ -34,6 +34,10 @@ function HTXJS_deleteForm(formid) {
             } else {
                 informationwindowInsert(3, "Kunne ikke slette formularen.");
                 console.error(data.error);
+                console.error(data);
+                console.log(ajaxurl);
+                console.log(formid);
+                console.log(action);
             }
         });
     }
@@ -215,12 +219,13 @@ function HTXJS_deleteSetting(setting) {
     });
 }
 
-function HTXJS_addSetting(setting, type) {
+function HTXJS_addSetting(setting, type, formid) {
     var id = informationwindowInsert(2, "Arbejder på det...");
     $.post(ajaxurl, {
         action: "htx_add_setting",
         setting: setting,
-        columnType: type
+        columnType: type,
+        tableId: formid
     }, function(data) {
         informationwindowremove(id);
         if(data.success) {
