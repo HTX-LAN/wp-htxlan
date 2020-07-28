@@ -163,7 +163,7 @@ function htx_new_column() {
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['inputType']) && isset($_POST['tableId'])) {
         if(!current_user_can("manage_options"))
             return;
-        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price");
+        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price", 'spacing');
         $possibleInputWithSettingCat = array("dropdown", "user dropdown", "radio", "checkbox");
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
         $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
@@ -174,11 +174,10 @@ function htx_new_column() {
             $link = database_connection();
             $link->autocommit(FALSE); //turn off transactions
             // User input
-            // Check if inputType is valid
-            if (in_array($_POST['inputType'],$possibleInput)) 
-                $userInputType = $_POST['inputType'];
-            else 
-                $userInputType = $possibleInput[0];
+            $userInputType = $_POST['inputType'];
+
+            // Break if the user input is not known
+            if (!in_array($userInputType, $possibleInput)) throw new Exception('Invalid input type');
 
             // Check if table exist
             $tableId = intval($_POST['tableId']);
@@ -207,9 +206,6 @@ function htx_new_column() {
                   }    
             }
             $stmt->close();
-
-            // Break if the user input is not known
-            if (!in_array($userInputType, $possibleInput)) throw new Exception('Invalid input type');
 
             // Define values for new element
             $columnNameFront = "New element"; $format=$possibleFormat[0]; $columnType=$userInputType; $special=0; $specialName="";

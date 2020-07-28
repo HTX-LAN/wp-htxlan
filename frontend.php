@@ -302,6 +302,9 @@
                     $html .= "\n<h5 id='$columnId[$i]-input'>$columnNameFront[$i]</h5>";
                     $html .= "\n<p>$placeholderText[$i]</p>";
                 break;
+                case "spacing":
+                    $html .= "\n<div style='width: 100%; height: ".$placeholderText[$i]."rem; margin: 0px; padding: 0px;'></div>";
+                break;
                 case "price":
                     if ($priceSet == false) {
                         if (!in_array($format[$i], $possiblePrice)) $format[$i] = "";

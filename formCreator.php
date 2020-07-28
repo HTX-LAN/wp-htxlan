@@ -65,7 +65,7 @@
         echo "<div class='formCreator_edit rtl' id='formCreator_edit'><div class='ltr'>";
 
         // Possible input types in array
-        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price"); #Missing: checkboxes with text input (for ex team names per game basis), range
+        $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price", "spacing"); #Missing: checkboxes with text input (for ex team names per game basis), range
 
         // Possible formats types in array
         $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
@@ -319,6 +319,9 @@
                         if ($format == 'text') $format = 'DKK';
                         echo "<p>$placeholderText PRICE HERE $format</p>";
                     break;
+                    case "spacing":
+                        echo "<div id='$settingId-spacer' style='width: 100%; height: ".$placeholderText."rem; margin: 0px; padding: 0px;'></div>";
+                    break;
                     default:
                         // Input preview
                         echo "<input type='$format' value='$placeholderText' class='inputBox' disabled>";
@@ -379,7 +382,8 @@
                     $settingCat = $row['settingCat'];
 
                     // Write
-                    echo "<div id='settingEdit-$settingTableId-$settingId'><h3>$columnNameFront</h3>";
+                    if ($columnType != 'spacing')
+                        echo "<div id='settingEdit-$settingTableId-$settingId'><h3>$columnNameFront</h3>";
 
                     if ($columnNameBack == "email") {
                         echo "<p>Dette input kan ikke ændres, fordi dette input er essentielt for pluginet.</p><p>Du kan dog ændre placeringen herunder.</p></div>";
@@ -827,7 +831,7 @@
                                 >info</span></label>
                                 <input type='text' id='settingTelformat' class='inputBox' name='telformat' value='$formatExtra'></div>";
                             } else {
-                                echo "<input type='hidden' id='settingTelformat' class='inputBox' name='telformat' value='[0-9]{8}'></div>";
+                                echo "<div><input type='hidden' id='settingTelformat' class='inputBox' name='telformat' value='[0-9]{8}'></div>";
                             }
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
@@ -907,6 +911,34 @@
 
                             // Special name (hidden)
                             echo "<div class='hidden'><label for='settingSpecial'>Funktion navn </label> <input id='settingSpecial' class='inputBox' class='special' name='specialName' value=''></div>";
+                            // Required (hidden)
+                            echo "<input type='hidden' name='required' value='0'>";
+                            echo "<div class='hidden'><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' type='checkbox' class='inputCheckbox' name='required' value='1'";
+                            if ($required == 1) echo "checked";
+                            echo "></div>";
+                        break;
+                        case "spacing":
+                            echo "<div id='settingEdit-$settingTableId-$settingId'><h3>Mellemrum</h3>";
+                            echo "<div class='formCreator_edit_container formCreator_flexRow'>";
+                            // Column type
+                            echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
+                            // space
+                            echo "<div><label for='settingTelformat'>Afstand: <span id='settingSpacer'>$placeholderText</span> </label> <br>
+                            <input type='range' id='settingPlaceholder' class='inputBox' name='telformat' min='0' max='5' step='0.1' value='$placeholderText' 
+                            onchange='spacing = document.getElementById(\"settingPlaceholder\").value; document.getElementById(\"settingSpacer\").innerHTML = spacing; document.getElementById(\"$settingId-spacer\").style.height = spacing+\"rem\"'
+                            ></div>";
+                            // Sorting
+                            echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
+                            // Disabled
+                            echo "<input type='hidden' name='disabled' value='0'>";
+                            echo "<div><label for='settingDisabled'>Deaktiveret </label><input id='settingDisabled' type='checkbox' class='inputCheckbox' name='disabled' value='1'";
+                            if ($disabled == 1) echo "checked";
+                            echo "></div>";
+
+                            // Special name (hidden)
+                            echo "<div class='hidden'><label for='settingSpecial'>Funktion navn </label> <input id='settingSpecial' class='inputBox' class='special' name='specialName' value=''></div>";
+                            // Name (Hidden)
+                            echo "<input type='hidden' id='settingName' class='inputBox' name='columnNameFront' value='spacing'>";
                             // Required (hidden)
                             echo "<input type='hidden' name='required' value='0'>";
                             echo "<div class='hidden'><label for='settingRequired'>Skal udfyldes </label><input id='settingRequired' type='checkbox' class='inputCheckbox' name='required' value='1'";
