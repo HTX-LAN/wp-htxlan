@@ -294,7 +294,9 @@
                                 $setting_id = $row3['id'];
 
                                 // Set as selected from post
-                                if(in_array($setting_id, $_POST[$columnNameBack[$i]])) $postSelected = 'checked="checked"'; else $postSelected = '';
+                                if (isset($_POST[$columnNameBack[$i]])) {
+                                    if(in_array($setting_id, $_POST[$columnNameBack[$i]])) $postSelected = 'checked="checked"'; else $postSelected = '';
+                                }
 
                                 // Price function
                                 if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunctionCheckbox'; else $priceClass = '';
@@ -354,10 +356,17 @@
                     
                     if (in_array($columnTypeID[$specialNameExtra[$i]], $inputtypeTextfield)) {
                         // Use -input
-                        $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
-                        $html .= "\n if (isValue.includes(thatValue)) 
-                            document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
-                            else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                        if ($formatID[$specialNameExtra[$i]] == 'number' AND $columnTypeID[$specialNameExtra[$i]] == 'inputbox') {
+                            $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
+                            $html .= "\n if (isValue.includes(thatValue)) 
+                                document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                        } else {
+                            $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
+                            $html .= "\n if (isValue.includes(thatValue)) 
+                                document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                        }
                     } else if ($columnTypeID[$specialNameExtra[$i]] == 'radio') {
                         // Use -radio
                         $html .= "\n

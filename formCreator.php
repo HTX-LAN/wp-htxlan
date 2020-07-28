@@ -446,10 +446,15 @@
                             $stmt2->close();
                             echo "</div>";
                         } else {
-                            echo "<input type='hidden' id='settingShowValueKind' value='1'>";
-                            echo "<div><label for='settingShowValue'>Værdi der viser dette felt <span class='material-icons' style='font-size: 15px; cursor: help;'
-                            title='Værdier kan sepereres med comma \",\" uden mellemrum'>info</span></label> 
-                            <input type='text' id='settingShowValue' class='settingShowValue' class='inputBox' name='settingShowValue' value='".implode(",", $elementValues['specialNameExtra2'])."'></div>";
+                            echo "<input type='hidden' id='settingShowValueKind' value='1'><div>";
+                            if ($allElementValues[$selectedElementN]['format'] == 'number') {
+                                echo "<label for='settingShowValue'>Værdi kriterie for at vise dette felt <span class='material-icons' style='font-size: 15px; cursor: help;'
+                                title='Eksempeler:\n<0 (alt over 0)\n>50 (alt under 50)'>info</span></label>";
+                            } else {
+                                echo "<label for='settingShowValue'>Værdi der viser dette felt <span class='material-icons' style='font-size: 15px; cursor: help;'
+                                title='Værdier kan sepereres med comma \",\" uden mellemrum'>info</span></label>";
+                            }
+                            echo "<input type='text' id='settingShowValue' class='settingShowValue' class='inputBox' name='settingShowValue' value='".implode(",", $elementValues['specialNameExtra2'])."'></div>";
                         }
                     }
                 }

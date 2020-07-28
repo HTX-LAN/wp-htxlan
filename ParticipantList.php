@@ -88,10 +88,11 @@
 
             // Pre main column
             echo "<th></th>";
-            echo "<th>Id</th>";
+            echo "<th onClick='sortTable(1,1,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer'>Id
+            <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_1'></span></th>";
 
             // Writing every column and insert into table head
-            $columnNumber = 1;
+            $columnNumber = 2;
             for ($i=0; $i < count($columnNameBack); $i++) {
                 // Check if input should not be shown
                 if (!in_array($columnType[$i], $nonUserInput)) {
