@@ -806,10 +806,11 @@
                                     echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsAll[$i]' $selected>
                                     <label for='function-$i'>$possibleFunctionsAllName[$i]</label></div>";
                                 }
-                                for ($i=0; $i < count($possibleFunctionsInput); $i++) {
-                                    if (in_array($possibleFunctionsInput[$i], $specialName)) $selected = "checked"; else $selected = "";
-                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsInput[$i]' $selected>
-                                    <label for='function-$i'>$possibleFunctionsInputName[$i]</label></div>";
+                                for ($j=0; $j < (count($possibleFunctionsInput)); $j++) {
+                                    $i++;
+                                    if (in_array($possibleFunctionsInput[$j], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsInput[$j]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsInputName[$j]</label></div>";
                                 }
                             echo "</div></div>";
                             // Placeholder text
