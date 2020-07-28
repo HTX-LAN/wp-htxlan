@@ -20,7 +20,7 @@ function submitForm(id) {
 }
 
 function HTXJS_deleteForm(formid) {
-    var confirmDelete = confirm("Er du sikker på at du vil slette denne formular?");
+    var confirmDelete = confirm("Er du sikker på at du vil slette denne formular?\nDette er en permanent handling!");
     if (confirmDelete == true) {
         var id = informationwindowInsert(2, "Arbejder på det...");
         $.post(ajaxurl, {
@@ -197,28 +197,31 @@ function HTXJS_updateColumn(setting, formid) {
 }
 
 function HTXJS_deleteColumn(setting) {
-    var id = informationwindowInsert(2, "Arbejder på det...");
-    var form = {
-        action: "htx_delete_column",
-        setting: setting
-    };
-    if($('#settingsTrue').length)
-        form.settingsTrue = $('#settingsTrue').val();
-    if($('#settingsAmount').length)
-        form.settingsAmount = $('#settingsAmount').val();
-    $(".settingId").each(function() {
-        form[$(this).attr('id')] = $(this).val();
-    });
-    $.post(ajaxurl, form, function(data) {
-        informationwindowremove(id);
-        if(data.success) {
-            informationwindowInsert(1, "Rækken blev slettet");
-            location.search = "page=" + getParameterByName("page") + "&form=" + getParameterByName("form");
-        } else {
-            informationwindowInsert(3, "Kunne ikke slette rækken.");
-            console.error(data.error);
-        }
-    });
+    var confirmDelete = confirm("Er du sikker på at du vil slette dette element?\nDette er en permanent handling!");
+    if (confirmDelete == true) {
+        var id = informationwindowInsert(2, "Arbejder på det...");
+        var form = {
+            action: "htx_delete_column",
+            setting: setting
+        };
+        if($('#settingsTrue').length)
+            form.settingsTrue = $('#settingsTrue').val();
+        if($('#settingsAmount').length)
+            form.settingsAmount = $('#settingsAmount').val();
+        $(".settingId").each(function() {
+            form[$(this).attr('id')] = $(this).val();
+        });
+        $.post(ajaxurl, form, function(data) {
+            informationwindowremove(id);
+            if(data.success) {
+                informationwindowInsert(1, "Rækken blev slettet");
+                location.search = "page=" + getParameterByName("page") + "&form=" + getParameterByName("form");
+            } else {
+                informationwindowInsert(3, "Kunne ikke slette rækken.");
+                console.error(data.error);
+            }
+        });
+    }
 }
 
 function HTXJS_deleteSetting(setting) {
