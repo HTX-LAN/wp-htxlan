@@ -221,7 +221,7 @@ function htx_new_column() {
             return;
         $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price", 'spacing');
         $possibleInputWithSettingCat = array("dropdown", "user dropdown", "radio", "checkbox");
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range');
         $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
         $response = new stdClass();
         header('Content-type: application/json');
@@ -387,7 +387,7 @@ function htx_update_column() {
             $link = database_connection();
             $link->autocommit(FALSE); //turn on transactions
 
-            $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
+            $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range');
             $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
             $setting = $_POST['setting'];
 
@@ -427,12 +427,12 @@ function htx_update_column() {
                 }
             }
 
-            if (!isset($_POST['placeholder'])) $placeholderText = ""; else $placeholderText = trim($_POST['placeholder']);
+            if (!isset($_POST['placeholder'])) $placeholderText = ""; else $placeholderText = htmlspecialchars(trim($_POST['placeholder']));
             if ($_POST['disabled'] == 1) $required = 0; else $required = $_POST['required']; #Disabeling the option for both required and hidden input
-            if (in_array(trim($_POST['format']), $possibleFormat) OR in_array(trim($_POST['format']), $possiblePrice)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
-            if (trim($_POST['name']) == "") throw new Exception("No name given.");
+            if (in_array(htmlspecialchars(trim($_POST['format'])), $possibleFormat) OR in_array(trim($_POST['format']), $possiblePrice)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
+            if (htmlspecialchars(trim($_POST['name'])) == "") throw new Exception("No name given.");
             $table_name = $wpdb->prefix . 'htx_column';
-            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ?, formatExtra = ?, specialNameExtra = ?, specialnameExtra2 = ? WHERE id = ?");
+            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ?, formatExtra = ?, specialNameExtra = ?, specialnameExtra2 = ?, specialnameExtra3 = ? WHERE id = ?");
             if(!$stmt1)
                 throw new Exception($link->error);
 
@@ -448,9 +448,22 @@ function htx_update_column() {
                 $specialPostArray = "";
             }
 
+            // special name extra 3
+            if (isset($_POST['specialNameExtra3'])) {
+                $specialNameExtra3 = floatval(trim($_POST['specialNameExtra3']));
+            } else {
+                $specialNameExtra3 = "";
+            }
+
             // format extra
             if ($formatPost == 'tel') {
                 $formatExtra = htmlspecialchars(trim($_POST['formatExtra']));
+            } else if ($formatPost == 'range') {
+                $formatExtra = floatval(trim($_POST['formatExtra']));
+                $placeholderText = floatval($placeholderText);
+                if ($specialNameExtra3 < $formatExtra) $specialNameExtra3 = floatval($formatExtra)+floatval(10);
+                if ($placeholderText < $formatExtra) $placeholderText = $formatExtra;
+                else if ($placeholderText > $specialNameExtra3) $placeholderText = $specialNameExtra3;
             } else {
                 $formatExtra = '';
             }
@@ -492,7 +505,7 @@ function htx_update_column() {
             }
             
 
-            $stmt1->bind_param("ssisiiisssssi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, htmlspecialchars(trim($_POST['teams'])), $formatExtra, $specialNameExtra,$specialnameExtra2,$setting);
+            $stmt1->bind_param("ssisiiissssssi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, htmlspecialchars(trim($_POST['teams'])), $formatExtra, $specialNameExtra,$specialnameExtra2,$specialNameExtra3,$setting);
             // Updating special, and inserting as array
 
             $stmt1->execute();

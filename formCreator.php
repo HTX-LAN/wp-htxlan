@@ -68,7 +68,7 @@
         $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price", "spacing"); #Missing: checkboxes with text input (for ex team names per game basis), range
         
         // Possible formats types in array
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range');
 
         // Possible prices types in array
         $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
@@ -84,6 +84,8 @@
         $possibleUniceFunction = array("onchange='HTXJS_unCheckFunctionCheckbox(\"1\")'","onchange='HTXJS_unCheckFunctionCheckbox(\"0\")'");
         $possibleFunctionsAll = array('teams','show');
         $possibleFunctionsAllName = array('Hold valg','Vis kun hvis krav er mødt');
+        $possibleFunctionsText = array('show');
+        $possibleFunctionsTextName = array('Vis kun hvis krav er mødt');
 
         // Make div
         echo "<div id='edit-form-$tableId' class='formCreator_edit_container'>";
@@ -116,6 +118,7 @@
                 $specialName = explode(",", $row['specialName']);
                 $specialNameExtra = $row['specialNameExtra'];
                 $specialNameExtra2 = explode(",", $row['specialNameExtra2']);
+                $specialNameExtra3 = $row['specialNameExtra3'];
                 $placeholderText = $row['placeholderText'];
                 $formatExtra = $row['formatExtra'];
                 $teams = $row['teams'];
@@ -135,6 +138,7 @@
                     "specialName" => $specialName,
                     "specialNameExtra" => $specialNameExtra,
                     "specialNameExtra2" => $specialNameExtra2,
+                    "specialNameExtra3" => $specialNameExtra3,
                     "placeholderText" => $placeholderText,
                     "formatExtra" => $formatExtra,
                     "teams" => $teams,
@@ -349,7 +353,9 @@
                     break;
                     default:
                         // Input preview
-                        echo "<input type='$format' value='$placeholderText' class='inputBox' disabled>";
+                        echo "<input type='$format' value='$placeholderText' class='inputBox'";
+                        if ($format == 'range') echo "min='$formatExtra' max='$specialNameExtra3'";
+                        echo" disabled>";
                         if ($format == 'tel') echo "<small>Format: $placeholderText</small>";
                     break;
                 }
@@ -447,14 +453,24 @@
                             echo "</div>";
                         } else {
                             echo "<input type='hidden' id='settingShowValueKind' value='1'><div>";
-                            if ($allElementValues[$selectedElementN]['format'] == 'number') {
+                            if ($allElementValues[$selectedElementN]['format'] == 'number' OR $allElementValues[$selectedElementN]['format'] == 'range') {
                                 echo "<label for='settingShowValue'>Værdi kriterie for at vise dette felt <span class='material-icons' style='font-size: 15px; cursor: help;'
-                                title='Eksempeler:\n<0 (alt over 0)\n>50 (alt under 50)'>info</span></label>";
+                                title='Eksempeler:\n<50 (alt under 50)\n>50 (alt over 50)\n=50 (alt ligmed 50)\n>=50 (alt ligmed og over 50)\n!=50 (alt ikke ligmed 50)'>info</span></label>";
+                                echo "<input type='text' id='settingShowValue' class='settingShowValue' class='inputBox' name='settingShowValue' value='".implode(",", $elementValues['specialNameExtra2'])."'
+                                oninput='thisValue = document.getElementById(\"settingShowValue\").value; 
+                                regex = /[!]+.+/g; 
+                                regex2 = /\s/g;
+                                regex3 = /[^!<>=0-9,]+/g;
+                                if (regex.test(thisValue)) thisValue = thisValue.replace(/[!]+./g, \"!=\");
+                                if (regex2.test(thisValue)) thisValue = thisValue.replace(/\s/g, \",\");
+                                if (regex3.test(thisValue)) thisValue = thisValue.replace(/[^!<>=0-9,]+/g, \"\");
+                                document.getElementById(\"settingShowValue\").value=thisValue;'>";
                             } else {
                                 echo "<label for='settingShowValue'>Værdi der viser dette felt <span class='material-icons' style='font-size: 15px; cursor: help;'
                                 title='Værdier kan sepereres med comma \",\" uden mellemrum'>info</span></label>";
+                                echo "<input type='text' id='settingShowValue' class='settingShowValue' class='inputBox' name='settingShowValue' value='".implode(",", $elementValues['specialNameExtra2'])."'>";
                             }
-                            echo "<input type='text' id='settingShowValue' class='settingShowValue' class='inputBox' name='settingShowValue' value='".implode(",", $elementValues['specialNameExtra2'])."'></div>";
+                            echo "</div>";
                         }
                     }
                 }
@@ -481,6 +497,7 @@
                     $specialName = explode(",", $row['specialName']);
                     $specialNameExtra = $row['specialNameExtra'];
                     $specialNameExtra2 = explode(",", $row['specialNameExtra2']);
+                    $specialNameExtra3 = $row['specialNameExtra3'];
                     $placeholderText = $row['placeholderText'];
                     $formatExtra = $row['formatExtra'];
                     $teams = $row['teams'];
@@ -501,6 +518,7 @@
                         "specialName" => $specialName,
                         "specialNameExtra" => $specialNameExtra,
                         "specialNameExtra2" => $specialNameExtra2,
+                        "specialNameExtra3" => $specialNameExtra3,
                         "placeholderText" => $placeholderText,
                         "formatExtra" => $formatExtra,
                         "teams" => $teams,
@@ -957,16 +975,32 @@
                                 }
                             echo "</div></div>";
                             // Placeholder text
-                            echo "<div><label for='settingPlaceholder'>";
-                            if ($format == 'tel') echo "Format tekst";
-                            else echo "placeholder tekst";
-                            echo "</label><input type='$format' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
+                            if ($format == 'tel') { 
+                                echo "<div><label for='settingPlaceholder'>";
+                                echo "Format tekst";
+                                echo "</label><input type='text' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
+                            } else if ($format == 'range') {
+                                echo "<div><label for='settingPlaceholder'>";
+                                echo "Start værdi <span class='material-icons' style='font-size: 15px; cursor: help;'title='Startpunkt for slider'>info</span>";
+                                echo "</label><input type='number' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
+                            } else {
+                                echo "<div><label for='settingPlaceholder'>";
+                                echo "placeholder tekst";
+                                echo "</label><input type='$format' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
+                            }
                             // Tel format
                             if ($format == 'tel') {
                                 echo "<div><label for='settingTelformat'>Telefon format <span class='material-icons' style='font-size: 15px; cursor: help;'
                                 title='Telefon format kører på \"RegExp\"\nEksempler:\nFormat: [0-9]{8} visuelt: 11223344\nFormat: [0-9]{2} [0-9]{2} [0-9]{2} [0-9]{2} visuelt: 11 22 33 44\nFormat: [+][0-9]{2} [0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2} visuelt: +00 11-22-33-44\n\nHusk at opdatere \"Format tekst\", så det stemmer overens med \"Telefon format\"'
                                 >info</span></label>
                                 <input type='text' id='settingTelformat' class='inputBox' name='telformat' value='$formatExtra'></div>";
+                            } else if ($format == 'range') {
+                                echo "<div><label for='settingTelformat'>Min. værdi 
+                                <span class='material-icons' style='font-size: 15px; cursor: help;'title='Mindste værdi for slider'>info</span></label>
+                                <input type='text' id='settingTelformat' class='inputBox' name='telformat' value='$formatExtra'></div>";
+                                echo "<div><label for='settingSpecial3'>Maks værdi 
+                                <span class='material-icons' style='font-size: 15px; cursor: help;'title='Maksimale værdi for slider'>info</span></label>
+                                <input type='text' id='settingSpecial3' class='inputBox' name='settingSpecial3' value='$specialNameExtra3'></div>";
                             } else {
                                 echo "<div><input type='hidden' id='settingTelformat' class='inputBox' name='telformat' value='[0-9]{8}'></div>";
                             }
@@ -1019,6 +1053,16 @@
                             echo "<div><label for='settingName'>Overskrift </label> <input type='text' id='settingName' class='inputBox' name='columnNameFront' value='$columnNameFront'></div>";
                             // Column type
                             echo "<div style='margin-bottom:0.5rem'><label>Input type <br><i>$columnType</i></label></div>";
+                            // Special name
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctionsText); $i++) {
+                                    if (in_array($possibleFunctionsText[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsText[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsTextName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
+                            // function - show if criteria is met
+                            HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Placeholder text
                             echo "<div><label for='settingPlaceholder'>Tekst </label><br><textarea id='settingPlaceholder' class='textArea' name='placeholderText'>$placeholderText</textarea></div>";
                             // Sorting
@@ -1052,6 +1096,16 @@
                                 echo "<option value='$possiblePrice[$i]' $selected>$possiblePrice[$i]</option>";
                             }
                             echo "</select></div>";
+                            // Special name
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctionsText); $i++) {
+                                    if (in_array($possibleFunctionsText[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsText[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsTextName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
+                            // function - show if criteria is met
+                            HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Placeholder text
                             echo "<div><label for='settingPlaceholder'>Tekst </label><br><textarea id='settingPlaceholder' class='textArea' name='placeholderText'>$placeholderText</textarea></div>";
                             // Sorting
@@ -1078,8 +1132,18 @@
                             // space
                             echo "<div><label for='settingTelformat'>Afstand: <span id='settingSpacer'>$placeholderText</span> </label> <br>
                             <input type='range' id='settingPlaceholder' class='inputBox' name='telformat' min='0' max='5' step='0.1' value='$placeholderText' 
-                            onchange='spacing = document.getElementById(\"settingPlaceholder\").value; document.getElementById(\"settingSpacer\").innerHTML = spacing; document.getElementById(\"$settingId-spacer\").style.height = spacing+\"rem\"'
+                            oninput='spacing = document.getElementById(\"settingPlaceholder\").value; document.getElementById(\"settingSpacer\").innerHTML = spacing; document.getElementById(\"$settingId-spacer\").style.height = spacing+\"rem\"'
                             ></div>";
+                            // Special name
+                            echo "<div style='margin-bottom:0.5rem'><label>Funktioner</label><div class='formCreator_flexRow'>";
+                                for ($i=0; $i < count($possibleFunctionsText); $i++) {
+                                    if (in_array($possibleFunctionsText[$i], $specialName)) $selected = "checked"; else $selected = "";
+                                    echo "<div style='width: unset'><input class='special' type='checkbox' name='specialName[]' id='function-$i' value='$possibleFunctionsText[$i]' $selected>
+                                    <label for='function-$i'>$possibleFunctionsTextName[$i]</label></div>";
+                                }
+                            echo "</div></div>";
+                            // function - show if criteria is met
+                            HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             // Disabled

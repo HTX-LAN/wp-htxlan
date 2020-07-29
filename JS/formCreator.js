@@ -128,6 +128,7 @@ function HTXJS_updateColumn(setting, formid) {
         placeholder: $('#settingPlaceholder').val(),
         formatExtra: $('#settingTelformat').val(),
         specialNameExtra: $('#settingshow1').val(),
+        specialNameExtra3: $('#settingSpecial3').val(),
         teams: $('#settingTeams').val(),
         required: $('#settingRequired').is(":checked") ? 1 : 0,
         disabled: $('#settingDisabled').is(":checked") ? 1 : 0,

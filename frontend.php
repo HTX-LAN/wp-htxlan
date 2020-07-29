@@ -75,6 +75,7 @@
                 $specialName[] = explode(",", $row['specialName']);
                 $specialNameExtra[] = $row['specialNameExtra'];
                 $specialNameExtra2[] = explode(",", $row['specialNameExtra2']);
+                $specialNameExtra3[] = $row['specialNameExtra3'];
                 $placeholderText[] = $row['placeholderText'];
                 $sorting[] = $row['sorting'];
                 $disabled[] = $row['disabled'];
@@ -90,6 +91,7 @@
                 $specialNameID[$row['id']] = explode(",", $row['specialName']);
                 $specialNameExtraID[$row['id']] = $row['specialNameExtra'];
                 $specialNameExtra2ID[$row['id']] = explode(",", $row['specialNameExtra2']);
+                $specialNameExtra3ID[$row['id']] = $row['specialNameExtra3'];
                 $placeholderTextID[$row['id']] = $row['placeholderText'];
                 $sortingID[$row['id']] = $row['sorting'];
                 $disabledID[$row['id']] = $row['disabled'];
@@ -335,10 +337,13 @@
                 break;
                 default:
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                    $html .= "\n<input id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' oninput='HTX_frontend_js()' placeholder='$placeholderText[$i]'";
-                    if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]'";
+                    $html .= "\n<input id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' oninput='HTX_frontend_js();";
+                    if ($format[$i] == 'range') $html .= "document.getElementById(\"$columnId[$i]-rangeValue\").innerHTML = document.getElementById(\"$columnId[$i]-input\").value;' min='$formatExtra[$i]' max='$specialNameExtra3[$i]' style='padding: 0px;' ";
+                    else $html .= "'";
+                    if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]' ";
                     $html .= "class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
                     if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
+                    if ($format[$i] == 'range') $html .= "\n<small>værdi: <span id='$columnId[$i]-rangeValue'>$placeholderText[$i]</span></small>";
                     $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
                     $html .= "\n</p>";
             }
@@ -353,14 +358,15 @@
                 if ($specialNameExtra[$i] != "") {
                     // Transfering special name extra 2
                     $html .= "\n var isValue = ".json_encode($specialNameExtra2[$i]).";";
-                    
                     if (in_array($columnTypeID[$specialNameExtra[$i]], $inputtypeTextfield)) {
                         // Use -input
                         if ($formatID[$specialNameExtra[$i]] == 'number' AND $columnTypeID[$specialNameExtra[$i]] == 'inputbox') {
-                            $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
-                            $html .= "\n if (isValue.includes(thatValue)) 
-                                document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
-                                else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                            if (preg_match('/[<>=!]{1}+[=]?+\d+/', htmlspecialchars_decode($specialNameExtra2[$i][0]), $output_array)) {
+                                $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
+                                $html .= "\n if (thatValue $output_array[0]) 
+                                    document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                    else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                            }
                         } else {
                             $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
                             $html .= "\n if (isValue.includes(thatValue)) 
