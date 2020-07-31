@@ -95,7 +95,7 @@
             <input name='page' value='".$_GET['page']."' class='hidden'>
             <input name='form' value='$tableId' class='hidden'>
             <input class='hidden' name='setting' value='0'>
-            <h2 onclick='document.getElementById(\"formSettings\").submit()' style='margin-top: 0px;'><a>$tableName</a></h2>
+            <h2 onclick='document.getElementById(\"formSettings\").submit()' style='margin-top: 0px;cursor:pointer'><a>$tableName</a></h2>
         </form>";
 
         // Column info
@@ -159,7 +159,7 @@
 
                 // Edit button
                 echo "<form id='form-content-$settingTableId-$settingId' action='admin.php' method=\"get\">
-                    <button type='submit' class='material-icons settingIcon'>settings</button>
+                    <button type='submit' class='material-icons settingIcon' style='cursor:pointer'>settings</button>
                     <input name='page' value='".$_GET['page']."' class='hidden'>
                     <input name='form' value='$settingTableId' class='hidden'>
                     <input class='hidden' name='setting' value='$settingId'>

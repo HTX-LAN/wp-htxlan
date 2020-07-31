@@ -1,21 +1,23 @@
 /*Navbar - Fireship*/
     :root {
+        --bg: white;
+        --bg-main: rgb(241, 241, 241);
+        --bg-primary: #23232e;
+        --bg-secondary: #141418;
+        --btn-basic: #dadada;
+        --btn-basic-hover: #bdbdbd;
+        --dropshadow: lightgrey;
         --text-primary: #b6b6b6;
         --text-primary-light: #d3d3d3;
         --text-primary-secondary: #dddddd;
         --text-secondary: #ececec;
         --text-tertiary: #f3f3f3;
         --text-quaternary: #fafafa;
-        --bg-primary: #23232e;
-        --bg-secondary: #141418;
         --transition-speed: 600ms;
         --transition-speed-box: 600ms;
         --transition-speed-table: calc(var(--transition-speed)/2);
         --transition-speed-inputfield: calc(var(--transition-speed)/4);
         --transition-speed-freight: 1200ms;
-        --brand-primary: #ffa3ba;
-        --brand-secondary: #8AE1FF;
-        --brand-secondary-light: #c5f0ff;
         --text-hover-primary:#003b4f;
         --text-hover-secundary: #005876;
         --text-hover-tertiary: #0093c4;
@@ -323,7 +325,7 @@
         background-color: var(--cancel-color-tertiary);
     }
     .crewpayed, form select .crewpayed {
-        background-color: var(--brand-secondary);
+        background-color: #8AE1FF;
     }
 
     /* Checkbox */
@@ -339,4 +341,60 @@
         vertical-align: middle;
         position: relative;
         top: -1px;
+    }
+
+    /*Areas of main*/
+    .main-backend-area {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        background-color: inherit;
+    }
+
+    /*Quickselect*/
+    .Quickselect-card {
+        transition: box-shadow var(--transition-speed) ease-in-out;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 7.5rem;
+        background: var(--bg);
+        /* background: darkgrey; /*Shall be removed - Only for visuel clue*/
+        box-shadow: 0 0 10px 0px var(--dropshadow);
+        padding: 2rem;
+        margin: 2rem;
+        border-radius: 2rem;
+
+        min-width: 100px;
+        max-width: 50%;
+        min-height: 8rem;
+        max-height: 20rem;
+
+        overflow-y: none;
+    }
+    
+    .Quickselect-card form {
+        overflow-y: auto;
+        max-height: calc(20rem - 4rem);
+        scrollbar-width: thin; /*for firefox*/
+        scrollbar-color: var(--text-primary) var(--btn-basic); /*for firefox*/
+    }
+    .Quickselect-card form::-webkit-scrollbar {
+        width: 0.5rem;
+        
+    }
+    .Quickselect-card form::-webkit-scrollbar-track {
+        background: var(--btn-basic);
+        border-radius: 2rem;
+    }
+    
+    .Quickselect-card form::-webkit-scrollbar-thumb {
+        background: var(--text-primary);
+        height: 50%;
+        border-radius: 2rem;
+    }
+
+    .Quickselect-card:hover {
+        transition: box-shadow var(--transition-speed) ease-in-out;
+        box-shadow: 0 0 10px 0px var(--text-hover-tertiary);
     }
