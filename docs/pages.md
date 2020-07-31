@@ -32,16 +32,16 @@ Denne side viser alle tilmeldte
 - [x] Muligt at registrer person som ankommet
 - [x] Muligt at slette tilmelding
 - [ ] Muligt at ændre tilmelding
-- [ ] Muligt at se endelige pris for tilmelding
+- [x] Muligt at se endelige pris for tilmelding
 
 ### Form creator
 Form creator, er hvor hver form ændres og sættes op
 - [x] Formularer tabel
   - [x] Vælge formular til redigering
   - [x] Opret ny formular
-- [ ] Redigering af formular
+- [x] Redigering af formular
   - [x] Redigere formular informationer
-  - [ ] Slette formular
+  - [x] Slette formular
   - [x] Rediger input felter
   - [x] Tilføj text input felt
     - [x] Muligt at give forskellige formater, som fx *numbers*, *text*, *color*, m.m.
@@ -54,13 +54,13 @@ Form creator, er hvor hver form ændres og sættes op
   - [x] Sætte input som *required*
   - [x] Deaktiver input, således at inputet ikke kan skrives i *Kan optimeres*
   - [x] Slette input felt
-  - [ ] Vis input i form baseret på andet inputs indhold
+  - [x] Vis input i form baseret på andet inputs indhold
   - [x] Input påvirker pris for deltager
-  - [ ] Element som viser samlet pris inden formular kan blive indsendt
+  - [x] Element som viser samlet pris inden formular kan blive indsendt
 
 ### Økonomi
 Denne side viser økonomi for event
-- [ ] Pris liste
+- [x] Pris liste
   - [x] Antal som har tilmeldt sig
   - [x] Antal som har betalt, og med hvilken type
   - [x] Priser for hver betalings type
@@ -70,8 +70,8 @@ Denne side viser økonomi for event
   - [x] Antal som har betalt
   - [x] Antal som har betalt men ikke er kommet
   - [x] Beløb fra billeter
-  - [ ] Beløb fra ekstra ting
-  - [ ] Liste med udgifter
+  - [x] Beløb fra ekstra ting
+  - [x] Liste med udgifter
 - [ ] Muligt at tilføje custom indtægt
 - [ ] Muligt at tilføje custom udgift
 
