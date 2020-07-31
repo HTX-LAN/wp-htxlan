@@ -221,7 +221,7 @@ function htx_new_column() {
             return;
         $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price", 'spacing');
         $possibleInputWithSettingCat = array("dropdown", "user dropdown", "radio", "checkbox");
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range');
         $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
         $response = new stdClass();
         header('Content-type: application/json');
@@ -385,18 +385,31 @@ function htx_update_column() {
         try {
             global $wpdb;
             $link = database_connection();
-            $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel');
+            $link->autocommit(FALSE); //turn on transactions
+
+            $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range');
             $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
             $setting = $_POST['setting'];
 
+            // Check if table exist
+            $tableId = intval($_POST['formid']);
+
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ? AND active = 1");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) throw new Exception("Form does not exist");
+            $stmt->close();
+
             // Update column settings
             if (isset($_POST['settingsTrue']) AND $_POST['settingsTrue'] == "1") {
-                $link->autocommit(FALSE); //turn on transactions
                 // There are settings
                 // Getting number of settings - Checking settingsAmount is a number
                 if (isset($_POST['settingsAmount']) AND intval($_POST['settingsAmount']) > 0) {
                     $settingAmount = intval($_POST['settingsAmount']);
-                    $link->autocommit(FALSE); //turn on transactions
                     $table_name = $wpdb->prefix . 'htx_settings';
                     $stmt1 = $link->prepare("UPDATE `$table_name` SET settingName = ?, value = ?, sorting = ?, active = ?, expence = ? WHERE id = ?");
                     if(!$stmt1)
@@ -406,39 +419,93 @@ function htx_update_column() {
                         // Id for line
                         $lineId = intval($_POST['settingId-'.$i]);
                         if (intval($_POST['settingActive-'.$lineId]) != 0) $active = 1; else $active = 0;
-                        $stmt1->bind_param("issiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
+                        $stmt1->bind_param("ssiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
                         $stmt1->execute();
                     }
 
                     $stmt1->close();
-                    $link->autocommit(TRUE); //turn off transactions + commit queued queries
                 }
             }
 
-            if (!isset($_POST['placeholder'])) $placeholderText = ""; else $placeholderText = trim($_POST['placeholder']);
+            if (!isset($_POST['placeholder'])) $placeholderText = ""; else $placeholderText = htmlspecialchars(trim($_POST['placeholder']));
             if ($_POST['disabled'] == 1) $required = 0; else $required = $_POST['required']; #Disabeling the option for both required and hidden input
-            if (in_array(trim($_POST['format']), $possibleFormat) OR in_array(trim($_POST['format']), $possiblePrice)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
-            if (trim($_POST['name']) == "") throw new Exception("No name given.");
+            if (in_array(htmlspecialchars(trim($_POST['format'])), $possibleFormat) OR in_array(trim($_POST['format']), $possiblePrice)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
+            if (htmlspecialchars(trim($_POST['name'])) == "") throw new Exception("No name given.");
             $table_name = $wpdb->prefix . 'htx_column';
-            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ?, formatExtra = ? WHERE id = ?");
+            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ?, formatExtra = ?, specialNameExtra = ?, specialnameExtra2 = ?, specialnameExtra3 = ? WHERE id = ?");
             if(!$stmt1)
                 throw new Exception($link->error);
+
+            // Special name
             if(!empty($_POST['specialName'])) {
                 $speciealPost = 1;
                 foreach($_POST['specialName'] as $specials) {
-                    $specialPostArrayStart[] = $specials;
+                    $specialPostArrayStart[] = htmlspecialchars(trim($specials));
                 }
                 $specialPostArray = implode(",", $specialPostArrayStart);
             } else {
                 $speciealPost = 0;
                 $specialPostArray = "";
             }
+
+            // special name extra 3
+            if (isset($_POST['specialNameExtra3'])) {
+                $specialNameExtra3 = floatval(trim($_POST['specialNameExtra3']));
+            } else {
+                $specialNameExtra3 = "";
+            }
+
+            // format extra
             if ($formatPost == 'tel') {
                 $formatExtra = htmlspecialchars(trim($_POST['formatExtra']));
+            } else if ($formatPost == 'range') {
+                $formatExtra = floatval(trim($_POST['formatExtra']));
+                $placeholderText = floatval($placeholderText);
+                if ($specialNameExtra3 < $formatExtra) $specialNameExtra3 = floatval($formatExtra)+floatval(10);
+                if ($placeholderText < $formatExtra) $placeholderText = $formatExtra;
+                else if ($placeholderText > $specialNameExtra3) $placeholderText = $specialNameExtra3;
             } else {
                 $formatExtra = '';
             }
-            $stmt1->bind_param("ssisiiisssi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, $_POST['disabled'], $placeholderText, $_POST['teams'], $formatExtra, $setting);
+
+            // Special name extra
+            if (in_array('show', explode(",", $specialPostArray))) {
+                $table_name2 = $wpdb->prefix . 'htx_column';
+                $stmt2 = $link->prepare("SELECT id FROM `$table_name` WHERE tableid = ?");
+                $stmt2->bind_param("i", $tableId);
+                $stmt2->execute();
+                $result2 = $stmt2->get_result();
+                if($result2->num_rows === 0) {} else {
+                    while($row2 = $result2->fetch_assoc()) {
+                        $columnIds[] = $row2['id'];
+                    }
+                }
+                $stmt2->close();
+                $specialNameExtra = htmlspecialchars(trim($_POST['specialNameExtra']));
+                if (!in_array($specialNameExtra, $columnIds)) $specialNameExtra = "";
+            } else {
+                $specialNameExtra = "";
+            }
+
+            // Special name extra 2
+            if ($_POST['settingShowValueKind'] == 1) {
+                // input box
+                $specialnameExtra2 = htmlspecialchars(trim($_POST['settingShowValue']));
+            } else if ($_POST['settingShowValueKind'] == 2) {
+                // Multiple
+                if(!empty($_POST['settingShowValue'])) {
+                    foreach($_POST['settingShowValue'] as $specials) {
+                        $specialNamePostArrayStart[] = htmlspecialchars(trim($specials));
+                    }
+                    $specialnameExtra2 = implode(",", $specialNamePostArrayStart);
+                } else $specialnameExtra2 = "";
+            } else {
+                // None
+                $specialnameExtra2 = "";
+            }
+            
+
+            $stmt1->bind_param("ssisiiissssssi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, htmlspecialchars(trim($_POST['teams'])), $formatExtra, $specialNameExtra,$specialnameExtra2,$specialNameExtra3,$setting);
             // Updating special, and inserting as array
 
             $stmt1->execute();

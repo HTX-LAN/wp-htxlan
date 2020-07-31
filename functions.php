@@ -204,8 +204,10 @@
                                 $stmt2->execute();
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) {} else {
-                                    $link->rollback(); //remove all queries from queue if error (undo)
-                                    return $errorUnique.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorUniqueSmall.$redBorder3.$endSpan;
+                                    if (htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]]))) != ""){
+                                        $link->rollback(); //remove all queries from queue if error (undo)
+                                        return $errorUnique.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorUniqueSmall.$redBorder3.$endSpan;
+                                    }
                                 }
                                 $stmt2->close();
                             }
@@ -276,7 +278,7 @@
                                         $stmt2->close();
                                     }
                                 } else {
-                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]])) {
+                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]) AND $_POST[$columnNameBack[$i]] != "") {
                                         $link->rollback(); //remove all queries from queue if error (undo)
                                         return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                     }
@@ -285,7 +287,7 @@
                             } else {
                                 // Check if column has settings
                                 if (in_array($columnType[$i],$columnsWithSettings)) {
-                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]])) {
+                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]) AND $_POST[$columnNameBack[$i]] != "") {
                                         $link->rollback(); //remove all queries from queue if error (undo)
                                         return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                     } else 
@@ -335,6 +337,9 @@
                     // Error handling (Needs to be more specifik)
 
                     // Success handling
+                    // Clearing post
+                    $_POST = array();
+                    // Writing success for user to see
                     return "<div class='form_success'>
                     <div class='form_success_icon'>
                         <span class='material-icons form_success_icon_span'>done_outline</span>

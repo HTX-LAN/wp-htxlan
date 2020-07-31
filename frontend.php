@@ -73,11 +73,30 @@
                 $columnType[] = $row['columnType'];
                 $special[] = $row['special'];
                 $specialName[] = explode(",", $row['specialName']);
+                $specialNameExtra[] = $row['specialNameExtra'];
+                $specialNameExtra2[] = explode(",", $row['specialNameExtra2']);
+                $specialNameExtra3[] = $row['specialNameExtra3'];
                 $placeholderText[] = $row['placeholderText'];
                 $sorting[] = $row['sorting'];
                 $disabled[] = $row['disabled'];
                 $required[] = $row['required'];
                 $settingCat[] = $row['settingCat'];
+
+                $columnNameFrontID[$row['id']] = $row['columnNameFront'];
+                $columnNameBackID[$row['id']] = $row['columnNameBack'];
+                $formatID[$row['id']] = $row['format'];
+                $formatExtraID[$row['id']] = $row['formatExtra'];
+                $columnTypeID[$row['id']] = $row['columnType'];
+                $specialID[$row['id']] = $row['special'];
+                $specialNameID[$row['id']] = explode(",", $row['specialName']);
+                $specialNameExtraID[$row['id']] = $row['specialNameExtra'];
+                $specialNameExtra2ID[$row['id']] = explode(",", $row['specialNameExtra2']);
+                $specialNameExtra3ID[$row['id']] = $row['specialNameExtra3'];
+                $placeholderTextID[$row['id']] = $row['placeholderText'];
+                $sortingID[$row['id']] = $row['sorting'];
+                $disabledID[$row['id']] = $row['disabled'];
+                $requiredID[$row['id']] = $row['required'];
+                $settingCatID[$row['id']] = $row['settingCat'];
             }
         }
         $stmt->close();
@@ -93,6 +112,7 @@
             // Setup for disabled
             if ($disabled[$i] == 1) $disabledClass = "hidden"; else $disabledClass = "";
             // Main writing of input
+            $html .= "\n<div id='$columnId[$i]-div'>";
             switch ($columnType[$i]) {
                 case "dropdown":
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
@@ -121,7 +141,7 @@
                         if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
                         
                         // Writing first part of dropdown
-                        $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' class='dropdown $disabledClass $priceClass' $priceFunction $isRequired>";
+                        $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' oninput='HTX_frontend_js()' class='dropdown $disabledClass $priceClass' $priceFunction $isRequired>";
 
                         // Writing dropdown options
                         while($row = $result->fetch_assoc()) {
@@ -170,7 +190,7 @@
                     if($result->num_rows === 0)  {return $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her <input type='hidden' name='name='$columnNameBack[$i]' value=''>";} else {
                         
                         // Writing first part of dropdown
-                        $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' id='extraUserSettingDropdown-$i' class='dropdown $disabledClass' $isRequired>";
+                        $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' id='extraUserSettingDropdown-$i' oninput='HTX_frontend_js()' class='dropdown $disabledClass' $isRequired>";
 
                         // Writing dropdown options
                         while($row = $result->fetch_assoc()) {
@@ -232,7 +252,7 @@
                                 if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
 
                                 // Write data
-                                $html .= "\n<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' value='$setting_id' class='inputBox  $disabledClass $priceClass' $priceFunction $postSelected>
+                                $html .= "\n<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' oninput='HTX_frontend_js()' value='$setting_id' class='inputBox $columnId[$i]-radio $disabledClass $priceClass' $priceFunction $postSelected>
                                 <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label><br>";
 
                                 // Price for javascript
@@ -276,14 +296,16 @@
                                 $setting_id = $row3['id'];
 
                                 // Set as selected from post
-                                if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
+                                if (isset($_POST[$columnNameBack[$i]])) {
+                                    if(in_array($setting_id, $_POST[$columnNameBack[$i]])) $postSelected = 'checked="checked"'; else $postSelected = '';
+                                }
 
                                 // Price function
                                 if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunctionCheckbox'; else $priceClass = '';
                                 if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
 
                                 // Write data
-                                $html .= "\n<div class='checkboxDiv'><input type='checkbox' id='$columnNameBack[$i]-$setting_id' class='$priceClass' name='".$columnNameBack[$i]."[]' $priceFunction value='$setting_id' $postSelected>
+                                $html .= "\n<div class='checkboxDiv'><input type='checkbox' id='$columnNameBack[$i]-$setting_id' oninput='HTX_frontend_js()' class='$priceClass $columnId[$i]-checkbox' name='".$columnNameBack[$i]."[]' $priceFunction value='$setting_id' $postSelected>
                                 <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label></div>";
 
                                 // Price for javascript
@@ -315,15 +337,76 @@
                 break;
                 default:
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                    $html .= "\n<input id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]'";
-                    if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]'";
+                    $html .= "\n<input id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' oninput='HTX_frontend_js();";
+                    if ($format[$i] == 'range') $html .= "document.getElementById(\"$columnId[$i]-rangeValue\").innerHTML = document.getElementById(\"$columnId[$i]-input\").value;' min='$formatExtra[$i]' max='$specialNameExtra3[$i]' style='padding: 0px;' ";
+                    else $html .= "'";
+                    if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]' ";
                     $html .= "class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
                     if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
+                    if ($format[$i] == 'range') $html .= "\n<small>værdi: <span id='$columnId[$i]-rangeValue'>$placeholderText[$i]</span></small>";
                     $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
                     $html .= "\n</p>";
             }
-
+            $html .= "\n</div>";
         }
+        // Writing script for showing elements based on other elements
+        $html .= "\n<script>function HTX_frontend_js() {";
+        // input field
+        $inputtypeTextfield = array('inputbox', 'dropdown', 'user dropdown');
+        for ($i=0; $i < count($columnId); $i++) {
+            if (in_array('show', $specialName[$i])) {
+                if ($specialNameExtra[$i] != "") {
+                    // Transfering special name extra 2
+                    $html .= "\n var isValue = ".json_encode($specialNameExtra2[$i]).";";
+                    if (in_array($columnTypeID[$specialNameExtra[$i]], $inputtypeTextfield)) {
+                        // Use -input
+                        if ($formatID[$specialNameExtra[$i]] == 'number' AND $columnTypeID[$specialNameExtra[$i]] == 'inputbox') {
+                            if (preg_match('/[<>=!]{1}+[=]?+\d+/', htmlspecialchars_decode($specialNameExtra2[$i][0]), $output_array)) {
+                                $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
+                                $html .= "\n if (thatValue $output_array[0]) 
+                                    document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                    else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                            }
+                        } else {
+                            $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
+                            $html .= "\n if (isValue.includes(thatValue)) 
+                                document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                        }
+                    } else if ($columnTypeID[$specialNameExtra[$i]] == 'radio') {
+                        // Use -radio
+                        $html .= "\n
+                        $('.$specialNameExtra[$i]-radio').each(function() {
+                            thatValue = $(this).val()
+                            if($(this).is(':checked')) {
+                                if (isValue.includes(thatValue)) 
+                                    document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                            } else {
+                                if (isValue.includes(thatValue)) 
+                                    document.getElementById('$columnId[$i]-div').classList.add('hidden');
+                            }
+                        });";
+                    } else if ($columnTypeID[$specialNameExtra[$i]] == 'checkbox') {
+                        // Use -checkbox
+                        $html .= "\n
+                        $('.$specialNameExtra[$i]-checkbox').each(function() {
+                            thatValue = $(this).val()
+                            if($(this).is(':checked')) {
+                                if (isValue.includes(thatValue)) 
+                                    document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                            } else {
+                                if (isValue.includes(thatValue)) 
+                                    document.getElementById('$columnId[$i]-div').classList.add('hidden');
+                            }
+                        });";
+                    } else {
+                        // do nothing
+                    }
+                }
+            }
+        }
+        $html .= "\n};setTimeout(() => {HTX_frontend_js()}, 500);</script>";
+        
         $html .= "\n<input name='tableId' value='$tableId' style='display: none'></p>";
 
         // Ending form with submit and reset buttons

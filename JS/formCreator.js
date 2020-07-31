@@ -20,7 +20,7 @@ function submitForm(id) {
 }
 
 function HTXJS_deleteForm(formid) {
-    var confirmDelete = confirm("Er du sikker på at du vil slette denne formular?");
+    var confirmDelete = confirm("Er du sikker på at du vil slette denne formular?\nDette er en permanent handling!");
     if (confirmDelete == true) {
         var id = informationwindowInsert(2, "Arbejder på det...");
         $.post(ajaxurl, {
@@ -117,21 +117,25 @@ function HTXJS_updateSorting(setting) {
     });
 }
 
-function HTXJS_updateColumn(setting) {
+function HTXJS_updateColumn(setting, formid) {
     //TODO: Optimize this function
     var id = informationwindowInsert(2, "Arbejder på det...");
     var form = {
+        formid: formid,
         action: "htx_update_column",
         name: $('#settingName').val(),
         format: $('#settingFormat option:selected').val(),
         placeholder: $('#settingPlaceholder').val(),
         formatExtra: $('#settingTelformat').val(),
+        specialNameExtra: $('#settingshow1').val(),
+        specialNameExtra3: $('#settingSpecial3').val(),
         teams: $('#settingTeams').val(),
         required: $('#settingRequired').is(":checked") ? 1 : 0,
         disabled: $('#settingDisabled').is(":checked") ? 1 : 0,
         setting: setting,
         sorting: $('#settingSorting').val()
     };
+
     var specials = [];
     $('.special').each(function() {
         if($(this).is(":checked")) {
@@ -139,6 +143,26 @@ function HTXJS_updateColumn(setting) {
         }
     });
     form.specialName = specials;
+
+    if ($('#settingShowValueKind').val() == '1') {
+        // Inputbox
+        form.settingShowValue = $('#settingShowValue').val()
+        form.settingShowValueKind = $('#settingShowValueKind').val()
+        
+    } else if ($('#settingShowValueKind').val() == '2') {
+        // Checkbox
+        var settingShowValues = [];
+        form.settingShowValueKind = $('#settingShowValueKind').val()
+        $('.settingShowValue').each(function() {
+            if($(this).is(":checked")) {
+                settingShowValues.push($(this).val());
+            }
+        });
+        form.settingShowValue = settingShowValues;
+    } else {
+        form.settingShowValue = "";
+    }
+
     if($('#settingsTrue').length)
         form.settingsTrue = $('#settingsTrue').val();
     if($('#settingsAmount').length)
@@ -174,28 +198,31 @@ function HTXJS_updateColumn(setting) {
 }
 
 function HTXJS_deleteColumn(setting) {
-    var id = informationwindowInsert(2, "Arbejder på det...");
-    var form = {
-        action: "htx_delete_column",
-        setting: setting
-    };
-    if($('#settingsTrue').length)
-        form.settingsTrue = $('#settingsTrue').val();
-    if($('#settingsAmount').length)
-        form.settingsAmount = $('#settingsAmount').val();
-    $(".settingId").each(function() {
-        form[$(this).attr('id')] = $(this).val();
-    });
-    $.post(ajaxurl, form, function(data) {
-        informationwindowremove(id);
-        if(data.success) {
-            informationwindowInsert(1, "Rækken blev slettet");
-            location.search = "page=" + getParameterByName("page") + "&form=" + getParameterByName("form");
-        } else {
-            informationwindowInsert(3, "Kunne ikke slette rækken.");
-            console.error(data.error);
-        }
-    });
+    var confirmDelete = confirm("Er du sikker på at du vil slette dette element?\nDette er en permanent handling!");
+    if (confirmDelete == true) {
+        var id = informationwindowInsert(2, "Arbejder på det...");
+        var form = {
+            action: "htx_delete_column",
+            setting: setting
+        };
+        if($('#settingsTrue').length)
+            form.settingsTrue = $('#settingsTrue').val();
+        if($('#settingsAmount').length)
+            form.settingsAmount = $('#settingsAmount').val();
+        $(".settingId").each(function() {
+            form[$(this).attr('id')] = $(this).val();
+        });
+        $.post(ajaxurl, form, function(data) {
+            informationwindowremove(id);
+            if(data.success) {
+                informationwindowInsert(1, "Rækken blev slettet");
+                location.search = "page=" + getParameterByName("page") + "&form=" + getParameterByName("form");
+            } else {
+                informationwindowInsert(3, "Kunne ikke slette rækken.");
+                console.error(data.error);
+            }
+        });
+    }
 }
 
 function HTXJS_deleteSetting(setting) {
