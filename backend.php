@@ -21,6 +21,7 @@
     add_action('wp_ajax_htx_delete_column', 'htx_delete_column');
     add_action('wp_ajax_htx_delete_setting', 'htx_delete_setting');
     add_action('wp_ajax_htx_add_setting', 'htx_add_setting');
+    add_action('wp_ajax_htx_dublicate_form', 'htx_dublicate_form');
 
     // Creating setup for pages
     function setup_admin_menu(){
@@ -58,6 +59,7 @@
                         $economic = true;
                     }
                 }
+                if ($economic == true and $torunament == true) break;
             }
         }
         $stmt->close();

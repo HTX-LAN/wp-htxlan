@@ -669,4 +669,252 @@ function htx_add_setting() {
     }
 }
 
+function htx_dublicate_form() {
+    if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid'])) {
+        $response = new stdClass();
+        header('Content-type: application/json');
+        if(!current_user_can("manage_options"))
+            {return;$response->error = "Missing permission";}
+
+        try {
+            global $wpdb;
+            $link = database_connection();
+            $link->autocommit(FALSE); //turn on transactions
+
+            $tableId = intval($_POST['formid']);
+
+            // getting curent form name and data
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` and id = ? LIMIT 1");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param('i',$tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {
+                throw new Exception('The form is no longer available');
+                $stmt->close();
+            } else {
+                while($row = $result->fetch_assoc()) {
+                    $tableName = $row['tableName']." (copy)";
+                    $tableActive = $row['active'];
+                    $tableDescription = $row['tableDescription'];
+                }
+                $stmt->close();
+
+                // Make new table
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, favorit, shortcode, tableName, tableDescription) VALUES (?,0,'HTX_Tilmeldningsblanket',?,?)");
+                $stmt->bind_param("iss", $tableActive, $tableName, $tableDescription);
+                $stmt->execute();
+                $tableNewId = $link->insert_id;
+                $stmt->close();
+            }
+            
+            // Get current settings category
+            $table_name = $wpdb->prefix . 'htx_settings_cat';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param('i',$tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {
+                $stmt->close();
+            } else {
+                while($row = $result->fetch_assoc()) {
+                    $settingCatId[] = $row['id'];
+                    $settingCatActive[] = $row['active'];
+                    $settingCatNameBack[] = $row['settingNameBack'];
+                    $settingCatType[] = $row['settingType'];
+                }
+                $stmt->close();
+
+                // Make new settings category
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, settingNameBack, settingType, tableId) VALUES (?,?,?,?)");
+                for ($i=0; $i < count($settingCatId); $i++) { 
+                    $stmt->bind_param("issi", $settingCatActive[$i], $settingCatNameBack[$i], $settingCatType[$i],$tableNewId);
+                    $stmt->execute();
+                    $settignCatNewId[$settingCatId[$i]] = $link->insert_id;
+                }
+                $stmt->close();
+            }
+
+            // Get current settings
+            $table_name = $wpdb->prefix . 'htx_settings';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param('i',$tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {
+                $stmt->close();
+            } else {
+                while($row = $result->fetch_assoc()) {
+                    $settingId[] = $row['id'];
+                    $settingSettingId[] = $row['settingId'];
+                    $settingActive[] = $row['active'];
+                    $settingName[] = $row['settingName'];
+                    $settingValue[] = $row['value'];
+                    $settingExpence[] = $row['expence'];
+                    $settingType[] = $row['type'];
+                    $settingSorting[] = $row['sorting'];
+                }
+                $stmt->close();
+
+                // Make new settings
+                $stmt = $link->prepare("INSERT INTO `$table_name` (settingId, active, settingName, value, expence, type, sorting, tableId) VALUES (?,?,?,?,?,?,?,?)");
+                for ($i=0; $i < count($settingId); $i++) { 
+                    $stmt->bind_param("issssssi", $settignCatNewId[$settingId[$i]], $settingActive[$i], $settingName[$i], $settingValue[$i], $settingExpence[$i], $settingType[$i], $settingSorting[$i], $tableNewId);
+                    $stmt->execute();
+                    $settignNewId[$settingId[$i]] = $link->insert_id;
+                }
+                $stmt->close();
+            }
+
+            // Get current users
+            $table_name = $wpdb->prefix . 'htx_form_users';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param('i',$tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {
+                $stmt->close();
+            } else {
+                while($row = $result->fetch_assoc()) {
+                    $usersId[] = $row['id'];
+                    $usersActive[] = $row['active'];
+                    $usersPayed[] = $row['payed'];
+                    $usersArrived[] = $row['arrived'];
+                    $usersCrew[] = $row['crew'];
+                    $usersPrice[] = $row['price'];
+                    $usersEmail[] = $row['email'];
+                }
+                $stmt->close();
+
+                // Make new users
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, payed, arrived, crew, price, email, tableId) VALUES (?,?,?,?,?,?,?)");
+                for ($i=0; $i < count($settingId); $i++) { 
+                    $stmt->bind_param("ssssssi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPrice[$i], $usersEmail[$i], $tableNewId);
+                    $stmt->execute();
+                    $usersNewId[$usersId[$i]] = $link->insert_id;
+                }
+                $stmt->close();
+            }
+
+            // Get current columns
+            $table_name = $wpdb->prefix . 'htx_form_users';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param('i',$tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {
+                $stmt->close();
+            } else {
+                while($row = $result->fetch_assoc()) {
+                    $columnId[] = $row['id'];
+                    $columnActive[] = $row['active'];
+                    $columnNameFront[] = $row['columnNameFront'];
+                    $columnNameBack[] = $row['columnNameBack'];
+                    $columnSettingCat[] = $row['settingCat'];
+                    $columnFormat[] = $row['format'];
+                    $columnType[] = $row['columnType'];
+                    $columnSpecial[] = $row['special'];
+                    $columnSpecialName[] = $row['specialName'];
+                    $columnPlaceholderText[] = $row['placeholderText'];
+                    $columnTeams[] = $row['teams'];
+                    $columnFormatExtra[] = $row['formatExtra'];
+                    $columnSpecialNameExtra[] = $row['specialNameExtra'];
+                    $columnSpecialNameExtra2[] = $row['specialNameExtra2'];
+                    $columnSpecialNameExtra3[] = $row['specialNameExtra3'];
+                    $columnSpecialNameExtra4[] = $row['specialNameExtra4'];
+                    $columnSorting[] = $row['sorting'];
+                    $columnDisabled[] = $row['disabled'];
+                    $columnRequired[] = $row['required'];
+                }
+                $columnSettingCat['zero'] = 0;
+                $stmt->close();
+
+                // Make new columns
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, columnNameFront, columnNameBack, settingCat, format, columnType, special, specialName, placeholdeText, teams,
+                formatExtra, specialNameExtra, specialNameExtra2, specialNameExtra3, specialNameExtra4, sorting, disabled, required, tableId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                for ($i=0; $i < count($settingId); $i++) { 
+                    if ($columnSettingCat == 0 or $columnSettingCat == null) $columnSettingCatNew[$i] = 0; else $columnSettingCatNew[$i] = $settignCatNewId[$columnSettingCat[$i]];
+                    if ($columnTeams == "" or $columnTeams == null) $columnTeamsNew[$i] = ""; else $columnTeamsNew[$i] = $settignNewId[$columnTeams[$i]];
+                    if ($columnSpecialNameExtra2 == "" or $columnSpecialNameExtra2 == null) $columnSpecialNameExtra2New[$i] = ""; 
+                    else $columnSpecialNameExtra2New[$i] = $settignNewId[$columnSpecialNameExtra2[$i]];
+
+                    $stmt->bind_param("ssssssssssssssssssi", $columnActive[$i], $columnNameFront[$i], $columnNameBack[$i], $columnSettingCatNew[$i], $columnFormat[$i], $columnType[$i], 
+                    $columnSpecial[$i], $columnSpecialName[$i], $columnPlaceholderText[$i], $columnTeamsNew[$i], $columnFormatExtra[$i], $columnSpecialNameExtra2[$i], 
+                    $columnSpecialNameExtra3[$i], $columnSpecialNameExtra4[$i], $columnSorting[$i],$columnDisabled[$i],$columnRequired[$i], $tableNewId);
+                    $stmt->execute();
+                    $columnNewId[$columnId[$i]] = $link->insert_id;
+
+                    if($columnSpecialNameExtra != "" or $columnSpecialNameExtra != null)
+                        {
+                            $updateSpecialNameExtra[] = $link->insert_id;
+                            $updateSpecialNameExtraI[] = $i;
+                        }
+                }
+                $stmt = $link->prepare("UPDATE `$table_name` SET specialNameExtra WHERE id = ?");
+                for ($i=0; $i < count($updateSpecialNameExtra); $i++) { 
+                    $stmt->bind_param("ii", $columnNewId[$columnFormatExtra[$updateSpecialNameExtraI[$i]]] ,$updateSpecialNameExtra[$i]);
+                    $stmt->execute();
+                }
+                $stmt->close();
+            }
+
+            // Get current submissions (MISSING)
+            $table_name = $wpdb->prefix . 'htx_form';
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param('i',$tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) {
+                $stmt->close();
+            } else {
+                while($row = $result->fetch_assoc()) {
+                    $form[] = $row['id'];
+                    $usersActive[] = $row['active'];
+                    $usersPayed[] = $row['payed'];
+                    $usersArrived[] = $row['arrived'];
+                    $usersCrew[] = $row['crew'];
+                    $usersPrice[] = $row['price'];
+                    $usersEmail[] = $row['email'];
+                }
+                $stmt->close();
+
+                // Make new submissions
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, payed, arrived, crew, price, email, tableId) VALUES (?,?,?,?,?,?,?)");
+                for ($i=0; $i < count($settingId); $i++) { 
+                    $stmt->bind_param("ssssssi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPrice[$i], $usersEmail[$i], $tableNewId);
+                    $stmt->execute();
+                    $usersNewId[$usersId[$i]] = $link->insert_id;
+                }
+                $stmt->close();
+            }
+
+            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+            $link->close();
+
+            $response->success = true;
+            $response->id = $tableId;
+            $response->newName = $tableName;
+        } catch(Exception $e) {
+            $response->success = false;
+            $response->error = $e->getMessage();
+            $link->rollback(); //remove all queries from queue if error (undo)
+        }
+
+        echo json_encode($response);
+        wp_die();
+    }
+}
+
 ?>

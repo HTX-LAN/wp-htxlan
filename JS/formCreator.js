@@ -61,6 +61,24 @@ function HTXJS_updateForm(formid) {
     });
 }
 
+function HTXJS_dublicateForm(formid) {
+    var id = informationwindowInsert(2, "Arbejder på det...");
+    $.post(ajaxurl, {
+        formid: formid,
+        action: "htx_dublicate_form"
+    }, function(data) {
+        informationwindowremove(id);
+        console.log(data);
+        if(data.success) {
+            informationwindowInsert(1, "Formularen blev dublikeret.<br>Det nye navn er:<br>"+data.newName);
+        } else {
+            informationwindowInsert(3, "Kunne ikke dublikere formularen.");
+            console.error(data.error);
+        }
+    });
+}
+
+
 function HTXJS_createForm() {
     var id = informationwindowInsert(2, "Arbejder på det...");
     $.post(ajaxurl, {

@@ -21,6 +21,7 @@
         --text-hover-primary:#003b4f;
         --text-hover-secundary: #005876;
         --text-hover-tertiary: #0093c4;
+        --text-hover-quaternary: #00bfff;
         --border-primary: 1px Solid lightgray;
         --border-primary-color: lightgray;
         --submit-color-primary: #70ff41;
@@ -266,11 +267,11 @@
                 background-color: var(--cancel-color-primary);
             }
             .normalBtn {
-                background-color: var(--text-hover-tertiary);
+                background-color: var(--text-hover-quaternary);
                 color: white;
             }
             .normalBtn:hover {
-                background-color: var(--text-hover-secundary);
+                background-color: var(--text-hover-tertiary);
                 color: white;
             }
         /*Not saved style*/

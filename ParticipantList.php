@@ -185,16 +185,25 @@
                                         $valueArray = explode(",", $row2['value']);
                                         if (count($valueArray) > 0) {
                                             for ($j=0; $j < count($valueArray); $j++) {
-                                                echo htmlspecialchars($settingName[$valueArray[$j]]);
-
                                                 // Writing price
                                                 if (in_array('price_intrance', $specialName[$index])) {
-                                                    $price = $price + floatval($settingValue[$valueArray[$j]]);
+                                                    if ($settingValue[$valueArray[$j]] != "") {
+                                                        $price = $price + floatval($settingValue[$valueArray[$j]]);
+                                                        echo htmlspecialchars($settingName[$valueArray[$j]]);
+                                                    } else {
+                                                        echo htmlspecialchars($settingValue[$valueArray[$j]]);
+                                                    }
 
-                                                }
-                                                // Writing extra price
-                                                if (in_array('price_extra', $specialName[$index])) {
-                                                    $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
+                                                } else if (in_array('price_extra', $specialName[$index])) {
+                                                    // Writing extra price
+                                                    if ($settingValue[$valueArray[$j]] != "") {
+                                                        $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
+                                                        echo htmlspecialchars($settingName[$valueArray[$j]]);
+                                                    } else {
+                                                        echo htmlspecialchars($settingValue[$valueArray[$j]]);
+                                                    }
+                                                } else {
+                                                    echo htmlspecialchars($settingValue[$valueArray[$j]]);
                                                 }
                                                 // Insert comma, if the value is not the last
                                                 if (count($valueArray) != ($j + 1)) {
@@ -203,16 +212,25 @@
                                             }
                                         }
                                     } else {
-                                        echo htmlspecialchars($settingName[$row2['value']]);
-
-                                        // Writing price
                                         if (in_array('price_intrance', $specialName[$index])) {
-                                            $price = $price + floatval($settingValue[$row2['value']]);
+                                            // Writing price
+                                            if ($settingValue[$valueArray[$j]] != "") {
+                                                $price = $price + floatval($settingValue[$valueArray[$j]]);
+                                                echo htmlspecialchars($settingName[$valueArray[$j]]);
+                                            } else {
+                                                echo htmlspecialchars($settingValue[$valueArray[$j]]);
+                                            }
 
-                                        }
-                                        // Writing extra price
-                                        if (in_array('price_extra', $specialName[$index])) {
-                                            $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
+                                        } else if (in_array('price_extra', $specialName[$index])) {
+                                            // Writing extra price
+                                            if ($settingValue[$valueArray[$j]] != "") {
+                                                $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
+                                                echo htmlspecialchars($settingName[$valueArray[$j]]);
+                                            } else {
+                                                echo htmlspecialchars($settingValue[$valueArray[$j]]);
+                                            }
+                                        } else {
+                                            echo htmlspecialchars($settingValue[$valueArray[$j]]);
                                         }
                                     }
 
