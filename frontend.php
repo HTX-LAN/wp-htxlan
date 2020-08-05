@@ -23,7 +23,7 @@
         $html = "";
 
         // Check and get form from shortcode
-        if (!isset($atts['form'])) $tableId = 0; else $tableId = $atts['form'];
+        if (!isset($atts['form'])) $tableId = 0; else $tableId = intval($atts['form']);
 
         // Standard load
         $html .= HTX_load_standard_frontend();
@@ -37,7 +37,8 @@
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
-        if($result->num_rows === 0) {return "<p>Denne form virker desværre ikke, fordi den specificeret formular ikke findes.</p>";} else {
+        if($result->num_rows === 0) return "<p>Denne form virker desværre ikke, fordi den specificeret formular ikke findes.</p><p>Formular: $tableId</p>";
+        else {
             while($row = $result->fetch_assoc()) {
                 $formName = $row['tableName'];
             }

@@ -14,7 +14,7 @@
         global $wpdb;
 
         // Check tableId
-        if (!ctype_alnum($tableId)) return "Sql injection attempt";
+        if (!is_numeric($tableId)) return "Sql injection attempt";
         $tableId = intval($tableId);
 
         // Post handling

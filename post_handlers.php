@@ -685,7 +685,7 @@ function htx_dublicate_form() {
 
             // getting curent form name and data
             $table_name = $wpdb->prefix . 'htx_form_tables';
-            $stmt = $link->prepare("SELECT * FROM `$table_name` and id = ? LIMIT 1");
+            $stmt = $link->prepare("SELECT * FROM `$table_name` where id = ? LIMIT 1");
             if(!$stmt)
                 throw new Exception($link->error);
             $stmt->bind_param('i',$tableId);
@@ -765,7 +765,7 @@ function htx_dublicate_form() {
                 // Make new settings
                 $stmt = $link->prepare("INSERT INTO `$table_name` (settingId, active, settingName, value, expence, type, sorting, tableId) VALUES (?,?,?,?,?,?,?,?)");
                 for ($i=0; $i < count($settingId); $i++) { 
-                    $stmt->bind_param("issssssi", $settignCatNewId[$settingId[$i]], $settingActive[$i], $settingName[$i], $settingValue[$i], $settingExpence[$i], $settingType[$i], $settingSorting[$i], $tableNewId);
+                    $stmt->bind_param("issssssi", $settignCatNewId[$settingSettingId[$i]], $settingActive[$i], $settingName[$i], $settingValue[$i], $settingExpence[$i], $settingType[$i], $settingSorting[$i], $tableNewId);
                     $stmt->execute();
                     $settignNewId[$settingId[$i]] = $link->insert_id;
                 }
@@ -805,7 +805,7 @@ function htx_dublicate_form() {
             }
 
             // Get current columns
-            $table_name = $wpdb->prefix . 'htx_form_users';
+            $table_name = $wpdb->prefix . 'htx_column';
             $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
             if(!$stmt)
                 throw new Exception($link->error);
@@ -840,35 +840,41 @@ function htx_dublicate_form() {
                 $stmt->close();
 
                 // Make new columns
-                $stmt = $link->prepare("INSERT INTO `$table_name` (active, columnNameFront, columnNameBack, settingCat, format, columnType, special, specialName, placeholdeText, teams,
-                formatExtra, specialNameExtra, specialNameExtra2, specialNameExtra3, specialNameExtra4, sorting, disabled, required, tableId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-                for ($i=0; $i < count($settingId); $i++) { 
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, columnNameFront, columnNameBack, settingCat, format, columnType, special, specialName, placeholderText, teams, formatExtra, specialNameExtra, specialNameExtra2, specialNameExtra3, specialNameExtra4, sorting, disabled, required, tableId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                for ($i=0; $i < count($columnId); $i++) { 
                     if ($columnSettingCat == 0 or $columnSettingCat == null) $columnSettingCatNew[$i] = 0; else $columnSettingCatNew[$i] = $settignCatNewId[$columnSettingCat[$i]];
                     if ($columnTeams == "" or $columnTeams == null) $columnTeamsNew[$i] = ""; else $columnTeamsNew[$i] = $settignNewId[$columnTeams[$i]];
-                    if ($columnSpecialNameExtra2 == "" or $columnSpecialNameExtra2 == null) $columnSpecialNameExtra2New[$i] = ""; 
+                    if ($columnSpecialNameExtra2 == "" or $columnSpecialNameExtra2 == null or $columnSpecialNameExtra2 == NULL) $columnSpecialNameExtra2New[$i] = ""; 
                     else $columnSpecialNameExtra2New[$i] = $settignNewId[$columnSpecialNameExtra2[$i]];
 
-                    $stmt->bind_param("ssssssssssssssssssi", $columnActive[$i], $columnNameFront[$i], $columnNameBack[$i], $columnSettingCatNew[$i], $columnFormat[$i], $columnType[$i], 
-                    $columnSpecial[$i], $columnSpecialName[$i], $columnPlaceholderText[$i], $columnTeamsNew[$i], $columnFormatExtra[$i], $columnSpecialNameExtra2[$i], 
-                    $columnSpecialNameExtra3[$i], $columnSpecialNameExtra4[$i], $columnSorting[$i],$columnDisabled[$i],$columnRequired[$i], $tableNewId);
+                    $stmt->bind_param("ssssssssssssssssssi", $columnActive[$i], $columnNameFront[$i], $columnNameBack[$i], $columnSettingCatNew[$i], $columnFormat[$i],
+                    $columnType[$i], $columnSpecial[$i], $columnSpecialName[$i], $columnPlaceholderText[$i], $columnTeamsNew[$i], $columnFormatExtra[$i], $columnSpecialNameExtra[$i],
+                    $columnSpecialNameExtra2New[$i], $columnSpecialNameExtra3[$i], $columnSpecialNameExtra4[$i], $columnSorting[$i],$columnDisabled[$i],$columnRequired[$i], $tableNewId);
                     $stmt->execute();
                     $columnNewId[$columnId[$i]] = $link->insert_id;
 
-                    if($columnSpecialNameExtra != "" or $columnSpecialNameExtra != null)
-                        {
-                            $updateSpecialNameExtra[] = $link->insert_id;
-                            $updateSpecialNameExtraI[] = $i;
-                        }
+                    if($columnSpecialNameExtra[$i] != "" or $columnSpecialNameExtra[$i] != null OR $columnSpecialNameExtra[$i] != NULL){
+                        $updateSpecialNameExtra[] = $link->insert_id;
+                        $updateSpecialNameExtraI[] = $i;
+                    }
                 }
-                $stmt = $link->prepare("UPDATE `$table_name` SET specialNameExtra WHERE id = ?");
+
+                // Update table to get the right specialNameExtra values
+                $stmt->close();
+                $stmt = $link->prepare("UPDATE `$table_name` SET specialNameExtra = ? WHERE id = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
                 for ($i=0; $i < count($updateSpecialNameExtra); $i++) { 
-                    $stmt->bind_param("ii", $columnNewId[$columnFormatExtra[$updateSpecialNameExtraI[$i]]] ,$updateSpecialNameExtra[$i]);
+                    $stmt->bind_param("ii", $columnNewId[$columnSpecialNameExtra[$updateSpecialNameExtraI[$i]]] ,$updateSpecialNameExtra[$i]);
                     $stmt->execute();
+                    $response->newSpecialNameExtra[] = $columnNewId[$columnSpecialNameExtra[$updateSpecialNameExtraI[$i]]];
                 }
                 $stmt->close();
             }
 
-            // Get current submissions (MISSING)
+            // Get current submissions
             $table_name = $wpdb->prefix . 'htx_form';
             $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
             if(!$stmt)
@@ -881,21 +887,25 @@ function htx_dublicate_form() {
             } else {
                 while($row = $result->fetch_assoc()) {
                     $form[] = $row['id'];
-                    $usersActive[] = $row['active'];
-                    $usersPayed[] = $row['payed'];
-                    $usersArrived[] = $row['arrived'];
-                    $usersCrew[] = $row['crew'];
-                    $usersPrice[] = $row['price'];
-                    $usersEmail[] = $row['email'];
+                    $formActive[] = $row['active'];
+                    $formUserId[] = $row['userId'];
+                    $formName[] = $row['name'];
+                    $formValue[] = $row['value'];
                 }
                 $stmt->close();
 
                 // Make new submissions
-                $stmt = $link->prepare("INSERT INTO `$table_name` (active, payed, arrived, crew, price, email, tableId) VALUES (?,?,?,?,?,?,?)");
-                for ($i=0; $i < count($settingId); $i++) { 
-                    $stmt->bind_param("ssssssi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPrice[$i], $usersEmail[$i], $tableNewId);
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, userId, name, value, tableId) VALUES (?,?,?,?,?)");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                for ($i=0; $i < count($form); $i++) {
+                    if (in_array($formName[$i],$settingCatNameBack)) {
+                        if (in_array($formValue[$i],$settingId))
+                            $formValue[$i] = $settignNewId[$formValue[$i]];
+                    }
+                    $stmt->bind_param("ssssi", $formActive[$i], $usersNewId[$formUserId[$i]], $formName[$i], $formValue[$i], $tableNewId);
                     $stmt->execute();
-                    $usersNewId[$usersId[$i]] = $link->insert_id;
+                    $formNewId[$usersId[$i]] = $link->insert_id;
                 }
                 $stmt->close();
             }

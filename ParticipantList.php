@@ -210,27 +210,27 @@
                                                     echo ", ";
                                                 }
                                             }
-                                        }
+                                        }else echo "test";
                                     } else {
                                         if (in_array('price_intrance', $specialName[$index])) {
                                             // Writing price
-                                            if ($settingValue[$valueArray[$j]] != "") {
-                                                $price = $price + floatval($settingValue[$valueArray[$j]]);
-                                                echo htmlspecialchars($settingName[$valueArray[$j]]);
+                                            if ($settingValue[$row2['value']] != "") {
+                                                $price = $price + floatval($settingValue[$row2['value']]);
+                                                echo htmlspecialchars($settingName[$row2['value']]);
                                             } else {
-                                                echo htmlspecialchars($settingValue[$valueArray[$j]]);
+                                                echo htmlspecialchars($settingValue[$row2['value']]);
                                             }
 
                                         } else if (in_array('price_extra', $specialName[$index])) {
                                             // Writing extra price
-                                            if ($settingValue[$valueArray[$j]] != "") {
-                                                $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
-                                                echo htmlspecialchars($settingName[$valueArray[$j]]);
+                                            if ($settingValue[$row2['value']] != "") {
+                                                $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
+                                                echo htmlspecialchars($settingName[$row2['value']]);
                                             } else {
-                                                echo htmlspecialchars($settingValue[$valueArray[$j]]);
+                                                echo htmlspecialchars($settingValue[$row2['value']]);
                                             }
                                         } else {
-                                            echo htmlspecialchars($settingValue[$valueArray[$j]]);
+                                            echo htmlspecialchars($settingValue[$row2['value']]);
                                         }
                                     }
 
