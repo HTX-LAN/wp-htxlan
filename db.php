@@ -57,8 +57,8 @@ if(!defined('ABSPATH')) {
             payed varchar(255) default 0,
             arrived INT default 0,
             crew INT default 0,
-            price FLOAT default 0,
             email TEXT,
+            lastEditedBy TEXT,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) $charset_collate;";

@@ -88,7 +88,8 @@
 
             // Pre main column
             echo "<th></th>";
-            echo "<th onClick='sortTable(1,1,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer'>Id
+            echo "<th onClick='sortTable(1,1,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer' class='table_header'>
+            <span>Id</span>
             <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_1'></span></th>";
 
             // Writing every column and insert into table head
@@ -96,8 +97,8 @@
             for ($i=0; $i < count($columnNameBack); $i++) {
                 // Check if input should not be shown
                 if (!in_array($columnType[$i], $nonUserInput)) {
-                    echo "<th onClick='sortTable(1,$columnNumber,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer'>
-                        $columnNameFront[$i]
+                    echo "<th onClick='sortTable(1,$columnNumber,\"participantListTable\",true,\"participantListTable\")' class='table_header' title='Sorter efter denne kolonne' style='cursor: pointer'>
+                        <span class='table_header_text'>$columnNameFront[$i]</span>&nbsp;
                         <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_$columnNumber'></span>
                     </th>";
                     $columnNumber++;
@@ -307,25 +308,6 @@
                 // Price
                 $price = floatval($price) + floatval($priceExtra);
                 echo "<td>$price,-</td>";
-                // Updating price, if it does not match with what is in the database
-                if ($price != $prices[$i]) {
-                    $table_name2 = $wpdb->prefix . 'htx_form_users';
-                    $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE id = ?");
-                    $stmt2->bind_param("i", $userid[$i]);
-                    $stmt2->execute();
-                    $result2 = $stmt2->get_result();
-                    if($result2->num_rows === 0) echo "<scrip>location.reload();</script>" /* User does not exist */; else {
-                        while($row2 = $result2->fetch_assoc()) {
-                            $table_name4 = $wpdb->prefix . 'htx_form_users';
-                            $stmt4 = $link->prepare("UPDATE $table_name4 SET price = ? WHERE id = ?");
-                            $stmt4->bind_param("si", $price, $userid[$i]);
-                            $stmt4->execute();
-                            $stmt4->close();
-                        }
-                    }
-                    $stmt2->close();
-                }
-
 
                 // Delete
                 echo "<td>

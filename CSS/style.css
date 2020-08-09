@@ -343,6 +343,12 @@
         position: relative;
         top: -1px;
     }
+    .table_header {
+        white-space: nowrap;
+    }
+    .table_header_text {
+        white-space: normal;
+    }
 
     /*Areas of main*/
     .main-backend-area {
