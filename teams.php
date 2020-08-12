@@ -361,6 +361,7 @@
     $TopColumnAmount = count($columnNameBack)+1;
 
     if (!$Error) {
+        $sortTable = array();
         for ($i=0; $i < count($tournamentColumnIds); $i++) { 
             echo "<h2>$tournamentColumnName[$i]</h2>";
             for ($index=0; $index < count($tournamentNames[$i]); $index++) { 
@@ -731,12 +732,12 @@
                 echo "</tbody></table>";
                 echo "<br>";
             }
-        }
-        if (count($sortTable)>0){
-            $sortTable = array_unique($sortTable);
-            // Sort table if needed
-            for ($i=0; $i < count($sortTable); $i++) { 
-                echo "<script>setTimeout(() => {sortTable(1, 0, \"teamsTable-".$sortTable[$i]."\")}, 300);</script>";
+            if (count($sortTable)>0){
+                $sortTable = array_unique($sortTable);
+                // Sort table if needed
+                for ($i=0; $i < count($sortTable); $i++) { 
+                    echo "<script>setTimeout(() => {sortTable(1, 0, \"teamsTable-".$sortTable[$i]."\")}, 300);</script>";
+                }
             }
         }
     }

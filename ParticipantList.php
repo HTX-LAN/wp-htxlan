@@ -50,6 +50,117 @@
         // Ending dropdown
         echo "</select></form><br></p>";
 
+
+        // Possible to edit what to show on this page
+        echo "<button class='btn normalBtn' style='margin-bottom: 1rem;' onclick='showTeamColumnSettings()'>Ændre viste felter</button><br>";
+
+        // Get already choosen elements - If no elements are present use default
+        $userId = get_current_user_id();
+        // $headsShown = array('firstName', 'lastName', 'email', 'discordTag'); #This controls the shown elements on screen - Default elements
+
+        // Gets all columns
+        $table_name = $wpdb->prefix . 'htx_column';
+        $stmt = $link->prepare("SELECT * FROM `$table_name` where tableId = ?");
+        $stmt->bind_param("i", $tableId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows === 0) {
+            $stmt->close();
+            $columns = array();
+        } else {
+            while($row = $result->fetch_assoc()) {
+                $columns[] = $row['id'];
+            }
+        }
+
+        // Getting user preferrence
+        $table_name = $wpdb->prefix . 'htx_settings';
+        $stmt = $link->prepare("SELECT * FROM `$table_name` where settingName = ? AND NOT value = '' AND active = 1 AND type = 'participantUserPreference' AND tableId = ? LIMIT 1");
+        $stmt->bind_param("ii", $userId, $tableId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows === 0) {
+            $stmt->close();
+            $headsShown = array();
+            $userSetting = false;
+        } else {
+            while($row = $result->fetch_assoc()) {
+                $headsShown = explode(",", $row['value']);
+                if (count(array_intersect($columns, $headsShown)) != count($headsShown)) $headsShown = array();
+            }
+            $userSetting = true;
+        }
+
+        // Post handling
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            switch  ($_POST['post']) {
+                case 'updateUserPreference':
+                    if(!current_user_can("manage_options")){
+                        echo "User can not do that!";
+                        break;
+                    }
+                $tempArray = array();
+                $tempSrting = "";
+                for ($i=0; $i < count($_POST['shownColumns']); $i++) { 
+                    if (in_array($_POST['shownColumns'][$i], $columns)) {
+                        $tempArray[] = $_POST['shownColumns'][$i];
+                    }
+                }
+                if (count(array_intersect($columns, $tempArray)) == count($tempArray)) {
+                    $headsShown = $tempArray;
+                    $headsShownString = implode(",",$headsShown);
+
+                    // Update database
+                    if ($userSetting == false) {
+                        // Make new record in database
+                        $table_name = $wpdb->prefix . 'htx_settings';
+                        $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type, tableId) VALUES (?, ?, 'participantUserPreference', ?)");
+                        $stmt->bind_param("isi", $userId, $headsShownString, $tableId);
+                        $stmt->execute();
+                        $stmt->close();
+                    } else {
+                        // Update record
+                        $table_name = $wpdb->prefix . 'htx_settings';
+                        $stmt = $link->prepare("UPDATE `$table_name` SET value = ? WHERE settingName = ? and tableId = ?");
+                        $stmt->bind_param("sii", $headsShownString, $userId, $tableId);
+                        $stmt->execute();
+                        $stmt->close();
+                    }
+                }
+
+                break;
+            }
+        }
+
+        // Page for showing possible columns to show
+        wp_enqueue_style( 'teams_style', "/wp-content/plugins/WPPlugin-HTXLan/CSS/teams.css");
+        wp_enqueue_script( 'teams_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/teams.js");
+        echo "<div id='columnShownEditPage' class='columnShownEditPage_closed'>";
+        echo "<h2>Viste kolonner</h2>";
+        echo "<form method='POST'>";
+        // Columns:
+        $table_name = $wpdb->prefix . 'htx_column';
+        $stmt = $link->prepare("SELECT * FROM `$table_name` where (active = 1 and tableId = ?) AND NOT(columnType = 'text area' OR columnType = 'price')");
+        $stmt->bind_param("i", $tableId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows === 0) {
+            echo "Der er ingen elementer i form";
+            $stmt->close();
+            $Error = true;
+            die; #Ending page, becuase of error
+        } else {
+            while($row = $result->fetch_assoc()) {
+                if (in_array($row['id'], $headsShown)) $selected = 'checked="checked"'; else $selected = '';
+                if (count($headsShown) == 0) $selected = 'checked="checked"';
+                echo "<input type='checkbox' id='checkBox-".$row['id']."' name='shownColumns[]' value='".$row['id']."' $selected><label for='checkBox-".$row['id']."'>".$row['columnNameFront']."</label><br>";
+            }
+        }
+        echo "<button type='submit' class='btn updateBtn' name='post' value='updateUserPreference'>Opdater</button>";
+        echo "</form>";
+        echo "</div>";
+
+
         // Start of table with head
         echo "<div class='formGroup_container'><div class='formGroup formGroup_scroll_left'>
             <table class='InfoTable' id='participantListTable'><thead><tr>";
@@ -70,6 +181,7 @@
             $result3 = $stmt3->get_result();
             if($result3->num_rows === 0) {return HTX_frontend_sql_notworking();} else {
                 while($row3 = $result3->fetch_assoc()) {
+                    $columnId[] = $row3['id'];
                     $columnNameFront[] = $row3['columnNameFront'];
                     $columnNameBack[] = $row3['columnNameBack'];
                     $format[] = $row3['format'];
@@ -97,7 +209,8 @@
             for ($i=0; $i < count($columnNameBack); $i++) {
                 // Check if input should not be shown
                 if (!in_array($columnType[$i], $nonUserInput)) {
-                    echo "<th onClick='sortTable(1,$columnNumber,\"participantListTable\",true,\"participantListTable\")' class='table_header' title='Sorter efter denne kolonne' style='cursor: pointer'>
+                    if (!in_array($columnId[$i], $headsShown)) $shown[$i] = "hidden"; else $shown[$i] = "";
+                    echo "<th onClick='sortTable(1,$columnNumber,\"participantListTable\",true,\"participantListTable\")' class='table_header $shown[$i]' title='Sorter efter denne kolonne' style='cursor: pointer'>
                         <span class='table_header_text'>$columnNameFront[$i]</span>&nbsp;
                         <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_$columnNumber'></span>
                     </th>";
@@ -171,13 +284,13 @@
                     $result2 = $stmt2->get_result();
                     if($result2->num_rows === 0) {
                         if (!in_array($columnType[$index], $nonUserInput)) {
-                            echo "<td>";
+                            echo "<td class='$shown[$index]'>";
                             echo "<i style='color: red'>-</i>";
                             echo "</td>";
                         }
                     } else {
                         if (!in_array($columnType[$index], $nonUserInput)) {
-                            echo "<td>";
+                            echo "<td class='$shown[$index]'>";
                             while($row2 = $result2->fetch_assoc()) {
                                 // Checks if dropdown or other where value is an id
                                 if (in_array($row2['name'], $settingNameBacks)) {
