@@ -240,16 +240,16 @@
                                 $stmt2->execute();
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) {
-                                    echo "Den indstilling du har valgt som 'Ekstra pris' er desværre ikke en som kan bruges sammen med økonomi siden.";
+                                    echo "Den indstilling du har valgt som 'Ekstra pris' er desværre ikke en som kan bruges sammen med økonomi siden.<br>Visningen nedenfor kan være forkert på grund af dette.<br>";
                                     $stmt2->close();
                                     $EconomicExtraError = 1;
                                 } else if($result2->num_rows > 1) {
                                     echo "Noget er gruligt galt, venligst rapporter dette til udviklerne:<br>
-                                    <i style='color:red'>Economic page - Too many settings category, with the same backend name for extra price</i>";
+                                    <i style='color:red'>Economic page - Too many settings category, with the same backend name for extra price</i><br><br>Visningen nedenfor kan være forkert på grund af dette.<br>";
                                     $stmt2->close();
                                     $EconomicExtraError = 1;
                                 } else {
-                                    $EconomicExtraErrorError = 0;
+                                    $EconomicExtraError = 0;
                                     // Fetching and storing values in arrays
                                     while($row = $result2->fetch_assoc()) {
                                         $settingCatExtraName[$g] = $columnNameFront[$j];
@@ -264,9 +264,9 @@
                                     $stmt2->execute();
                                     $result2 = $stmt2->get_result();
                                     if($result2->num_rows === 0) {
-                                        echo "Der er ingen værdier for 'Ekstra pris' formular elementet, og derved virker økonomi siden ikke.";
+                                        echo "Der er ingen værdier for 'Ekstra pris' formular elementet, og derved virker økonomi siden ikke.<br>Visningen nedenfor kan være forkert på grund af dette.<br>";
                                         $stmt2->close();
-                                        $EconomicExtraErrorError = 1;
+                                        $EconomicExtraError = 1;
                                     } else {
                                         // Fetching and storing values in arrays
                                         while($row = $result2->fetch_assoc()) {
@@ -283,9 +283,9 @@
                                         $stmt2->execute();
                                         $result2 = $stmt2->get_result();
                                         if($result2->num_rows === 0) {
-                                            echo "Ingen tilmeldinger med pris elementet besvaret - Du burde overveje at lave det element til 'required'";
+                                            echo "Ingen tilmeldinger med ekstra pris elementet besvaret - Du burde overveje at lave det element til 'required'<br>Visningen nedenfor kan være forkert på grund af dette.<br>";
                                             $stmt2->close();
-                                            $EconomicExtraErrorError = 1;
+                                            $EconomicExtraError = 1;
                                         } else {
                                             // Fetching and storing values in arrays
                                             while($row = $result2->fetch_assoc()) {
