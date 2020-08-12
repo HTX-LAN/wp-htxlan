@@ -145,7 +145,6 @@
         echo "<h2>Farlig zone</h2>";
         HTX_danger_zone();
         echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_resetDatabases()'>Nulstil databaser</button><br>";
-        echo "<button class='btn updateBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_downloadData()'>Download data</button>";
     }
 
 

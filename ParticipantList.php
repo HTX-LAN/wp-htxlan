@@ -8,6 +8,7 @@
     // Tabel med alle tilmeldinger som kan ses - Evt en knap som kan trykkes, hvor så at felterne kan blive redigerbare - Man kan vælge imellem forskellige forms
     // Widgets and style
     HTX_load_standard_backend();
+    wp_enqueue_script( 'participantList_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/participant.js");
 
     // Getting start information for database connection
     global $wpdb;
@@ -265,9 +266,13 @@
                 }
             }
 
+            // download data array
+            $dataForDownload = array();
 
             // Getting and writing every user information
             for ($i=0; $i < count($userid); $i++) {
+                // Data for line
+                $lineData = array();
                 // Starting price
                 $price = 0;
                 $priceExtra = 0;
@@ -275,6 +280,10 @@
                 echo "<tr class='InfoTableRow'>";
                 echo "<td><span class='material-icons' style='cursor: pointer'>edit</span></td>";
                 echo "<td>$userid[$i]</td>";
+
+                // data
+                $lineData['id'] = intval($userid[$i]);
+
                 // For every column
                 for ($index=0; $index < count($columnNameBack); $index++) {
                     // Getting data for specefied column
@@ -288,6 +297,9 @@
                             echo "<td class='$shown[$index]'>";
                             echo "<i style='color: red'>-</i>";
                             echo "</td>";
+
+                            // Data for download
+                            $lineData[$columnNameFront[$index]] = '-';
                         }
                     } else {
                         if (!in_array($columnType[$index], $nonUserInput)) {
@@ -299,14 +311,22 @@
                                     if ($columnType[$index] == "checkbox") {
                                         $valueArray = explode(",", $row2['value']);
                                         if (count($valueArray) > 0) {
+                                            // Data
+                                            $lineData[$columnNameFront[$index]] = '';
                                             for ($j=0; $j < count($valueArray); $j++) {
                                                 // Writing price
                                                 if (in_array('price_intrance', $specialName[$index])) {
                                                     if ($settingValue[$valueArray[$j]] != "") {
                                                         $price = $price + floatval($settingValue[$valueArray[$j]]);
                                                         echo htmlspecialchars($settingName[$valueArray[$j]]);
+
+                                                        // Data
+                                                        $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingName[$valueArray[$j]]);
                                                     } else {
                                                         echo htmlspecialchars($settingValue[$valueArray[$j]]);
+
+                                                        // Data
+                                                        $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingValue[$valueArray[$j]]);
                                                     }
 
                                                 } else if (in_array('price_extra', $specialName[$index])) {
@@ -314,15 +334,26 @@
                                                     if ($settingValue[$valueArray[$j]] != "") {
                                                         $priceExtra = $priceExtra + floatval($settingValue[$valueArray[$j]]);
                                                         echo htmlspecialchars($settingName[$valueArray[$j]]);
+
+                                                        // Data
+                                                        $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingName[$valueArray[$j]]);
                                                     } else {
                                                         echo htmlspecialchars($settingValue[$valueArray[$j]]);
+
+                                                        // Data
+                                                        $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingValue[$valueArray[$j]]);
                                                     }
                                                 } else {
                                                     echo htmlspecialchars($settingValue[$valueArray[$j]]);
+
+                                                    // Data
+                                                    $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingValue[$valueArray[$j]]);
                                                 }
                                                 // Insert comma, if the value is not the last
                                                 if (count($valueArray) != ($j + 1)) {
                                                     echo ", ";
+                                                    // Data
+                                                    $lineData[$columnNameFront[$index]] .= ", ";
                                                 }
                                             }
                                         }else echo "test";
@@ -332,8 +363,14 @@
                                             if ($settingValue[$row2['value']] != "") {
                                                 $price = $price + floatval($settingValue[$row2['value']]);
                                                 echo htmlspecialchars($settingName[$row2['value']]);
+
+                                                // Data
+                                                $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingName[$row2['value']]);
                                             } else {
                                                 echo htmlspecialchars($settingValue[$row2['value']]);
+
+                                                // Data
+                                                $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingValue[$row2['value']]);
                                             }
 
                                         } else if (in_array('price_extra', $specialName[$index])) {
@@ -341,11 +378,20 @@
                                             if ($settingValue[$row2['value']] != "") {
                                                 $priceExtra = $priceExtra + floatval($settingValue[$row2['value']]);
                                                 echo htmlspecialchars($settingName[$row2['value']]);
+
+                                                // Data
+                                                $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingName[$row2['value']]);
                                             } else {
                                                 echo htmlspecialchars($settingValue[$row2['value']]);
+
+                                                // Data
+                                                $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingValue[$row2['value']]);
                                             }
                                         } else {
                                             echo htmlspecialchars($settingValue[$row2['value']]);
+
+                                            // Data
+                                            $lineData[$columnNameFront[$index]] .= htmlspecialchars($settingValue[$row2['value']]);
                                         }
                                     }
 
@@ -361,6 +407,9 @@
                                         if (in_array('price_intrance', $specialName[$index])) {
                                             $priceExtra = $priceExtra + floatval($row2['value']);
                                         }
+
+                                        // Data
+                                        $lineData[$columnNameFront[$index]] .= htmlspecialchars($row2['value']);
                                     }
                                 }
                             }
@@ -369,6 +418,7 @@
                     }
                     $stmt2->close();
                 }
+
                 // Adding payed, and arrived at the end of inputs
                 // Payed
 
@@ -397,6 +447,17 @@
                     </form>
                 </td>";
 
+                // data
+                if ($payed[$i] == 0) {
+                    $lineData['Betaling'] = 'Ingen';
+                } else if ($payed[$i] == '0-f') {
+                    $lineData['Betaling'] = 'Kontant';
+                } else if ($payed[$i] == '0-f') {
+                    $lineData['Betaling'] = 'Mobilepay';
+                } else {
+                    $lineData['Betaling'] = '';
+                }
+
                 // Arrived
                 echo "<td style='text-align: center'>";
                 echo "<form id='$i-arrived' method='POST'>";
@@ -407,6 +468,12 @@
                 echo ">";
                 echo "</form>";
                 echo "</td>";
+
+                // data
+                if ($arrived[$i] == 1)
+                    $lineData['Ankommet'] = 'Ja';
+                else 
+                    $lineData['Ankommet'] = 'Nej';
 
                 // Crew
                 echo "<td style='text-align: center'>";
@@ -419,9 +486,18 @@
                 echo "</form>";
                 echo "</td>";
 
+                // data
+                if ($arrived[$i] == 1)
+                    $lineData['Crew'] = 'Ja';
+                else 
+                    $lineData['Crew'] = 'Nej';
+
                 // Price
                 $price = floatval($price) + floatval($priceExtra);
                 echo "<td>$price,-</td>";
+
+                // data
+                $lineData['Pris'] = floatval($price);
 
                 // Delete
                 echo "<td>
@@ -433,12 +509,20 @@
                     </form>
                 </a>
                 </td>";
+
+                array_push($dataForDownload, $lineData);
             }
 
         }
         $stmt->close();
 
         // Ending table
-        echo "</thead></table></div>";
+        echo "</thead></table></div></div>";
+
+        // Download data as CSV
+        echo "<script>tableCSVContent = ".json_encode($dataForDownload).";</script>\n";
+        echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.2.0/papaparse.min.js" integrity="sha512-rKFvwjvE4liWPlFnvH4ZhRDfNZ9FOpdkD/BU5gAIA3VS3vOQrQ5BjKgbO3kxebKhHdHcNUHLqxQYSoxee9UwgA==" crossorigin="anonymous"></script>'."\n";
+        echo "<button class='btn updateBtn' onclick='downloadData();'>Download data</button>";
     }
+
 ?>
