@@ -14,6 +14,9 @@
     // Connecting to database, with custom variable
     $link = database_connection();
 
+    // Non user editable inputs saved
+    $nonUserInput = array('text area', 'price','spacing');
+
     // Header
     echo "<h1>HTX Lan tilmeldinger</h1>";
 
@@ -140,7 +143,7 @@
         echo "<form method='POST'>";
         // Columns:
         $table_name = $wpdb->prefix . 'htx_column';
-        $stmt = $link->prepare("SELECT * FROM `$table_name` where (active = 1 and tableId = ?) AND NOT(columnType = 'text area' OR columnType = 'price')");
+        $stmt = $link->prepare("SELECT * FROM `$table_name` where (active = 1 and tableId = ?) AND NOT(columnType = 'text area' OR columnType = 'price' OR columnType = 'spacing')");
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -151,8 +154,9 @@
             die; #Ending page, becuase of error
         } else {
             while($row = $result->fetch_assoc()) {
+                if (in_array($row['columnType'], $nonUserInput)) continue;
                 if (in_array($row['id'], $headsShown)) $selected = 'checked="checked"'; else $selected = '';
-                if (count($headsShown) == 0) $selected = 'checked="checked"';
+                if ($userSetting == false) $selected = 'checked="checked"';
                 echo "<input type='checkbox' id='checkBox-".$row['id']."' name='shownColumns[]' value='".$row['id']."' $selected><label for='checkBox-".$row['id']."'>".$row['columnNameFront']."</label><br>";
             }
         }
@@ -195,9 +199,6 @@
             }
             $stmt3->close();
 
-            // Non user editable inputs saved
-            $nonUserInput = array('text area', 'price');
-
             // Pre main column
             echo "<th></th>";
             echo "<th onClick='sortTable(1,1,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer' class='table_header'>
@@ -209,7 +210,7 @@
             for ($i=0; $i < count($columnNameBack); $i++) {
                 // Check if input should not be shown
                 if (!in_array($columnType[$i], $nonUserInput)) {
-                    if (!in_array($columnId[$i], $headsShown)) $shown[$i] = "hidden"; else $shown[$i] = "";
+                    if (!in_array($columnId[$i], $headsShown) AND $userSetting == true) $shown[$i] = "hidden"; else $shown[$i] = "";
                     echo "<th onClick='sortTable(1,$columnNumber,\"participantListTable\",true,\"participantListTable\")' class='table_header $shown[$i]' title='Sorter efter denne kolonne' style='cursor: pointer'>
                         <span class='table_header_text'>$columnNameFront[$i]</span>&nbsp;
                         <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_$columnNumber'></span>

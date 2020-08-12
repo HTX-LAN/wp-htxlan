@@ -13,6 +13,9 @@
     // Connecting to database, with custom variable
     $link = database_connection();
 
+    // Non user editable inputs saved
+    $nonUserInput = array('text area', 'price', 'spacing');
+
     // Header
     echo "<h1>HTX Lan turneringer og hold</h1>";
 
@@ -146,7 +149,7 @@
     echo "<form method='POST'>";
     // Columns:
     $table_name = $wpdb->prefix . 'htx_column';
-    $stmt = $link->prepare("SELECT * FROM `$table_name` where (active = 1 and tableId = ?) AND (NOT columnType = 'text area' OR columnType = 'price')");
+    $stmt = $link->prepare("SELECT * FROM `$table_name` where (active = 1 and tableId = ?) AND NOT(columnType = 'text area' OR columnType = 'price' OR columnType = 'spacing')");
     $stmt->bind_param("i", $tableId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -157,8 +160,10 @@
         die; #Ending page, becuase of error
     } else {
         while($row = $result->fetch_assoc()) {
-            if (in_array($row['columnNameBack'], $headsShown)) $selected = 'checked="checked"'; else $selected = '';
-            echo "<input type='checkbox' id='checkBox-".$row['columnNameBack']."' name='shownColumns[]' value='".$row['columnNameBack']."' $selected><label for='checkBox-".$row['columnNameBack']."'>".$row['columnNameFront']."</label><br>";
+            if (in_array($row['columnType'], $nonUserInput)) continue;
+            if (in_array($row['id'], $headsShown)) $selected = 'checked="checked"'; else $selected = '';
+            if ($userSetting == false) $selected = 'checked="checked"';
+            echo "<input type='checkbox' id='checkBox-".$row['id']."' name='shownColumns[]' value='".$row['id']."' $selected><label for='checkBox-".$row['id']."'>".$row['columnNameFront']."</label><br>";
         }
     }
     echo "<button type='submit' class='btn updateBtn' name='post' value='updateUserPreference'>Opdater</button>";
@@ -353,9 +358,6 @@
         }
         $stmt3->close();
     }
-
-    // Non user editable inputs saved
-    $nonUserInput = array('text area', 'price');
 
     // Amount of columns
     $TopColumnAmount = count($columnNameBack)+1;
