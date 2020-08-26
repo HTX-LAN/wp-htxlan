@@ -358,9 +358,13 @@
                                                     $lineData[$columnNameFront[$index]] .= ", ";
                                                 }
                                             }
-                                        }else echo "test";
+                                        }
                                     } else {
-                                        if (in_array('price_intrance', $specialName[$index])) {
+                                        if (in_array('otherInput',$specialName[$index]) and !in_array($row2['value'],$settingName)) {
+                                            echo htmlspecialchars($row2['value']);
+                                            // Data
+                                            $lineData[$columnNameFront[$index]] .= htmlspecialchars($row2['value']);
+                                        } else if (in_array('price_intrance', $specialName[$index])) {
                                             // Writing price
                                             if ($settingValue[$row2['value']] != "") {
                                                 $price = $price + floatval($settingValue[$row2['value']]);

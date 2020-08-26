@@ -104,7 +104,6 @@
         // Setting up form
         $html .= "\n<form method=\"post\">";
         $html .= "\n<script>var price = {};</script>";
-
         // Writing for every column entry
         for ($i=0; $i < count($columnNameFront); $i++) {
             // Setup for required label
@@ -147,7 +146,7 @@
                         // None input option
                         if (in_array('noneInput',$specialName[$i])) {
                             if($_POST[$columnNameBack[$i]] == 0) $postSelected = 'selected'; else $postSelected = '';
-                            $html .= "<option value='0' $postSelected></option>";
+                            $html .= "\n<option value='0' $postSelected></option>";
                         }
 
                         // Writing dropdown options
@@ -168,6 +167,13 @@
 
                         // Finishing dropdown
                         $html .= "\n</select>";
+
+                        // Other input option
+                        if (in_array('otherInput',$specialName[$i])) {
+                            $html .= "\n<small><i><label>Andet: </label>";
+                            $html .= "\n<input name='$columnNameBack[$i]Other' type='text' placeholder='Andet' id='$columnId[$i]-input-other' style='max-width: 250px; margin-top: 10px' value='".$_POST[$columnNameBack[$i]."Other"]."'>";
+                            $html .= "\n</small>";
+                        }
                     }
                     $stmt->close();
                     $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
@@ -202,7 +208,7 @@
                         // None input option
                         if (in_array('noneInput',$specialName[$i])) {
                             if($_POST[$columnNameBack[$i]] == 0) $postSelected = 'selected'; else $postSelected = '';
-                            $html .= "<option value='0' $postSelected></option>";
+                            $html .= "\n<option value='0' $postSelected></option>";
                         }
 
                         // Writing dropdown options
@@ -282,6 +288,12 @@
                                 if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
                                     $html .= "\n<script>price['$setting_id']='".$row3['value']."';</script>";
 
+                            }
+                            // Other input option
+                            if (in_array('otherInput',$specialName[$i])) {
+                                $html .= "\n<small><i><label>Andet: </label>";
+                                $html .= "\n<input name='$columnNameBack[$i]Other' type='text' placeholder='Andet' id='$columnId[$i]-input-other' style='max-width: 250px; margin-top: 10px'>";
+                                $html .= "\n</small>";
                             }
                         }
                         $stmt3->close();

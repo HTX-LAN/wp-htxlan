@@ -201,19 +201,20 @@
                 $teamsTournament[$row['id']] = $row['teams'];
                 $teamsTournamentWname[$row['columnNameBack']] = $row['teams'];
                 $teamsColumnType[] = $row['columnType'];
+                $teamsColumnTypeWname[$row['columnNameBack']] = $row['columnType'];
             }
         }
         $stmt->close();
     }
 
-    for ($i=0; $i < count($tournamentColumnIds); $i++) { 
+    for ($i=0; $i < count($tournamentColumnbackend); $i++) { 
         $table_name = $wpdb->prefix . 'htx_settings_cat';
         $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 and tableId = ? and settingNameBack = ?");
-        $stmt->bind_param("ii", $tableId, $tournamentColumnIds[$i]);
+        $stmt->bind_param("ii", $tableId, $tournamentColumnbackend[$i]);
         $stmt->execute();
         $result = $stmt->get_result();
         if($result->num_rows === 0) {
-            echo "Der er ingen kategorier for turneringerne";
+            echo "Der er ingen kategorier for turneringerne $tableId $tournamentColumnbackend[$i]";
             $stmt->close();
             $Error = true;
             die; #Ending page, becuase of error
@@ -269,11 +270,11 @@
         if ($teamsColumnType[$i] != 'inputbox') {
             $table_name = $wpdb->prefix . 'htx_settings_cat';
             $stmt = $link->prepare("SELECT * FROM `$table_name` where active = 1 and tableId = ? and settingNameBack = ?");
-            $stmt->bind_param("ii", $tableId, $teamsColumnIds[$i]);
+            $stmt->bind_param("ii", $tableId, $teamsColumnbackend[$teamsColumnIds[$i]]);
             $stmt->execute();
             $result = $stmt->get_result();
             if($result->num_rows === 0) {
-                echo "Der er ingen indstillings kategorier for '".$teamsColumnName[$teamsColumnIds[$i]]."'";
+                echo "Der er ingen indstillings kategorier for '".$teamsColumnName[$teamsColumnIds[$i]]."' $teamsColumnIds[$i]";
                 $stmt->close();
                 $Error = true;
                 die; #Ending page, becuase of error
@@ -298,14 +299,13 @@
                     $teamsNames[$i][] = $row['settingName'];
                     $teamsIds[$i][] = $row['id'];
                     $teamsNamesWId[$row['id']] = $row['settingName'];
-                    $teamsNamesWcolumnId[$teamsColumnIds[$i]][] = $row['settingName'];
-                    $teamsIdsWcolumnId[$teamsColumnIds[$i]][] = $row['id'];
+                    $teamsNamesWcolumnId[$teamsColumnbackend[$teamsColumnIds[$i]]][] = $row['settingName'];
+                    $teamsIdsWcolumnId[$teamsColumnbackend[$teamsColumnIds[$i]]][] = $row['id'];
                 }
                 $stmt->close();
             }
         }
     }
-    
 
     // Information for user
 
@@ -396,7 +396,7 @@
 
                         $table_name = $wpdb->prefix . 'htx_form';
                         $stmt = $link->prepare("SELECT DISTINCT userId FROM `$table_name` where active = 1 and tableId = ? and name = ?");
-                        $stmt->bind_param("ii", $tableId, $tournamentColumnIds[$i]);
+                        $stmt->bind_param("ii", $tableId, $tournamentColumnbackend[$i]);
                         $stmt->execute();
                         $result = $stmt->get_result();
                         if($result->num_rows === 0) {
@@ -405,6 +405,7 @@
                             <tr class='InfoTableRow'>
                                 <td colspan='$TopColumnAmount'>Ingen tilmeldte endnu</td>
                             </tr>";
+                            
                         } else {
                             $whileCount = 0;
                             $noUser = 0;
@@ -413,10 +414,11 @@
 
                                 $table_name2 = $wpdb->prefix . 'htx_form';
                                 $stmt2 = $link->prepare("SELECT * FROM `$table_name2` where active = 1 and tableId = ? and userId = ? and name = ?");
-                                $stmt2->bind_param("iii", $tableId, $row['userId'], $tournamentColumnIds[$i]);
+                                $stmt2->bind_param("iii", $tableId, $row['userId'], $tournamentColumnbackend[$i]);
                                 $stmt2->execute();
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) {
+
                                     $stmt2->close();
                                     $tmpExplode = false;
                                     $noUser = $noUser + 1;
@@ -503,11 +505,11 @@
                         </thead>
                         <tbody>"; 
                         for ($j=0; $j < count($teamColumnId[$i][$index]); $j++) {
-                            if ($teamsColumnType[$index] == 'inputbox') {
+                            if ($teamsColumnTypeWname[$teamColumnId[$i][$index][$j]] == 'inputbox') {
                                 $userIdsGame = array();
                                 $table_name = $wpdb->prefix . 'htx_form';
                                 $stmt = $link->prepare("SELECT DISTINCT userId, value FROM `$table_name` where active = 1 and tableId = ? and name = ? and value != ''");
-                                $stmt->bind_param("ii", $tableId, $tournamentColumnIds[$i]);
+                                $stmt->bind_param("ii", $tableId, $tournamentColumnbackend[$i]);
                                 $stmt->execute();
                                 $result = $stmt->get_result();
                                 if($result->num_rows === 0) {
@@ -634,7 +636,7 @@
 
                                     $table_name = $wpdb->prefix . 'htx_form';
                                     $stmt = $link->prepare("SELECT DISTINCT userId, value FROM `$table_name` where active = 1 and tableId = ? and name = ? and value != ''");
-                                    $stmt->bind_param("ii", $tableId, $tournamentColumnIds[$i]);
+                                    $stmt->bind_param("ii", $tableId, $tournamentColumnbackend[$i]);
                                     $stmt->execute();
                                     $result = $stmt->get_result();
                                     if($result->num_rows === 0) {

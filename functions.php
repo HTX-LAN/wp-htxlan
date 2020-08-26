@@ -24,6 +24,7 @@
                 case 'new':
                     $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price");
                     $columnsWithSettings = array("dropdown", "user dropdown", "radio", "checkbox");
+                    $columnsWithOther = array("dropdown", "radio");
                     $nonUserInput = array("text area", "price");
                     
                     // Predefined error text
@@ -292,9 +293,11 @@
                             } else {
                                 // Check if column has settings
                                 if (in_array($columnType[$i],$columnsWithSettings)) {
-                                    if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]) AND $_POST[$columnNameBack[$i]] != "") {
+                                    if (in_array($columnType[$i],$columnsWithOther) AND $_POST[$columnNameBack[$i]."Other"]!="" AND $_POST[$columnNameBack[$i]."Other"]!=NULL AND isset($_POST[$columnNameBack[$i]."Other"])) {
+                                        $inputValue = htmlspecialchars(trim($_POST[$columnNameBack[$i]."Other"]));
+                                    } else if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]) AND $_POST[$columnNameBack[$i]] != "") {
                                         $link->rollback(); //remove all queries from queue if error (undo)
-                                        return $errorSettings.$columnNameFront[$i]."test her 2".$_POST[$columnNameBack[$i]].$columnSettingsId[$columnId[$i]][0].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
+                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                     } else 
                                         $inputValue = htmlspecialchars(intval(trim($_POST[$columnNameBack[$i]])));
                                 } else {
