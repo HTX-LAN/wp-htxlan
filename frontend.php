@@ -143,6 +143,12 @@
                         
                         // Writing first part of dropdown
                         $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' oninput='HTX_frontend_js()' class='dropdown $disabledClass $priceClass' $priceFunction $isRequired>";
+                        
+                        // None input option
+                        if (in_array('noneInput',$specialName[$i])) {
+                            if($_POST[$columnNameBack[$i]] == 0) $postSelected = 'selected'; else $postSelected = '';
+                            $html .= "<option value='0' $postSelected></option>";
+                        }
 
                         // Writing dropdown options
                         while($row = $result->fetch_assoc()) {
@@ -193,6 +199,12 @@
                         // Writing first part of dropdown
                         $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' id='extraUserSettingDropdown-$i' oninput='HTX_frontend_js()' class='dropdown $disabledClass' $isRequired>";
 
+                        // None input option
+                        if (in_array('noneInput',$specialName[$i])) {
+                            if($_POST[$columnNameBack[$i]] == 0) $postSelected = 'selected'; else $postSelected = '';
+                            $html .= "<option value='0' $postSelected></option>";
+                        }
+
                         // Writing dropdown options
                         while($row = $result->fetch_assoc()) {
                             // Getting data
@@ -240,6 +252,20 @@
                         $stmt3->execute();
                         $result3 = $stmt3->get_result();
                         if($result3->num_rows === 0) $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value='' disabled>"; else {
+                            // Price function
+                            if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunctionRadio'; else $priceClass = '';
+                            if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
+
+                            // None input option
+                            if (in_array('noneInput',$specialName[$i])) {
+                                if($_POST[$columnNameBack[$i]] == 0) $postSelected = 'checked="checked"'; else $postSelected = '';
+                                $html .= "\n<input type='radio' id='$columnNameBack[$i]-0' name='$columnNameBack[$i]' oninput='HTX_frontend_js()' value='0' class='inputBox $columnId[$i]-radio $disabledClass $priceClass' $priceFunction $postSelected>
+                                <label for='$columnNameBack[$i]-0'><i>Intet</i></label><br>";
+
+                                // Price for javascript
+                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
+                                    $html .= "\n<script>price[0]='0';</script>";
+                            }
                             while($row3 = $result3->fetch_assoc()) {
                                 // Getting data
                                 $setting_settingName = $row3['settingName'];
@@ -247,10 +273,6 @@
 
                                 // Set as selected from post
                                 if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
-
-                                // Price function
-                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunctionRadio'; else $priceClass = '';
-                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
 
                                 // Write data
                                 $html .= "\n<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' oninput='HTX_frontend_js()' value='$setting_id' class='inputBox $columnId[$i]-radio $disabledClass $priceClass' $priceFunction $postSelected>

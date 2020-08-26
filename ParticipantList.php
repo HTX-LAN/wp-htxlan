@@ -260,6 +260,8 @@
             $stmt3->execute();
             $result3 = $stmt3->get_result();
             if($result3->num_rows === 0) echo ""; else {
+                $settingName[0] = "";
+                $settingValue[0] = 0;
                 while($row3 = $result3->fetch_assoc()) {
                     $settingName[$row3['id']] = $row3['settingName'];
                     $settingValue[$row3['id']] = $row3['value'];

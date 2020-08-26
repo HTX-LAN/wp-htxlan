@@ -163,6 +163,10 @@
                                             if($result3->num_rows === 0) {
                                                 // No settings
                                             } else {
+                                                if (in_array('noneInput',explode(",", $row['specialName']))) {
+                                                    $columnSettingsId[$row['id']][] = "0";
+                                                }
+                                                
                                                 while($row3 = $result3->fetch_assoc()) {
                                                     $columnSettingsId[$row['id']][] = $row3['id'];
                                                 }
@@ -189,6 +193,7 @@
                         $stmt->close();
 
                         // Inserting rest of rows
+                        $inputName = $inputValue = "";
                         $table_name = $wpdb->prefix . 'htx_form';
                         $stmt = $link->prepare("INSERT INTO `$table_name` (name, value, userId, tableId) VALUES (?, ?, ?, ?)");
                         $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
@@ -280,7 +285,7 @@
                                 } else {
                                     if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]) AND $_POST[$columnNameBack[$i]] != "") {
                                         $link->rollback(); //remove all queries from queue if error (undo)
-                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
+                                        return $errorSettings.$columnNameFront[$i]."test her".$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                     }
                                     $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
                                 }
@@ -289,7 +294,7 @@
                                 if (in_array($columnType[$i],$columnsWithSettings)) {
                                     if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]) AND $_POST[$columnNameBack[$i]] != "") {
                                         $link->rollback(); //remove all queries from queue if error (undo)
-                                        return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
+                                        return $errorSettings.$columnNameFront[$i]."test her 2".$_POST[$columnNameBack[$i]].$columnSettingsId[$columnId[$i]][0].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                     } else 
                                         $inputValue = htmlspecialchars(intval(trim($_POST[$columnNameBack[$i]])));
                                 } else {
