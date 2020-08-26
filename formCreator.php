@@ -692,10 +692,6 @@
                             HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Other input methods
                             echo "<p>Andre inputs muligheder</p>";
-                            // other input
-                            echo "<div><input id='settingOtherInput' type='checkbox' class='inputCheckbox special' name='OtherInput' value='otherInput'";
-                            if (in_array('otherInput', $specialName)) echo "checked";
-                            echo "><label for='settingOtherInput'>Anden mulighed </label></div>";
                             // None input
                             echo "<div><input id='settingNoneInput' type='checkbox' class='inputCheckbox special' name='noneInput' value='noneInput'";
                             if (in_array('noneInput', $specialName)) echo "checked";
