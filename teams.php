@@ -331,6 +331,7 @@
     if($result3->num_rows === 0) {} else {
         while($row3 = $result3->fetch_assoc()) {
             $settingName[$row3['id']] = $row3['settingName'];
+            $settingId[$row3['id']] = $row3['id'];
             $settingValue[$row3['id']] = $row3['value'];
         }
     }
@@ -464,6 +465,8 @@
                                                                         }
                                                                     }
                                                                 }
+                                                            } else if (in_array('otherInput',$specialName[$indexWrite]) and !in_array($row3['value'],$settingId)) {
+                                                                if ($row3['value'] == "0") echo ""; else echo htmlspecialchars($row3['value']);
                                                             } else {
                                                                 echo htmlspecialchars($settingName[$row3['value']]);
                                                             }
@@ -554,6 +557,8 @@
                                                                 }
                                                             }
                                                         }
+                                                    } else if (in_array('otherInput',$specialName[$indexWrite]) and !in_array($row3['value'],$settingId)) {
+                                                        if ($row3['value'] == "0") echo ""; else echo htmlspecialchars($row3['value']);
                                                     } else {
                                                         echo htmlspecialchars($settingName[$row3['value']]);
                                                     }
@@ -603,6 +608,8 @@
                                                                     }
                                                                 }
                                                             }
+                                                        } else if (in_array('otherInput',$specialName[$indexWrite]) and !in_array($row3['value'],$settingId)) {
+                                                            if ($row3['value'] == "0") echo ""; else echo htmlspecialchars($row3['value']);
                                                         } else {
                                                             echo htmlspecialchars($settingName[$row3['value']]);
                                                         }
@@ -710,6 +717,8 @@
                                                                         }
                                                                     }
                                                                 }
+                                                            } else if (in_array('otherInput',$specialName[$indexWrite]) and !in_array($row3['value'],$settingId)) {
+                                                                if ($row3['value'] == "0") echo ""; else echo htmlspecialchars($row3['value']);
                                                             } else {
                                                                 echo htmlspecialchars($settingName[$row3['value']]);
                                                             }
