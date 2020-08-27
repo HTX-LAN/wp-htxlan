@@ -108,38 +108,41 @@
                     echo "User can not do that!";
                     break;
                 }
-            $tempArray = array();
-            $tempSrting = "";
-            for ($i=0; $i < count($_POST['shownColumns']); $i++) { 
-                if (in_array($_POST['shownColumns'][$i], $columns)) {
-                    $tempArray[] = $_POST['shownColumns'][$i];
+                $tempArray = array();
+                $tempSrting = "";
+                for ($i=0; $i < count($_POST['shownColumns']); $i++) { 
+                    if (in_array($_POST['shownColumns'][$i], $columns)) {
+                        $tempArray[] = $_POST['shownColumns'][$i];
+                    }
                 }
-            }
-            if (count(array_intersect($columns, $tempArray)) == count($tempArray)) {
-                $headsShown = $tempArray;
-                $headsShownString = implode(",",$headsShown);
+                if (count(array_intersect($columns, $tempArray)) == count($tempArray)) {
+                    $headsShown = $tempArray;
+                    $headsShownString = implode(",",$headsShown);
 
-                // Update database
-                if ($userSetting == false) {
-                    // Make new record in database
-                    $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type, tableId) VALUES (?, ?, 'teamsUserPreference', ?)");
-                    $stmt->bind_param("isi", $userId, $headsShownString, $tableId);
-                    $stmt->execute();
-                    $stmt->close();
-                } else {
-                    // Update record
-                    $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("UPDATE `$table_name` SET value = ? WHERE settingName = ? and tableId = ?");
-                    $stmt->bind_param("sii", $headsShownString, $userId, $tableId);
-                    $stmt->execute();
-                    $stmt->close();
+                    // Update database
+                    if ($userSetting == false and $headsShownString != "") {
+                        // Make new record in database
+                        $table_name = $wpdb->prefix . 'htx_settings';
+                        $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type, tableId) VALUES (?, ?, 'teamsUserPreference', ?)");
+                        $stmt->bind_param("isi", $userId, $headsShownString, $tableId);
+                        $stmt->execute();
+                        $stmt->close();
+                    } else if ($headsShownString != "") {
+                        // Update record
+                        $table_name = $wpdb->prefix . 'htx_settings';
+                        $stmt = $link->prepare("UPDATE `$table_name` SET value = ? WHERE settingName = ? and tableId = ?");
+                        $stmt->bind_param("sii", $headsShownString, $userId, $tableId);
+                        $stmt->execute();
+                        $stmt->close();
+                    } else {
+                        echo "<span style='color: red'>Der gik noget galt, prøv igen</span>";
+                    }
                 }
-            }
 
             break;
         }
     }
+    if (!isset($headsShown) OR count($headsShown) <= 0) $headsShown = array('firstName', 'lastName', 'email');
 
     // Page for showing possible columns to show
     wp_enqueue_style( 'teams_style', "/wp-content/plugins/WPPlugin-HTXLan/CSS/teams.css");
@@ -161,9 +164,8 @@
     } else {
         while($row = $result->fetch_assoc()) {
             if (in_array($row['columnType'], $nonUserInput)) continue;
-            if (in_array($row['id'], $headsShown)) $selected = 'checked="checked"'; else $selected = '';
-            if ($userSetting == false) $selected = 'checked="checked"';
-            echo "<input type='checkbox' id='checkBox-".$row['id']."' name='shownColumns[]' value='".$row['id']."' $selected><label for='checkBox-".$row['id']."'>".$row['columnNameFront']."</label><br>";
+            if (in_array($row['columnNameBack'], $headsShown)) $selected = 'checked="checked"'; else $selected = '';
+            echo "<input type='checkbox' id='checkBox-".$row['id']."' name='shownColumns[]' value='".$row['columnNameBack']."' $selected><label for='checkBox-".$row['id']."'>".$row['columnNameFront']."</label><br>";
         }
     }
     echo "<button type='submit' class='btn updateBtn' name='post' value='updateUserPreference'>Opdater</button>";
@@ -332,8 +334,6 @@
             $settingValue[$row3['id']] = $row3['value'];
         }
     }
-
-    if (!isset($headsShown) OR count($headsShown) <= 0) $headsShown = array('firstName', 'lastName', 'email', 'discordTag');
 
     for ($i=0; $i < count($headsShown); $i++) { 
         // Gettiing every column
@@ -740,7 +740,7 @@
                 $sortTable = array_unique($sortTable);
                 // Sort table if needed
                 for ($i=0; $i < count($sortTable); $i++) { 
-                    echo "<script>setTimeout(() => {sortTable(1, 0, \"teamsTable-".$sortTable[$i]."\")}, 300);</script>";
+                    echo "<script>setTimeout(() => {sortTable(1, 0, \"teamsTable-".$sortTable[$i]."\",false,\"$sortTable[$i]\")}, 300);</script>";
                 }
             }
         }
