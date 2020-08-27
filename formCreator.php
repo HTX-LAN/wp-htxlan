@@ -36,6 +36,40 @@
                 $tableNames[] = $row['tableName'];
             }
             $noTable = false;
+
+            // Getting table id
+            if (isset($_GET['form'])) {
+                if (in_array(intval($_GET['form']), $tableIds)) $tableId = intval($_GET['form']); else $tableId = $tableIds[0];
+
+                // Check cookie
+                if(!isset($_COOKIE['tableId'])) {
+                    // Set cookie because it does not exist
+                    setCustomCookie('tableId',$tableId);
+                } else {
+                    // Cookie exist
+                    if (intval($_COOKIE['tableId']) != $tableId) 
+                        setCustomCookie('tableId',$tableId); // Cookie does not match formular - Updatet cookie
+                }
+            } else {
+                // Check cookie
+                if(!isset($_COOKIE['tableId'])) {
+                    // Set cookie because it does not exist
+                    $tableId = $tableIds[0]; //Use first table
+                    setCustomCookie('tableId',$tableId);
+                } else {
+                    // Cookie exist
+                    if (in_array(intval($_COOKIE['tableId']), $tableIds)) {
+                        // Cookie is a valid table - Set as new table
+                        $tableId = intval($_COOKIE['tableId']); 
+                        $_GET['form'] = $tableId;
+                    } else {
+                        // Cookie is not a valid cookie, set standard
+                        $tableId = $tableIds[0]; //Use first table
+                        setCustomCookie('tableId',$tableId);
+                    }
+                }
+            }
+
             for ($i=0; $i < count($tableNames); $i++) {
                 // Ved klik på den form man vil vælge, kommer formularen frem i midten af skærmen
                 echo "<form id='form-tableOfContent-$tableIds[$i]' action='admin.php' method=\"get\">
@@ -49,9 +83,6 @@
 
             }
         }
-
-
-
 
         echo "<br><br><button type='submit' class='btn' name='submit' value='newForm' onclick='HTXJS_createForm()'>Tilføj ny formular</button><br>";
 
@@ -1246,11 +1277,32 @@
                     echo "<div><label for='tableName'>Navn </label> <input type='text' id='tableName' class='inputBox' name='tableName' value='$tableName'></div>";
                     // Description
                     echo "<div><label for='tableDescription'>Beskrivelse </label> <br><textarea id='tableDescription' class='textArea' name='tableDescription'>$tableDescription</textarea></div>";
+                    
+                    // Extra elements for participant list
+                    echo "<br>";
+                    echo "Visning af ekstra elementer i tilmeldings liste";
+                    // Arrived column for participant list
+                    echo "<div><input id='arrivedInput' type='checkbox' class='inputCheckbox special' name='arrived' value='1'";
+                    if ($row['arrived'] == 1) echo "checked";
+                    echo "><label for='arrivedInput'>Arrived checkbox </label></div>";
+                    // crew column for participant list
+                    echo "<div><input id='crewInput' type='checkbox' class='inputCheckbox special' name='crew' value='1'";
+                    if ($row['crew'] == 1) echo "checked";
+                    echo "><label for='crewInput'>Crew checkbox </label></div>";
+                    // Pizza column for participant list
+                    echo "<div><input id='pizzaInput' type='checkbox' class='inputCheckbox special' name='pizza' value='1'";
+                    if ($row['pizza'] == 1) echo "checked";
+                    echo "><label for='pizzaInput'>Pizza checkbox </label></div>";
+
+                    echo "<br>";
+
+                    // Data for table
                     // Shortcode
                     echo "<div><label>Shortcode </label> <br><i>[$tableShortcode form='$tableId']</i></div>";
                     // Shortcode
                     echo "<div><label>Dato oprettet </label> <br><i>$taleDateCreate</i></div>";
 
+                    echo "<br>";
 
                     echo "</div>";
                     // make submit button

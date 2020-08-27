@@ -45,6 +45,9 @@ function HTXJS_updateForm(formid) {
         formid: formid,
         tableName: $('#tableName').val(),
         tableDescription: $('#tableDescription').val(),
+        arrived: $('#arrivedInput').is(":checked") ? 1 : 0,
+        crew: $('#crewInput').is(":checked") ? 1 : 0,
+        pizza: $('#pizzaInput').is(":checked") ? 1 : 0,
         action: "htx_update_form"
     }, function(data) {
         informationwindowremove(id);

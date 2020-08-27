@@ -30,10 +30,43 @@
         while($row = $result->fetch_assoc()) {
             $tableIds[] = $row['id'];
             $tableNames[] = $row['tableName'];
+            $tableArrived[$row['id']] = $row['arrived'];
+            $tableCrew[$row['id']] = $row['crew'];
+            $tablePizza[$row['id']] = $row['pizza'];
         }
 
         // Getting table id
-        if (in_array(intval($_GET['formular']), $tableIds)) $tableId = intval($_GET['formular']); else $tableId = $tableIds[0];
+        if (isset($_GET['formular'])) {
+            if (in_array(intval($_GET['formular']), $tableIds)) $tableId = intval($_GET['formular']); else $tableId = $tableIds[0];
+
+            // Check cookie
+            if(!isset($_COOKIE['tableId'])) {
+                // Set cookie because it does not exist
+                setCustomCookie('tableId',$tableId);
+            } else {
+                // Cookie exist
+                if (intval($_COOKIE['tableId']) != $tableId) 
+                setCustomCookie('tableId',$tableId); // Cookie does not match formular - Updatet cookie
+            }
+        } else {
+            // Check cookie
+            if(!isset($_COOKIE['tableId'])) {
+                // Set cookie because it does not exist
+                $tableId = $tableIds[0]; //Use first table
+                setCustomCookie('tableId',$tableId);
+            } else {
+                // Cookie exist
+                if (in_array(intval($_COOKIE['tableId']), $tableIds)) 
+                    // Cookie is a valid table - Set as new table
+                    $tableId = intval($_COOKIE['tableId']); 
+                else {
+                    // Cookie is not a valid cookie, set standard
+                    $tableId = $tableIds[0]; //Use first table
+                    setCustomCookie('tableId',$tableId);
+                }
+            }
+        }
+            
 
         // Post handling
         participantList_post($tableId);
@@ -60,7 +93,6 @@
 
         // Get already choosen elements - If no elements are present use default
         $userId = get_current_user_id();
-        // $headsShown = array('firstName', 'lastName', 'email', 'discordTag'); #This controls the shown elements on screen - Default elements
 
         // Gets all columns
         $table_name = $wpdb->prefix . 'htx_column';
@@ -221,8 +253,12 @@
             }
             // Writing extra lines
             echo "<th>Betaling</th>";
-            echo "<th><span class='material-icons' title='Ankommet' style='cursor: help'>flight_land</span></th>";
-            echo "<th><span class='material-icons' title='Person er en del af crew' style='cursor: help'>people_alt</span></th>";
+            if ($tableArrived[$tableId] == 1)
+                echo "<th><span class='material-icons' title='Ankommet' style='cursor: help'>flight_land</span></th>";
+            if ($tableCrew[$tableId] == 1)
+                echo "<th><span class='material-icons' title='Person er en del af crew' style='cursor: help'>people_alt</span></th>";
+            if ($tablePizza[$tableId] == 1)
+                echo "<th><span class='material-icons' title='Person har fået leveret pizza' style='cursor: help'>local_pizza</span></th>";
             echo "<th>Pris</th>";
             echo "<th></th>";
 
@@ -239,6 +275,7 @@
                 $payed[] = $row['payed'];
                 $arrived[] = $row['arrived'];
                 $crew[] = $row['crew'];
+                $pizza[] = $row['pizza'];
                 $prices[] = $row['price'];
             }
 
@@ -261,9 +298,11 @@
             $result3 = $stmt3->get_result();
             if($result3->num_rows === 0) echo ""; else {
                 $settingName[0] = "";
+                $settingNameID[0] = "";
                 $settingValue[0] = 0;
                 while($row3 = $result3->fetch_assoc()) {
                     $settingName[$row3['id']] = $row3['settingName'];
+                    $settingNameID[$row3['id']] = $row3['id'];
                     $settingValue[$row3['id']] = $row3['value'];
                 }
             }
@@ -360,7 +399,7 @@
                                             }
                                         }
                                     } else {
-                                        if (in_array('otherInput',$specialName[$index]) and !in_array($row2['value'],$settingName)) {
+                                        if (in_array('otherInput',$specialName[$index]) and !in_array($row2['value'],$settingNameID)) {
                                             echo htmlspecialchars($row2['value']);
                                             // Data
                                             $lineData[$columnNameFront[$index]] .= htmlspecialchars($row2['value']);
@@ -464,39 +503,62 @@
                     $lineData['Betaling'] = '';
                 }
 
-                // Arrived
-                echo "<td style='text-align: center'>";
-                echo "<form id='$i-arrived' method='POST'>";
-                echo "<input type='hidden' name='post' value='arrivedtUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
-                echo "<input type='hidden' name='arrived' value='0'>";
-                echo "<input id='arrived-$i' type='checkbox' class='inputCheckbox' name='arrived' value='1' onchange='document.getElementById(\"$i-arrived\").submit()'";
-                if ($arrived[$i] == 1) echo "checked";
-                echo ">";
-                echo "</form>";
-                echo "</td>";
+                if ($tableArrived[$tableId] == 1) {
+                    // Arrived
+                    echo "<td style='text-align: center'>";
+                    echo "<form id='$i-arrived' method='POST'>";
+                    echo "<input type='hidden' name='post' value='arrivedtUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
+                    echo "<input type='hidden' name='arrived' value='0'>";
+                    echo "<input id='arrived-$i' type='checkbox' class='inputCheckbox' name='arrived' value='1' onchange='document.getElementById(\"$i-arrived\").submit()'";
+                    if ($arrived[$i] == 1) echo "checked";
+                    echo ">";
+                    echo "</form>";
+                    echo "</td>";
 
-                // data
-                if ($arrived[$i] == 1)
-                    $lineData['Ankommet'] = 'Ja';
-                else 
-                    $lineData['Ankommet'] = 'Nej';
+                    // data
+                    if ($arrived[$i] == 1)
+                        $lineData['Ankommet'] = 'Ja';
+                    else 
+                        $lineData['Ankommet'] = 'Nej';
+                }
 
-                // Crew
-                echo "<td style='text-align: center'>";
-                echo "<form id='$i-crew' method='POST'>";
-                echo "<input type='hidden' name='post' value='crewUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
-                echo "<input type='hidden' name='crew' value='0'>";
-                echo "<input id='crew-$i' type='checkbox' class='inputCheckbox' name='crew' value='1' onchange='document.getElementById(\"$i-crew\").submit()'";
-                if ($crew[$i] == 1) {echo "checked"; $price = 0;}
-                echo ">";
-                echo "</form>";
-                echo "</td>";
+                if ($tableCrew[$tableId] == 1) {
+                    // Crew
+                    echo "<td style='text-align: center'>";
+                    echo "<form id='$i-crew' method='POST'>";
+                    echo "<input type='hidden' name='post' value='crewUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
+                    echo "<input type='hidden' name='crew' value='0'>";
+                    echo "<input id='crew-$i' type='checkbox' class='inputCheckbox' name='crew' value='1' onchange='document.getElementById(\"$i-crew\").submit()'";
+                    if ($crew[$i] == 1) {echo "checked"; $price = 0;}
+                    echo ">";
+                    echo "</form>";
+                    echo "</td>";
 
-                // data
-                if ($arrived[$i] == 1)
-                    $lineData['Crew'] = 'Ja';
-                else 
-                    $lineData['Crew'] = 'Nej';
+                    // data
+                    if ($crew[$i] == 1)
+                        $lineData['Crew'] = 'Ja';
+                    else 
+                        $lineData['Crew'] = 'Nej';
+                }
+
+                if ($tablePizza[$tableId] == 1){
+                    // Pizza leveret
+                    echo "<td style='text-align: center'>";
+                    echo "<form id='$i-pizza' method='POST'>";
+                    echo "<input type='hidden' name='post' value='pizzaUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
+                    echo "<input type='hidden' name='pizza' value='0'>";
+                    echo "<input id='pizza-$i' type='checkbox' class='inputCheckbox' name='pizza' value='1' onchange='document.getElementById(\"$i-pizza\").submit()'";
+                    if ($pizza[$i] == 1) {echo "checked"; $price = 0;}
+                    echo ">";
+                    echo "</form>";
+                    echo "</td>";
+
+                    // data
+                    if ($pizza[$i] == 1)
+                        $lineData['Pizza'] = 'Ja';
+                    else 
+                        $lineData['Pizza'] = 'Nej';
+                }
 
                 // Price
                 $price = floatval($price) + floatval($priceExtra);

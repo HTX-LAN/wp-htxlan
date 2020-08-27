@@ -33,7 +33,36 @@
         $stmt->close();
 
         // Getting table id
-        if (in_array(intval($_GET['formular']), $tableIds)) $tableId = intval($_GET['formular']); else $tableId = $tableIds[0];
+        if (isset($_GET['formular'])) {
+            if (in_array(intval($_GET['formular']), $tableIds)) $tableId = intval($_GET['formular']); else $tableId = $tableIds[0];
+
+            // Check cookie
+            if(!isset($_COOKIE['tableId'])) {
+                // Set cookie because it does not exist
+                setCustomCookie('tableId',$tableId);
+            } else {
+                // Cookie exist
+                if (intval($_COOKIE['tableId']) != $tableId) 
+                setCustomCookie('tableId',$tableId); // Cookie does not match formular - Updatet cookie
+            }
+        } else {
+            // Check cookie
+            if(!isset($_COOKIE['tableId'])) {
+                // Set cookie because it does not exist
+                $tableId = $tableIds[0]; //Use first table
+                setCustomCookie('tableId',$tableId);
+            } else {
+                // Cookie exist
+                if (in_array(intval($_COOKIE['tableId']), $tableIds)) 
+                    // Cookie is a valid table - Set as new table
+                    $tableId = intval($_COOKIE['tableId']); 
+                else {
+                    // Cookie is not a valid cookie, set standard
+                    $tableId = $tableIds[0]; //Use first table
+                    setCustomCookie('tableId',$tableId);
+                }
+            }
+        }
 
         // Post handling
         participantList_post($tableId);
@@ -283,7 +312,7 @@
                                         $stmt2->execute();
                                         $result2 = $stmt2->get_result();
                                         if($result2->num_rows === 0) {
-                                            echo "Ingen tilmeldinger med ekstra pris elementet besvaret - Du burde overveje at lave det element til 'required'<br>Visningen nedenfor kan være forkert på grund af dette.<br>";
+                                            echo "<p>Ingen tilmeldinger med ekstra pris elementet besvaret - Du burde overveje at lave det element til 'required'<br>Visningen nedenfor kan være forkert på grund af dette.<br></p>";
                                             $stmt2->close();
                                             $EconomicExtraError = 1;
                                         } else {

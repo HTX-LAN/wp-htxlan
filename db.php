@@ -57,6 +57,7 @@ if(!defined('ABSPATH')) {
             payed varchar(255) default 0,
             arrived INT default 0,
             crew INT default 0,
+            pizza INT default 0,
             email TEXT,
             lastEditedBy TEXT,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -82,6 +83,9 @@ if(!defined('ABSPATH')) {
             shortcode TEXT,
             tableName TEXT,
             tableDescription TEXT,
+            arrived INT DEFAULT 1,
+            crew INT DEFAULT 1,
+            pizza INT DEFAULT 0,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) $charset_collate;";
