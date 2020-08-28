@@ -1,11 +1,11 @@
 <?php
     /**
     * Plugin Name: HTX-Lan
-    * Plugin URI: https://the0mikkel.github.io/WPPlugin-HTXLan/
+    * Plugin URI: https://htx-lan.github.io/WPPlugin-HTXLan/
     * Description: Event plugin designet for lan parties, and used by HTX-lan.dk
     * Version: 0.1.8
     * Author: Mikkel Albrechtsen & Frej Alexander Nielsen
-    * Author URI: https://the0mikkel.github.io/WPPlugin-HTXLan/authors
+    * Author URI: https://htx-lan.github.io/WPPlugin-HTXLan/authors
     */
 
     //Prevent direct file access
