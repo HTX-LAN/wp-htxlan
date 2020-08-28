@@ -15,22 +15,22 @@
     }
 
     // Database creation
-    require 'db.php';
+    require 'code/db.php';
 
     // custom code, such as css and javascript
-    require 'scripts.php';
+    require 'code/scripts.php';
 
     // Custom functions
-    require 'functions.php';
+    require 'code/functions.php';
 
     // Frontend for users to see
-    require 'frontend.php';
+    require 'code/frontend.php';
 
     // Backend for admins to see
-    require 'backend.php';
+    require 'code/backend.php';
 
     // Post request handlers
-    require 'post_handlers.php';
+    require 'code/post_handlers.php';
 
     //Setup to be run when the plugin is initially enabled.
     function HTX_initial_setup() {

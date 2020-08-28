@@ -1,14 +1,14 @@
 <?php
     //Prevent direct file access
     if(!defined('ABSPATH')) {
-        header("Location: ../../../");
+        header("Location: ../../../../");
         die();
     }
 
     // Tabel med alle tilmeldinger som kan ses - Evt en knap som kan trykkes, hvor så at felterne kan blive redigerbare - Man kan vælge imellem forskellige forms
     // Widgets and style
     HTX_load_standard_backend();
-    wp_enqueue_script( 'participantList_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/participant.js");
+    wp_enqueue_script( 'participantList_script', "/wp-content/plugins/WPPlugin-HTXLan/code/JS/participant.js");
 
     // Getting start information for database connection
     global $wpdb;
@@ -169,8 +169,8 @@
         }
 
         // Page for showing possible columns to show
-        wp_enqueue_style( 'teams_style', "/wp-content/plugins/WPPlugin-HTXLan/CSS/teams.css");
-        wp_enqueue_script( 'teams_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/teams.js");
+        wp_enqueue_style( 'teams_style', "/wp-content/plugins/WPPlugin-HTXLan/code/CSS/teams.css");
+        wp_enqueue_script( 'teams_script', "/wp-content/plugins/WPPlugin-HTXLan/code/JS/teams.js");
         echo "<div id='columnShownEditPage' class='columnShownEditPage_closed'>";
         echo "<h2>Viste kolonner</h2>";
         echo "<form method='POST'>";

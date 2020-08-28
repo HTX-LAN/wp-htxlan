@@ -1,7 +1,7 @@
 <?php
     //Prevent direct file access
     if(!defined('ABSPATH')) {
-        header("Location: ../../../");
+        header("Location: ../../../../");
         die();
     }
 
@@ -92,7 +92,7 @@
             echo "Ingen formularer";
 
             // Possible to add form, when none exist
-            wp_enqueue_script( 'form_creator_script', "/wp-content/plugins/WPPlugin-HTXLan/JS/formCreator.js");
+            wp_enqueue_script( 'form_creator_script', "/wp-content/plugins/WPPlugin-HTXLan/code/JS/formCreator.js");
             echo "<br><br><button type='submit'  class='btn updateBtn' name='submit' value='newForm' onclick='HTXJS_createForm()'>Tilføj ny formular</button><br>";
             // Spacer
             echo "<div style='height: 5rem;width: 100%;'></div>";

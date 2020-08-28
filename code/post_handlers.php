@@ -2,7 +2,7 @@
 
 //Prevent direct file access
 if(!defined('ABSPATH')) {
-    header("Location: ../../../");
+    header("Location: ../../../../");
     die();
 }
 
