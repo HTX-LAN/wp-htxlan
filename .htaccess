@@ -2,3 +2,11 @@
     Order Allow,Deny
     Deny from All
 </FilesMatch>
+<FilesMatch ".js">
+    Order Allow,Deny
+    Allow from All
+</FilesMatch>
+<FilesMatch ".css">
+    Order Allow,Deny
+    Allow from All
+</FilesMatch>

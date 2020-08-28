@@ -172,7 +172,7 @@
                         if (in_array('otherInput',$specialName[$i])) {
                             $html .= "\n<small><i><label>Andet: </label>";
                             $html .= "\n<input name='$columnNameBack[$i]Other' type='text' placeholder='Andet' id='$columnId[$i]-input-other' style='max-width: 250px; margin-top: 10px' value='".$_POST[$columnNameBack[$i]."Other"]."'>";
-                            $html .= "\n</small>";
+                            $html .= "\n</i></small>";
                         }
                     }
                     $stmt->close();
@@ -230,7 +230,7 @@
                         // Possible to add a new input
                         $html .= "\n<small><i><label>Andet: </label>";
                         $html .= "\n<input name='$columnNameBack[$i]-extra' type='$format[$i]' id='extraUserSetting-$i' 
-                        class='inputBox  $disabledClass' style='width: unset; margin-top: 5px;' value='".htmlspecialchars($_POST[$columnNameBack[$i].'-extra'])."'></small>";
+                        class='inputBox  $disabledClass' style='width: unset; margin-top: 5px;' value='".htmlspecialchars($_POST[$columnNameBack[$i].'-extra'])."'></i></small>";
                     }
                     $stmt->close();
                     $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
@@ -293,7 +293,7 @@
                             if (in_array('otherInput',$specialName[$i])) {
                                 $html .= "\n<small><i><label>Andet: </label>";
                                 $html .= "\n<input name='$columnNameBack[$i]Other' type='text' placeholder='Andet' id='$columnId[$i]-input-other' style='max-width: 250px; margin-top: 10px'>";
-                                $html .= "\n</small>";
+                                $html .= "\n</i></small>";
                             }
                         }
                         $stmt3->close();
