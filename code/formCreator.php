@@ -8,8 +8,8 @@
     // Liste over ting som kan ændres, som fx navne på felter og lignende - Her skal man også kunne vælge imellem forms
     // Widgets and style
     HTX_load_standard_backend();
-    wp_enqueue_style( 'form_creator_style', "/wp-content/plugins/WPPlugin-HTXLan/code/CSS/formCreator.css");
-    wp_enqueue_script( 'form_creator_script', "/wp-content/plugins/WPPlugin-HTXLan/code/JS/formCreator.js");
+    wp_enqueue_style( 'form_creator_style', "/wp-content/plugins/wp-htxlan/code/CSS/formCreator.css");
+    wp_enqueue_script( 'form_creator_script', "/wp-content/plugins/wp-htxlan/code/JS/formCreator.js");
 
     // Getting start information for database connection
     global $wpdb;
