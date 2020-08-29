@@ -299,7 +299,7 @@
             if($result3->num_rows === 0) echo ""; else {
                 $settingName[0] = "";
                 $settingNameID[0] = "";
-                $settingValue[0] = 0;
+                $settingValue[0] = "";
                 while($row3 = $result3->fetch_assoc()) {
                     $settingName[$row3['id']] = $row3['settingName'];
                     $settingNameID[$row3['id']] = $row3['id'];
@@ -400,9 +400,14 @@
                                         }
                                     } else {
                                         if (in_array('otherInput',$specialName[$index]) and !in_array($row2['value'],$settingNameID)) {
-                                            echo htmlspecialchars($row2['value']);
-                                            // Data
-                                            $lineData[$columnNameFront[$index]] .= htmlspecialchars($row2['value']);
+                                            if ($row2['value'] != '0') {
+                                                echo htmlspecialchars($row2['value']);
+                                                // Data
+                                                $lineData[$columnNameFront[$index]] .= htmlspecialchars($row2['value']);
+                                            } else {
+                                                // Data
+                                                $lineData[$columnNameFront[$index]] .= "";
+                                            }
                                         } else if (in_array('price_intrance', $specialName[$index])) {
                                             // Writing price
                                             if ($settingValue[$row2['value']] != "") {
