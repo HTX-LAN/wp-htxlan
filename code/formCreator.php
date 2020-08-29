@@ -99,7 +99,7 @@
         $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price", "spacing"); #Missing: checkboxes with text input (for ex team names per game basis), range
         
         // Possible formats types in array
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range');
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range', 'textarea');
 
         // Possible prices types in array
         $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');

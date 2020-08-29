@@ -221,7 +221,7 @@ function htx_new_column() {
             return;
         $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price", 'spacing');
         $possibleInputWithSettingCat = array("dropdown", "user dropdown", "radio", "checkbox");
-        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range');
+        $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range','textarea');
         $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
         $response = new stdClass();
         header('Content-type: application/json');
@@ -387,7 +387,7 @@ function htx_update_column() {
             $link = database_connection();
             $link->autocommit(FALSE); //turn on transactions
 
-            $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range');
+            $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range','textarea');
             $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
             $setting = $_POST['setting'];
 

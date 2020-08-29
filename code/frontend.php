@@ -371,12 +371,14 @@
                     }
                 break;
                 default:
+                    if ($format[$i] == 'textarea') $inputMethod = 'textarea'; else $inputMethod = 'input';
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                    $html .= "\n<input id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' oninput='HTX_frontend_js();";
+                    $html .= "\n<$inputMethod id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' oninput='HTX_frontend_js();";
                     if ($format[$i] == 'range') $html .= "document.getElementById(\"$columnId[$i]-rangeValue\").innerHTML = document.getElementById(\"$columnId[$i]-input\").value;' min='$formatExtra[$i]' max='$specialNameExtra3[$i]' style='padding: 0px;' ";
                     else $html .= "'";
                     if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]' ";
                     $html .= "class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
+                    if ($format[$i] == 'textarea') $html .= "\n</textarea>";
                     if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
                     if ($format[$i] == 'range') $html .= "\n<small>værdi: <span id='$columnId[$i]-rangeValue'>$placeholderText[$i]</span></small>";
                     $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
