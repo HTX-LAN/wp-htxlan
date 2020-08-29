@@ -174,8 +174,8 @@
     if (!isset($headsShown) OR count($headsShown) <= 0) $headsShown = array('firstName', 'lastName', 'email');
 
     // Page for showing possible columns to show
-    wp_enqueue_style( 'teams_style', "/wp-content/plugins/WPPlugin-HTXLan/code/CSS/teams.css");
-    wp_enqueue_script( 'teams_script', "/wp-content/plugins/WPPlugin-HTXLan/code/JS/teams.js");
+    wp_enqueue_style( 'teams_style', "/wp-content/plugins/wp-htxlan/code/CSS/teams.css");
+    wp_enqueue_script( 'teams_script', "/wp-content/plugins/wp-htxlan/code/JS/teams.js");
     echo "<div id='columnShownEditPage' class='columnShownEditPage_closed'>";
     echo "<h2>Viste kolonner</h2>";
     echo "<form method='POST'>";

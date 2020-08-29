@@ -397,7 +397,7 @@
 
     // Setting cookie
     function setCustomCookie($cookieName, $cookieValue) {
-        wp_enqueue_script( 'cookie', "/wp-content/plugins/WPPlugin-HTXLan/code/JS/cookie.js");
+        wp_enqueue_script( 'cookie', "/wp-content/plugins/wp-htxlan/code/JS/cookie.js");
         echo "<script>
         function setCookieTime(cname,cvalue,exdays) {
             var d = new Date();
