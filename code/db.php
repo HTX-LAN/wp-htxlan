@@ -8,7 +8,7 @@ if(!defined('ABSPATH')) {
     // Upgrading of database
     function upgrade_db() {
         $databaseVersion = "0.1";
-        echo "<h4>Databse status</h4>";
+        echo "<h4>Database status</h4>";
 
         // Check version number
         try {
