@@ -15,6 +15,11 @@ Dette plugin er lavet af frivillige elever fra LAN udvalget på HTX i Nyk. F.
 - Mikkel
 - Frej
 
+### Til Udviklere
+Her er et diagram der viser hvordan de forskellige branches interagerer med hinanden. Master branchen er låst og kan kun opdateres via pull-requests fra andre branches. Under normal brug vil features blive lavet som branches der udspringer fra develop og når der så er tilpas mange commits i develop laver man en pull-request til masteren. Som så skal reviewes af mindst en anden før der merges. Derefter vil build scriptet gå igang og lave den nyeste version af pluginnet som så automatisk vil ende på hovedsitet! Så venligst tjek tingene på et lokalt test site først ;-)
+
+![image](https://media.discordapp.net/attachments/626496282789281812/748958654681579631/Git-Workflow.png)
+
 ## Theme
 For at få det bedste ud af denne form, er det vigtigt at bruge et ordentligt theme og layout for siden.
 Størstedel af siden er designet ved brug af ["The conference"](https://da.wordpress.org/themes/the-conference/)
@@ -23,12 +28,6 @@ Størstedel af siden er designet ved brug af ["The conference"](https://da.wordp
 ### Installation
 For at sætte pluginnet op på nuværende tidspunkt, skal pluginet først aktiveres, herefter skal de nødvendige databaser så oprettes, som sker ved at trykke på knappen "Opret database"
 <br> *Dette skal senere hen laves om til at gøres automatisk, således at databaser slettes og oprettes som pluginnet aktiveres og slettes*
-
-### Til Udviklere
-Her er et diagram der viser hvordan de forskellige branches interagerer med hinanden. Master branchen er låst og kan kun opdateres via pull-requests fra andre branches. Under normal brug vil features blive lavet som branches der udspringer fra develop og når der så er tilpas mange commits i develop laver man en pull-request til masteren. Som så skal reviewes af mindst en anden før der merges. Derefter vil build scriptet gå igang og lave den nyeste version af pluginnet som så automatisk vil ende på hovedsitet! Så venligst tjek tingene på et lokalt test site først ;-)
-
-![image](https://media.discordapp.net/attachments/626496282789281812/748958654681579631/Git-Workflow.png)
-
 
 ### Dagligt brug
 Når pluginnet er aktiveret, vil der automatisk allerede være lavet en ny formular, med en standard opsætning. Denne standarde opsætning kommer med alle nye formulare der laves. 
