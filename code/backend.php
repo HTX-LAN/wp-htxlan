@@ -1,9 +1,5 @@
 <?php
-    //Prevent direct file access
-    if(!defined('ABSPATH')) {
-        header("Location: ../../../../");
-        die();
-    }
+    $databaseVersion = "0.1";
 
     // Backend php page
 
@@ -145,6 +141,64 @@
         echo "<h2>Farlig zone</h2>";
         HTX_danger_zone();
         echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_resetDatabases()'>Nulstil databaser</button><br>";
+
+        // Database upgrade
+        // if ($serverDatabaseversion != $databaseVersion)
+        echo "<p>database version: 0</p>";
+        echo "<form method='post'><button type='submit' class='btn updateBtn' name='database_upgrade' style='margin-bottom: 0.5rem;' onclick='HTXJS_upgradeDatabases()'>Opgrader database</button><br></form>";
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['postType'])) {
+            if(current_user_can("manage_options")){
+                switch($_POST['postType']) {
+                    case 'database_upgrade':
+                        echo "<br>database upgrade in progress";
+                        $update = true;
+
+                        try {
+                            global $wpdb;
+                            $link = database_connection();
+                            $link->autocommit(FALSE); //turn on transactions
+
+                            $table_name = $wpdb->prefix . 'htx_settings';
+                            $stmt = $link->prepare("SELECT * FROM $table_name WHERE settingName = 'databaseVersion' and active = 2, and type = 'databaseVersion'");
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            if($result->num_rows === 0) $update = false;
+                            $stmt->close();
+
+                            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                            $link->close();
+                        } catch(Exception $e) {
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            echo "<br> Update failed.";
+                        }
+
+                        if ($update == false) {
+                            echo "<br> upgrade failed - Database is up to date.";
+                        } else {
+                            try {
+                                global $wpdb;
+                                $link = database_connection();
+                                $link->autocommit(FALSE); //turn on transactions
+
+                                echo "<br> Database is not up to date, upgrading...";
+                                $table_name = $wpdb->prefix . 'htx_settings';
+                                $stmt = $link->prepare("INSERT INTO $table_name (settingId, tableId, active, settingName, value, expence, special, specialName, type, sorting) VALUES (0, 0, 2, 'databaseVersion', 0.1, 0, 'databaseVersion', 'databaseVersion', 'databaseVersion', 0)");
+                                $stmt->execute();
+                                $stmt->close();
+
+                                $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                                $link->close();
+                            } catch(Exception $e) {
+                                $link->rollback(); //remove all queries from queue if error (undo)
+                                echo "<br> Update failed.";
+                            }
+                            echo "<br> Database is now updated";
+                        }
+                    break;
+                }
+            }
+        }
+
     }
 
 
