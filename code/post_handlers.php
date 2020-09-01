@@ -389,7 +389,7 @@ function htx_update_column() {
 
             $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range','textarea');
             $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
-            $setting = $_POST['setting'];
+            $setting = intval($_POST['setting']);
 
             // Check if table exist
             $tableId = intval($_POST['formid']);
@@ -468,10 +468,24 @@ function htx_update_column() {
                 $formatExtra = '';
             }
 
+            // Text in text area
+            $table_name2 = $wpdb->prefix . 'htx_column';
+            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE id = ?");
+            $stmt2->bind_param("i", $setting);
+            $stmt2->execute();
+            $result2 = $stmt2->get_result();
+            if($result2->num_rows === 0) {} else {
+                while($row2 = $result2->fetch_assoc()) {
+                    if ($row2['columnType'] == 'text area') 
+                        $placeholderText = trim($_POST['placeholder']);
+                }
+            } 
+            $stmt2->close();
+
             // Special name extra
             if (in_array('show', explode(",", $specialPostArray))) {
                 $table_name2 = $wpdb->prefix . 'htx_column';
-                $stmt2 = $link->prepare("SELECT id FROM `$table_name` WHERE tableid = ?");
+                $stmt2 = $link->prepare("SELECT id FROM `$table_name2` WHERE tableid = ?");
                 $stmt2->bind_param("i", $tableId);
                 $stmt2->execute();
                 $result2 = $stmt2->get_result();
