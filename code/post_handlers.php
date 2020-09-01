@@ -801,7 +801,7 @@ function htx_dublicate_form() {
                 // Make new users
                 $stmt = $link->prepare("INSERT INTO `$table_name` (active, payed, arrived, crew, pizza, price, email, tableId) VALUES (?,?,?,?,?,?,?,?)");
                 for ($i=0; $i < count($settingId); $i++) { 
-                    $stmt->bind_param("iiiiissi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPizza[$i], $usersPrice[$i], $usersEmail[$i], $tableNewId);
+                    $stmt->bind_param("isiiissi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPizza[$i], $usersPrice[$i], $usersEmail[$i], $tableNewId);
                     $stmt->execute();
                     $usersNewId[$usersId[$i]] = $link->insert_id;
                 }
