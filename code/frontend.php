@@ -447,7 +447,22 @@
         $html .= "\n<input name='tableId' value='$tableId' style='display: none'></p>";
 
         // Ending form with submit and reset buttons
-        $html .= "\n<p><button type='submit' name='submit' value='new'>Tilmeld</button> <button type='reset' name='reset'>Nulstil</button></p></form>";
+        $table_name = $wpdb->prefix . 'htx_form_tables';
+        $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
+        $stmt->bind_param("i", $tableId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows === 0) exit('Something went wrong...');
+        while($row = $result->fetch_assoc()) {
+            $html .= "\n<p><button type='submit' name='submit' value='new'>";
+            if ($row['registration'] == 1) {
+                $html .= "Tilmeld";
+            } else {
+                $html .= "Indsend";
+            }
+            $html .= "</button> <button type='reset' name='reset'>Nulstil</button></p></form>";
+        }
+        $stmt->close();
 
         // Success handling - Give information via popup window, that the regristration have been saved
 

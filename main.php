@@ -8,6 +8,9 @@
     * Author URI: https://htx-lan.github.io/wp-htxlan/authors
     */
 
+    // Setting newest database  version
+    $databaseVersion = 0.2;
+
     //Prevent direct file access
     if(!defined('ABSPATH')) {
         header("Location: ../../../");

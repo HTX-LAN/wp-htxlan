@@ -141,10 +141,10 @@ function htx_update_form() {
             $link = database_connection();
             $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_form_tables';
-            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ? WHERE id = ?");
+            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ? WHERE id = ?");
             if(!$stmt)
                 throw new Exception($link->error);
-            $stmt->bind_param("ssiiii", $_POST['tableName'], $_POST['tableDescription'],intval($_POST['arrived']),intval($_POST['crew']),intval($_POST['pizza']), $_POST['formid']);
+            $stmt->bind_param("ssiiiii", $_POST['tableName'], $_POST['tableDescription'],intval($_POST['arrived']),intval($_POST['crew']),intval($_POST['pizza']),intval($_POST['registration']), $_POST['formid']);
             $stmt->execute();
             $stmt->close();
             $link->autocommit(TRUE); //turn off transactions + commit queued queries

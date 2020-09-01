@@ -117,14 +117,26 @@
                             return $errorInvalidEmail.$redBorder1."3".$redBorder2.$errorInvalidEmailSmall.$redBorder3;
                         }
 
-                        // Check if mail exist
-                        $table_name = $wpdb->prefix . 'htx_form_users';
-                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
-                        $stmt->bind_param("si", $email, $tableId);
+                        // Check if mail exist, and only return error if table is not a registration form
+                        $table_name = $wpdb->prefix . 'htx_form_tables';
+                        $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
+                        $stmt->bind_param("i", $tableId);
                         $stmt->execute();
                         $result = $stmt->get_result();
-                        if($result->num_rows === 0) {} else return $errorEmail;
-                        $stmt->close();
+                        if($result->num_rows === 0) exit('Something went wrong...');
+                        while($row = $result->fetch_assoc()) {
+                            if ($row['registration'] == 1) {
+                                $stmt->close();
+                                $table_name = $wpdb->prefix . 'htx_form_users';
+                                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
+                                $stmt->bind_param("si", $email, $tableId);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                if($result->num_rows === 0) {} else return $errorEmail;
+                                $stmt->close();
+                            } 
+                        }
+                        
                         // Convert values to the right format
                         // Getting column info
                         $table_name = $wpdb->prefix . 'htx_column';
