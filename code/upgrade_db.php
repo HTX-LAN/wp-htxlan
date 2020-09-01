@@ -52,11 +52,11 @@
 
                     $serverDatabaseversion = 0.1;
                 }
-                // Insert upgrade forms here
+                
                 if ($serverDatabaseversion < 0.2) {
                     // Some action here to update databse to 0.1
                     $table_name = $wpdb->prefix . 'htx_form_tables';
-                    $command = "ALTER TABLE $table_name ADD `registration` INT NOT NULL DEFAULT '1' AFTER `arrived`";
+                    $command = "ALTER TABLE $table_name ADD `registration` INT NOT NULL DEFAULT '1' AFTER `tableDescription`";
                     $stmt = $link->prepare("$command");
                     if(!$stmt)
                         throw new Exception($link->error);
@@ -72,6 +72,27 @@
                     $stmt->close();
 
                     $serverDatabaseversion = 0.2;
+                }
+
+                if ($serverDatabaseversion < 0.3) {
+                    // Some action here to update databse to 0.1
+                    $table_name = $wpdb->prefix . 'htx_form_tables';
+                    $command = "ALTER TABLE $table_name ADD `arrivedAtDoor` INT NOT NULL DEFAULT '0' AFTER `arrived`";
+                    $stmt = $link->prepare("$command");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+                    $stmt->close();
+
+                    // Update version number
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.3' WHERE settingName = 'databaseVersion' and active = 2 and type = 'databaseVersion'");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+                    $stmt->close();
+
+                    $serverDatabaseversion = 0.3;
                 }
 
                 // Update version number
