@@ -4,6 +4,7 @@
     function create_db(){
         // Getting start information to create databases
         global $wpdb;
+        global $databaseVersion;
         $db_name = DB_NAME;
         $charset_collate = $wpdb->get_charset_collate();
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -76,7 +77,9 @@
             shortcode TEXT,
             tableName TEXT,
             tableDescription TEXT,
+            registration INT DEFUALT 1,
             arrived INT DEFAULT 1,
+            arrivedAtDoor INT DEFUALT 0,
             crew INT DEFAULT 1,
             pizza INT DEFAULT 0,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -254,7 +257,7 @@
                 $stmt->execute();
                 $settingId = 0;
                 $tableId = 0;
-                $settingName = "databaseVersion"; $value="0.1"; $special=0; $specialName="databaseVersion"; $settingType="databaseVersion"; $sorting = 0;
+                $settingName = "databaseVersion"; $value=$databaseVersion; $special=0; $specialName="databaseVersion"; $settingType="databaseVersion"; $sorting = 0;
                 $stmt->execute();
                 $stmt->close();
                 $link->autocommit(TRUE); //turn off transactions + commit queued queries
