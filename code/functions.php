@@ -529,6 +529,41 @@
                         throw $e;
                     }
                 break;
+                case "arrivedAtDoorUpdate":
+                    try {
+                        $link->autocommit(FALSE); //turn on transactions
+                        // Checking user id
+                        $table_name = $wpdb->prefix . 'htx_form_users';
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
+                        $stmt->bind_param("ii", $tableId, intval($_POST['userId']));
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if($result->num_rows === 0) {
+                            echo "Bruger findes ikke længere";
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            break;
+                        }
+                        $stmt->close();
+
+                        // Getting and checking new payment id
+                        // Payment type
+                        if ($_POST['arrivedAtDoor'] != "0" AND $_POST['arrivedAtDoor'] != "1") break;
+
+
+                        // Sending new payment id to server
+                        $table_name = $wpdb->prefix . 'htx_form_users';
+                        $stmt = $link->prepare("UPDATE $table_name SET arrivedAtDoor = ? WHERE id = ?");
+                        $stmt->bind_param("ii", $_POST['arrivedAtDoor'], $_POST['userId']);
+                        $stmt->execute();
+                        $stmt->close();
+
+                        $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                        echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev opdateret')}, 500);</script>"; //User feedback
+                    } catch(Exception $e) {
+                        $link->rollback(); //remove all queries from queue if error (undo)
+                        throw $e;
+                    }
+                break;
                 case "crewUpdate":
                     try {
                         $link->autocommit(FALSE); //turn on transactions

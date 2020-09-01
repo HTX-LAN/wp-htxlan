@@ -82,6 +82,13 @@
                     if(!$stmt)
                         throw new Exception($link->error);
                     $stmt->execute();
+
+                    $table_name = $wpdb->prefix . 'htx_form_users';
+                    $command = "ALTER TABLE $table_name ADD `arrivedAtDoor` INT NOT NULL DEFAULT '0' AFTER `arrived`";
+                    $stmt = $link->prepare("$command");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
                     $stmt->close();
 
                     // Update version number

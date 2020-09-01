@@ -50,6 +50,7 @@
             tableId INT,
             payed varchar(255) default 0,
             arrived INT default 0,
+            arrivedAtDoor INT default 0,
             crew INT default 0,
             pizza INT default 0,
             email TEXT,

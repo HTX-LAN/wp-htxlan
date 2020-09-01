@@ -1299,6 +1299,10 @@
                     echo "<div><input id='pizzaInput' type='checkbox' class='inputCheckbox special' name='pizza' value='1'";
                     if ($row['pizza'] == 1) echo "checked";
                     echo "><label for='pizzaInput'>Pizza checkbox </label></div>";
+                    // arrived at door column for participant list
+                    echo "<div><input id='arrivedAtDoorInput' type='checkbox' class='inputCheckbox special' name='arrivedAtDoor' value='1'";
+                    if ($row['arrivedAtDoor'] == 1) echo "checked";
+                    echo "><label for='arrivedAtDoorInput'>Ankommet på dagen checkbox </label></div>";
 
                     echo "<br>";
 

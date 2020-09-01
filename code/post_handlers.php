@@ -141,10 +141,10 @@ function htx_update_form() {
             $link = database_connection();
             $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_form_tables';
-            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ? WHERE id = ?");
+            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ?, arrivedAtDoor = ? WHERE id = ?");
             if(!$stmt)
                 throw new Exception($link->error);
-            $stmt->bind_param("ssiiiii", $_POST['tableName'], $_POST['tableDescription'],intval($_POST['arrived']),intval($_POST['crew']),intval($_POST['pizza']),intval($_POST['registration']), $_POST['formid']);
+            $stmt->bind_param("ssiiiiii", $_POST['tableName'], $_POST['tableDescription'],intval($_POST['arrived']),intval($_POST['crew']),intval($_POST['pizza']),intval($_POST['registration']),intval($_POST['arrivedAtDoor']), $_POST['formid']);
             $stmt->execute();
             $stmt->close();
             $link->autocommit(TRUE); //turn off transactions + commit queued queries
@@ -702,12 +702,14 @@ function htx_dublicate_form() {
                     $tableArrived = $row['arrived'];
                     $tableCrew = $row['crew'];
                     $tablePiza = $row['pizza'];
+                    $tableArrivedAtDoor = $row['arrivedAtDoor'];
+                    $tableRegistration = $row['registration'];
                 }
                 $stmt->close();
 
                 // Make new table
-                $stmt = $link->prepare("INSERT INTO `$table_name` (active, favorit, shortcode, tableName, tableDescription, arrived, crew, pizza) VALUES (?,0,'HTX_Tilmeldningsblanket',?,?,?,?,?)");
-                $stmt->bind_param("issiii", $tableActive, $tableName, $tableDescription,$tableArrived,$tableCrew,$tablePiza);
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, favorit, shortcode, tableName, tableDescription, arrived, crew, pizza, arrivedAtDoor, registration) VALUES (?,0,'HTX_Tilmeldningsblanket',?,?,?,?,?,?,?)");
+                $stmt->bind_param("issiiiii", $tableActive, $tableName, $tableDescription,$tableArrived,$tableCrew,$tablePiza,$tableArrivedAtDoor,$tableRegistration);
                 $stmt->execute();
                 $tableNewId = $link->insert_id;
                 $stmt->close();
