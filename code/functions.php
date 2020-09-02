@@ -28,6 +28,24 @@
                     $nonUserInput = array("text area", "price");
                     
                     // Predefined error text
+                    $errorRegistration = "<div class='form_warning'>
+                    <div class='form_warning_icon'>
+                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    </div>
+                    <div class='form_warning_text'>
+                        <span>
+                            Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support
+                        </span>
+                    </div></div>";
+                    $error = "<div class='form_warning'>
+                    <div class='form_warning_icon'>
+                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    </div>
+                    <div class='form_warning_text'>
+                        <span>
+                            Formularen blev ikke indsend - Der er noget galt med indholdet af formularen - Venligst kontakt support
+                        </span>
+                    </div></div>";
 
                     $errorSettings = "<div class='form_warning'>
                         <div class='form_warning_icon'>
@@ -105,8 +123,15 @@
                         $stmt->bind_param("i", $tableId);
                         $stmt->execute();
                         $result = $stmt->get_result();
-                        if($result->num_rows === 0) return "Table does not match";
+                        if($result->num_rows === 0) return "Formularen findes ikke";
+                        while($row = $result->fetch_assoc()) {
+                            if ($row['registration'] == 1) 
+                                $registration = 1;
+                            else 
+                                $registration = 0;
+                        }
                         $stmt->close();
+                        
 
                         // Checking values
                         // Sanatize email
@@ -118,24 +143,16 @@
                         }
 
                         // Check if mail exist, and only return error if table is not a registration form
-                        $table_name = $wpdb->prefix . 'htx_form_tables';
-                        $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
-                        $stmt->bind_param("i", $tableId);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-                        if($result->num_rows === 0) exit('Something went wrong...');
-                        while($row = $result->fetch_assoc()) {
-                            if ($row['registration'] == 1) {
-                                $stmt->close();
-                                $table_name = $wpdb->prefix . 'htx_form_users';
-                                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
-                                $stmt->bind_param("si", $email, $tableId);
-                                $stmt->execute();
-                                $result = $stmt->get_result();
-                                if($result->num_rows === 0) {} else return $errorEmail;
-                                $stmt->close();
-                            } 
-                        }
+                        if ($registration == 1) {
+                            $stmt->close();
+                            $table_name = $wpdb->prefix . 'htx_form_users';
+                            $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
+                            $stmt->bind_param("si", $email, $tableId);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            if($result->num_rows === 0) {} else return $errorEmail;
+                            $stmt->close();
+                        } 
                         
                         // Convert values to the right format
                         // Getting column info
@@ -343,15 +360,8 @@
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
                         throw $e;
-                        return "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
-                        </div>
-                        <div class='form_warning_text'>
-                            <span>
-                                Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support
-                            </span>
-                        </div></div>";
+                        if ($registration == 1) return $errorRegistration;
+                        else return $error;
                     }
 
                     // Error handling (Needs to be more specifik)
@@ -360,15 +370,28 @@
                     // Clearing post
                     $_POST = array();
                     // Writing success for user to see
-                    return "<div class='form_success'>
-                    <div class='form_success_icon'>
-                        <span class='material-icons form_success_icon_span'>done_outline</span>
-                    </div>
-                    <div class='form_success_text'>
-                        <span>
-                            Tilmeldingen blev tilføjet
-                        </span>
-                    </div></div>";
+                    if ($registration == 0) {
+                        $succes = "<div class='form_success'>
+                        <div class='form_success_icon'>
+                            <span class='material-icons form_success_icon_span'>done_outline</span>
+                        </div>
+                        <div class='form_success_text'>
+                            <span>
+                                Formularen blev indsendt
+                            </span>
+                        </div></div>";
+                    } else {
+                        $succes = "<div class='form_success'>
+                        <div class='form_success_icon'>
+                            <span class='material-icons form_success_icon_span'>done_outline</span>
+                        </div>
+                        <div class='form_success_text'>
+                            <span>
+                                Tilmeldingen blev tilføjet
+                            </span>
+                        </div></div>";
+                    }
+                    return $succes;
                 break;
                 default: return "Noget gik galt🤔";
             }
