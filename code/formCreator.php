@@ -1277,14 +1277,20 @@
                     echo "<div><label for='tableName'>Navn </label> <input type='text' id='tableName' class='inputBox' name='tableName' value='$tableName'></div>";
                     // Description
                     echo "<div><label for='tableDescription'>Beskrivelse </label> <br><textarea id='tableDescription' class='textArea' name='tableDescription'>$tableDescription</textarea></div>";
-                    
+                    // Arrived column for participant list
+                    echo "<div><input id='registrationInput' type='checkbox' class='inputCheckbox special' name='registration' value='1'";
+                    if ($row['registration'] == 1) echo "checked";
+                    echo "><label for='registrationInput' 
+                    title='Hvis denne formular er en tilmeldings blanket til et event, så slå dette til.\nDenne gør at folk kun kan tilmelde sig en gang, samt ændrer submit knappens tekst.'>
+                    Registration blanket</label></div>";
+
                     // Extra elements for participant list
                     echo "<br>";
                     echo "Visning af ekstra elementer i tilmeldings liste";
                     // Arrived column for participant list
                     echo "<div><input id='arrivedInput' type='checkbox' class='inputCheckbox special' name='arrived' value='1'";
                     if ($row['arrived'] == 1) echo "checked";
-                    echo "><label for='arrivedInput'>Arrived checkbox </label></div>";
+                    echo "><label for='arrivedInput'>Ankommet checkbox </label></div>";
                     // crew column for participant list
                     echo "<div><input id='crewInput' type='checkbox' class='inputCheckbox special' name='crew' value='1'";
                     if ($row['crew'] == 1) echo "checked";
@@ -1293,6 +1299,10 @@
                     echo "<div><input id='pizzaInput' type='checkbox' class='inputCheckbox special' name='pizza' value='1'";
                     if ($row['pizza'] == 1) echo "checked";
                     echo "><label for='pizzaInput'>Pizza checkbox </label></div>";
+                    // arrived at door column for participant list
+                    echo "<div><input id='arrivedAtDoorInput' type='checkbox' class='inputCheckbox special' name='arrivedAtDoor' value='1'";
+                    if ($row['arrivedAtDoor'] == 1) echo "checked";
+                    echo "><label for='arrivedAtDoorInput'>Ankommet på dagen checkbox </label></div>";
 
                     echo "<br>";
 

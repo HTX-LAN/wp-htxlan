@@ -117,14 +117,26 @@
                             return $errorInvalidEmail.$redBorder1."3".$redBorder2.$errorInvalidEmailSmall.$redBorder3;
                         }
 
-                        // Check if mail exist
-                        $table_name = $wpdb->prefix . 'htx_form_users';
-                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
-                        $stmt->bind_param("si", $email, $tableId);
+                        // Check if mail exist, and only return error if table is not a registration form
+                        $table_name = $wpdb->prefix . 'htx_form_tables';
+                        $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
+                        $stmt->bind_param("i", $tableId);
                         $stmt->execute();
                         $result = $stmt->get_result();
-                        if($result->num_rows === 0) {} else return $errorEmail;
-                        $stmt->close();
+                        if($result->num_rows === 0) exit('Something went wrong...');
+                        while($row = $result->fetch_assoc()) {
+                            if ($row['registration'] == 1) {
+                                $stmt->close();
+                                $table_name = $wpdb->prefix . 'htx_form_users';
+                                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
+                                $stmt->bind_param("si", $email, $tableId);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                if($result->num_rows === 0) {} else return $errorEmail;
+                                $stmt->close();
+                            } 
+                        }
+                        
                         // Convert values to the right format
                         // Getting column info
                         $table_name = $wpdb->prefix . 'htx_column';
@@ -507,6 +519,41 @@
                         $table_name = $wpdb->prefix . 'htx_form_users';
                         $stmt = $link->prepare("UPDATE $table_name SET arrived = ? WHERE id = ?");
                         $stmt->bind_param("ii", $_POST['arrived'], $_POST['userId']);
+                        $stmt->execute();
+                        $stmt->close();
+
+                        $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                        echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev opdateret')}, 500);</script>"; //User feedback
+                    } catch(Exception $e) {
+                        $link->rollback(); //remove all queries from queue if error (undo)
+                        throw $e;
+                    }
+                break;
+                case "arrivedAtDoorUpdate":
+                    try {
+                        $link->autocommit(FALSE); //turn on transactions
+                        // Checking user id
+                        $table_name = $wpdb->prefix . 'htx_form_users';
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
+                        $stmt->bind_param("ii", $tableId, intval($_POST['userId']));
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if($result->num_rows === 0) {
+                            echo "Bruger findes ikke længere";
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            break;
+                        }
+                        $stmt->close();
+
+                        // Getting and checking new payment id
+                        // Payment type
+                        if ($_POST['arrivedAtDoor'] != "0" AND $_POST['arrivedAtDoor'] != "1") break;
+
+
+                        // Sending new payment id to server
+                        $table_name = $wpdb->prefix . 'htx_form_users';
+                        $stmt = $link->prepare("UPDATE $table_name SET arrivedAtDoor = ? WHERE id = ?");
+                        $stmt->bind_param("ii", $_POST['arrivedAtDoor'], $_POST['userId']);
                         $stmt->execute();
                         $stmt->close();
 

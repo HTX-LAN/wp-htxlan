@@ -141,10 +141,10 @@ function htx_update_form() {
             $link = database_connection();
             $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_form_tables';
-            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ? WHERE id = ?");
+            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ?, arrivedAtDoor = ? WHERE id = ?");
             if(!$stmt)
                 throw new Exception($link->error);
-            $stmt->bind_param("ssiiii", $_POST['tableName'], $_POST['tableDescription'],intval($_POST['arrived']),intval($_POST['crew']),intval($_POST['pizza']), $_POST['formid']);
+            $stmt->bind_param("ssiiiiii", $_POST['tableName'], $_POST['tableDescription'],intval($_POST['arrived']),intval($_POST['crew']),intval($_POST['pizza']),intval($_POST['registration']),intval($_POST['arrivedAtDoor']), $_POST['formid']);
             $stmt->execute();
             $stmt->close();
             $link->autocommit(TRUE); //turn off transactions + commit queued queries
@@ -389,7 +389,7 @@ function htx_update_column() {
 
             $possibleFormat = array("text", "number", "email", 'url', 'color', 'date', 'time', 'week', 'month', 'tel', 'range','textarea');
             $possiblePrice = array("", "DKK", ",-", "kr.", 'danske kroner', '$', 'NOK', 'SEK', 'dollars', 'euro');
-            $setting = $_POST['setting'];
+            $setting = intval($_POST['setting']);
 
             // Check if table exist
             $tableId = intval($_POST['formid']);
@@ -468,10 +468,24 @@ function htx_update_column() {
                 $formatExtra = '';
             }
 
+            // Text in text area
+            $table_name2 = $wpdb->prefix . 'htx_column';
+            $stmt2 = $link->prepare("SELECT * FROM `$table_name2` WHERE id = ?");
+            $stmt2->bind_param("i", $setting);
+            $stmt2->execute();
+            $result2 = $stmt2->get_result();
+            if($result2->num_rows === 0) {} else {
+                while($row2 = $result2->fetch_assoc()) {
+                    if ($row2['columnType'] == 'text area') 
+                        $placeholderText = trim($_POST['placeholder']);
+                }
+            } 
+            $stmt2->close();
+
             // Special name extra
             if (in_array('show', explode(",", $specialPostArray))) {
                 $table_name2 = $wpdb->prefix . 'htx_column';
-                $stmt2 = $link->prepare("SELECT id FROM `$table_name` WHERE tableid = ?");
+                $stmt2 = $link->prepare("SELECT id FROM `$table_name2` WHERE tableid = ?");
                 $stmt2->bind_param("i", $tableId);
                 $stmt2->execute();
                 $result2 = $stmt2->get_result();
@@ -702,12 +716,14 @@ function htx_dublicate_form() {
                     $tableArrived = $row['arrived'];
                     $tableCrew = $row['crew'];
                     $tablePiza = $row['pizza'];
+                    $tableArrivedAtDoor = $row['arrivedAtDoor'];
+                    $tableRegistration = $row['registration'];
                 }
                 $stmt->close();
 
                 // Make new table
-                $stmt = $link->prepare("INSERT INTO `$table_name` (active, favorit, shortcode, tableName, tableDescription, arrived, crew, pizza) VALUES (?,0,'HTX_Tilmeldningsblanket',?,?,?,?,?)");
-                $stmt->bind_param("issiii", $tableActive, $tableName, $tableDescription,$tableArrived,$tableCrew,$tablePiza);
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, favorit, shortcode, tableName, tableDescription, arrived, crew, pizza, arrivedAtDoor, registration) VALUES (?,0,'HTX_Tilmeldningsblanket',?,?,?,?,?,?,?)");
+                $stmt->bind_param("issiiiii", $tableActive, $tableName, $tableDescription,$tableArrived,$tableCrew,$tablePiza,$tableArrivedAtDoor,$tableRegistration);
                 $stmt->execute();
                 $tableNewId = $link->insert_id;
                 $stmt->close();
@@ -801,7 +817,7 @@ function htx_dublicate_form() {
                 // Make new users
                 $stmt = $link->prepare("INSERT INTO `$table_name` (active, payed, arrived, crew, pizza, price, email, tableId) VALUES (?,?,?,?,?,?,?,?)");
                 for ($i=0; $i < count($settingId); $i++) { 
-                    $stmt->bind_param("iiiiissi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPizza[$i], $usersPrice[$i], $usersEmail[$i], $tableNewId);
+                    $stmt->bind_param("isiiissi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPizza[$i], $usersPrice[$i], $usersEmail[$i], $tableNewId);
                     $stmt->execute();
                     $usersNewId[$usersId[$i]] = $link->insert_id;
                 }

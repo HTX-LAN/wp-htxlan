@@ -142,6 +142,8 @@
         echo "<button class='btn deleteBtn' style='margin-bottom: 0.5rem;' onclick='HTXJS_resetDatabases()'>Nulstil databaser</button><br>";
 
         // Database upgrade
+        echo "<h4>Database status</h4>";
+        require "upgrade_db.php";
         upgrade_db();
 
     }

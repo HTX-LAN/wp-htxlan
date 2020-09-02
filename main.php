@@ -1,12 +1,15 @@
 <?php
     /**
     * Plugin Name: HTX-Lan
-    * Plugin URI: https://htx-lan.github.io/WPPlugin-HTXLan/
+    * Plugin URI: https://htx-lan.github.io/wp-htxlan/
     * Description: Event plugin designet for lan parties, and used by HTX-lan.dk
-    * Version: 0.1.9
+    * Version: 0.1.10
     * Author: Mikkel Albrechtsen & Frej Alexander Nielsen
-    * Author URI: https://htx-lan.github.io/WPPlugin-HTXLan/authors
+    * Author URI: https://htx-lan.github.io/wp-htxlan/authors
     */
+
+    // Setting newest database  version
+    $databaseVersion = 0.3;
 
     //Prevent direct file access
     if(!defined('ABSPATH')) {

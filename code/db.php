@@ -1,79 +1,10 @@
 <?php
-
-//Prevent direct file access
-if(!defined('ABSPATH')) {
-    header("Location: ../../../../");
-    die();
-}
-    // Upgrading of database
-    function upgrade_db() {
-        $databaseVersion = "0.1";
-        echo "<h4>Database status</h4>";
-
-        // Check version number
-        try {
-            global $wpdb;
-            $link = database_connection();
-            $link->autocommit(FALSE); //turn on transactions
-
-            $db_error = false;
-            $table_name = $wpdb->prefix . 'htx_settings';
-            $stmt = $link->prepare("SELECT * FROM $table_name WHERE settingName = 'databaseVersion' and active = 2 and type = 'databaseVersion' limit 1");
-            if(!$stmt)
-                throw new Exception($link->error);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if($result->num_rows === 0) $db_error = true;
-            while($row = $result->fetch_assoc()) {
-                $serverDatabaseversion = $row['value'];
-            }
-            $stmt->close();
-
-            $link->autocommit(TRUE); //turn off transactions + commit queued queries
-            $link->close();
-        } catch(Exception $e) {
-            $link->rollback(); //remove all queries from queue if error (undo)
-            echo "<p style='color: red'><br>There was an error with the database, please reset database!<br>Error message from server:".$e."</p>";
-        }
-
-        if ($serverDatabaseversion != $databaseVersion) {
-            // Update database
-            try {
-                echo "<p style='color: orange'>Database update in progress...</p>";
-                global $wpdb;
-                $link = database_connection();
-                $link->autocommit(FALSE); //turn on transactions
-
-
-                // Update version number
-                $table_name = $wpdb->prefix . 'htx_settings';
-                $stmt = $link->prepare("UPDATE $table_name SET value = ? WHERE settingName = 'databaseVersion' and active = 2 and type = 'databaseVersion'");
-                if(!$stmt)
-                    throw new Exception($link->error);
-                $stmt->bind_param("s", $databaseVersion);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                if($result->num_rows === 0) $update = true;
-                $stmt->close();
-
-                $link->autocommit(TRUE); //turn off transactions + commit queued queries
-                $link->close();
-                echo "<p style='color: green'>Database is updated to $databaseVersion</p>";
-            } catch(Exception $e) {
-                $link->rollback(); //remove all queries from queue if error (undo)
-                echo "<br> Update failed. <br>Error:<br>".$e;
-                $update = false;
-            }
-        } else {
-            echo "<p style='color: green'>Database is up to date</p>";
-        }
-    }
-
     // Databases for plugin
 
     function create_db(){
         // Getting start information to create databases
         global $wpdb;
+        global $databaseVersion;
         $db_name = DB_NAME;
         $charset_collate = $wpdb->get_charset_collate();
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -119,6 +50,7 @@ if(!defined('ABSPATH')) {
             tableId INT,
             payed varchar(255) default 0,
             arrived INT default 0,
+            arrivedAtDoor INT default 0,
             crew INT default 0,
             pizza INT default 0,
             email TEXT,
@@ -146,7 +78,9 @@ if(!defined('ABSPATH')) {
             shortcode TEXT,
             tableName TEXT,
             tableDescription TEXT,
+            registration INT DEFUALT 1,
             arrived INT DEFAULT 1,
+            arrivedAtDoor INT DEFUALT 0,
             crew INT DEFAULT 1,
             pizza INT DEFAULT 0,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -324,7 +258,7 @@ if(!defined('ABSPATH')) {
                 $stmt->execute();
                 $settingId = 0;
                 $tableId = 0;
-                $settingName = "databaseVersion"; $value="0.1"; $special=0; $specialName="databaseVersion"; $settingType="databaseVersion"; $sorting = 0;
+                $settingName = "databaseVersion"; $value=$databaseVersion; $special=0; $specialName="databaseVersion"; $settingType="databaseVersion"; $sorting = 0;
                 $stmt->execute();
                 $stmt->close();
                 $link->autocommit(TRUE); //turn off transactions + commit queued queries

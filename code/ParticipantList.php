@@ -31,6 +31,7 @@
             $tableIds[] = $row['id'];
             $tableNames[] = $row['tableName'];
             $tableArrived[$row['id']] = $row['arrived'];
+            $tableArrivedAtDoor[$row['id']] = $row['arrivedAtDoor'];
             $tableCrew[$row['id']] = $row['crew'];
             $tablePizza[$row['id']] = $row['pizza'];
         }
@@ -199,7 +200,7 @@
 
 
         // Start of table with head
-        echo "<div class='formGroup_container'><div class='formGroup formGroup_scroll_left'>
+        echo "<div class='formGroup_container' style='overflow-x: hidden; margin-bottom: 1rem;'><div class='formGroup formGroup_scroll_left'>
             <table class='InfoTable' id='participantListTable'><thead><tr>";
 
         // Getting information from database
@@ -259,6 +260,8 @@
                 echo "<th><span class='material-icons' title='Person er en del af crew' style='cursor: help'>people_alt</span></th>";
             if ($tablePizza[$tableId] == 1)
                 echo "<th><span class='material-icons' title='Person har fået leveret pizza' style='cursor: help'>local_pizza</span></th>";
+            if ($tableArrivedAtDoor[$tableId] == 1)
+                echo "<th><span class='material-icons' title='Person købte billet ved ankomst' style='cursor: help'>sensor_door</span></th>";
             echo "<th>Pris</th>";
             echo "<th></th>";
 
@@ -274,6 +277,7 @@
                 $userid[] = $row['id'];
                 $payed[] = $row['payed'];
                 $arrived[] = $row['arrived'];
+                $arrivedAtDoor[] = $row['arrivedAtDoor'];
                 $crew[] = $row['crew'];
                 $pizza[] = $row['pizza'];
                 $prices[] = $row['price'];
@@ -553,7 +557,7 @@
                     echo "<input type='hidden' name='post' value='pizzaUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
                     echo "<input type='hidden' name='pizza' value='0'>";
                     echo "<input id='pizza-$i' type='checkbox' class='inputCheckbox' name='pizza' value='1' onchange='document.getElementById(\"$i-pizza\").submit()'";
-                    if ($pizza[$i] == 1) {echo "checked"; $price = 0;}
+                    if ($pizza[$i] == 1) echo "checked";
                     echo ">";
                     echo "</form>";
                     echo "</td>";
@@ -563,6 +567,25 @@
                         $lineData['Pizza'] = 'Ja';
                     else 
                         $lineData['Pizza'] = 'Nej';
+                }
+
+                if ($tableArrivedAtDoor[$tableId] == 1){
+                    // arrivedAtDoor tracking
+                    echo "<td style='text-align: center'>";
+                    echo "<form id='$i-arrivedAtDoor' method='POST'>";
+                    echo "<input type='hidden' name='post' value='arrivedAtDoorUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
+                    echo "<input type='hidden' name='arrivedAtDoor' value='0'>";
+                    echo "<input id='arrivedAtDoor-$i' type='checkbox' class='inputCheckbox' name='arrivedAtDoor' value='1' onchange='document.getElementById(\"$i-arrivedAtDoor\").submit()'";
+                    if ($arrivedAtDoor[$i] == 1) echo "checked";
+                    echo ">";
+                    echo "</form>";
+                    echo "</td>";
+
+                    // data
+                    if ($arrivedAtDoor[$i] == 1)
+                        $lineData['arrivedAtDoor'] = 'Ja';
+                    else 
+                        $lineData['arrivedAtDoor'] = 'Nej';
                 }
 
                 // Price
