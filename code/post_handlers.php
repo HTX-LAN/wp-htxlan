@@ -947,6 +947,167 @@ function htx_dublicate_form() {
     }
 }
 
+function htx_participant_update() {
+    // Post handling
+    if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid'])) {
+        $response = new stdClass();
+        header('Content-type: application/json');
+        // Post handling
+        // Database connection
+        $link = database_connection();
+        global $wpdb;
+
+        if(!current_user_can("manage_options")){
+            $response->success = 'permission denied';
+            echo json_encode($response);
+            wp_die();
+        }
+        if ($_POST['postType'] == 'update') {
+            try {
+                $tableId = intval($_POST['formid']);
+                $userId = intval($_POST['userId']);
+                $link->autocommit(FALSE); //turn on transactions
+
+                // Check if form exist
+                $table_name = $wpdb->prefix . 'htx_form_tables';
+                $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("i", $tableId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) throw new Exception("Form does not exist");
+                $stmt->close();
+
+                // Checking user id
+                $table_name = $wpdb->prefix . 'htx_form_users';
+                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("ii", $tableId, $userId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) {
+                        throw new Exception('User does not exist');
+                }
+                $stmt->close();
+
+                // Getting and checking values
+                $paymentMethodsId = array("0", "0-f", "1-f");
+                if (!isset($_POST['paymentOption']) AND !in_array($_POST['paymentOption'], $paymentMethodsId))
+                    throw new Exception('payment error');
+                else 
+                    $payment = $_POST['paymentOption'];
+
+                if (isset($_POST['arrived']) AND $_POST['arrived'] != "0" AND $_POST['arrived'] != "1")
+                    throw new Exception('arrived error');
+                else 
+                    $arrived = intval($_POST['arrived']);
+
+                if (isset($_POST['arrivedAtDoor']) AND $_POST['arrivedAtDoor'] != "0" AND $_POST['arrivedAtDoor'] != "1")
+                    throw new Exception('arrivedAtDoor error');
+                else 
+                    $arrivedAtDoor = intval($_POST['arrivedAtDoor']);
+
+                if (isset($_POST['crew']) AND $_POST['crew'] != "0" AND $_POST['crew'] != "1")
+                    throw new Exception('crew error');
+                else 
+                    $crew = intval($_POST['crew']);
+
+                if (isset($_POST['pizza']) AND $_POST['pizza'] != "0" AND $_POST['pizza'] != "1")
+                    throw new Exception('pizza error');
+                else 
+                    $pizza = intval($_POST['pizza']);
+
+                // Sending new payment id to server
+                $table_name = $wpdb->prefix . 'htx_form_users';
+                $stmt = $link->prepare("UPDATE $table_name SET crew = ?, payed = ?, arrived = ?, arrivedAtDoor = ?, pizza = ? WHERE id = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("isiiii", $crew,$payment,$arrived,$arrivedAtDoor,$pizza, $userId);
+                $stmt->execute();
+                $stmt->close();
+
+                $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                $link->close();
+                $response->success = true;
+            } catch(Exception $e) {
+                $link->rollback(); //remove all queries from queue if error (undo)
+                $response->success = false;
+                $response->error = $e->getMessage();
+            }
+            echo json_encode($response);
+            wp_die();
+        } else if ($_POST['postType'] == "deleteSubmission") {
+            try {
+                $tableId = intval($_POST['formid']);
+                $userId = intval($_POST['userId']);
+                $link->autocommit(FALSE); //turn on transactions
+
+                // Check if form exist
+                $table_name = $wpdb->prefix . 'htx_form_tables';
+                $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("i", $tableId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) throw new Exception("Form does not exist");
+                $stmt->close();
+
+                // Checking user id
+                $table_name = $wpdb->prefix . 'htx_form_users';
+                $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("ii", $tableId, $userId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) {
+                        throw new Exception('User does not exist');
+                }
+                $stmt->close();
+
+                // Delete user id
+                $table_name = $wpdb->prefix . 'htx_form_users';
+                $stmt = $link->prepare("DELETE FROM `$table_name` WHERE tableID = ? and id = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("ii", $tableId, $userId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if($result->num_rows === 0) throw new Exception('No user with this id');
+                $stmt->close();
+
+                // Delete form elements user submittet
+                $table_name = $wpdb->prefix . 'htx_form';
+                $stmt = $link->prepare("DELETE FROM `$table_name` WHERE tableID = ? and userId = ?");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("ii", $tableId, $userId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $stmt->close();
+
+                $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                $link->close();
+                $response->success = true;
+            } catch(Exception $e) {
+                $link->rollback(); //remove all queries from queue if error (undo)
+                $response->success = false;
+                $response->error = $e->getMessage();
+            }
+            echo json_encode($response);
+            wp_die();
+        } else {
+            $response->success = 'postType not defined';
+        }
+    }
+
+    echo json_encode($response);
+    wp_die();
+}
+
 // Widgets
 function htx_live_participant_count() {
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid'])) {

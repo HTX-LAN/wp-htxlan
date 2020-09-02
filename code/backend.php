@@ -17,6 +17,7 @@
     add_action('wp_ajax_htx_delete_setting', 'htx_delete_setting');
     add_action('wp_ajax_htx_add_setting', 'htx_add_setting');
     add_action('wp_ajax_htx_dublicate_form', 'htx_dublicate_form');
+    add_action('wp_ajax_htx_participant_update', 'htx_participant_update');
 
     // Creating setup for pages
     function setup_admin_menu(){

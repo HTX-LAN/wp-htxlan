@@ -70,7 +70,7 @@
             
 
         // Post handling
-        participantList_post($tableId);
+        // participantList_post($tableId);
 
         // Dropdown menu
         // Starting dropdown menu
@@ -255,13 +255,25 @@
             // Writing extra lines
             echo "<th>Betaling</th>";
             if ($tableArrived[$tableId] == 1)
-                echo "<th><span class='material-icons' title='Ankommet' style='cursor: help'>flight_land</span></th>";
+                $cellVisibility = '';
+            else 
+                $cellVisibility = 'hidden';
+                echo "<th><span class='material-icons $cellVisibility' title='Ankommet' style='cursor: help'>flight_land</span></th>";
             if ($tableCrew[$tableId] == 1)
-                echo "<th><span class='material-icons' title='Person er en del af crew' style='cursor: help'>people_alt</span></th>";
+            $cellVisibility = '';
+            else 
+                $cellVisibility = 'hidden';
+                echo "<th><span class='material-icons $cellVisibility' title='Person er en del af crew' style='cursor: help'>people_alt</span></th>";
             if ($tablePizza[$tableId] == 1)
-                echo "<th><span class='material-icons' title='Person har fået leveret pizza' style='cursor: help'>local_pizza</span></th>";
+                $cellVisibility = '';
+            else 
+                $cellVisibility = 'hidden';
+                echo "<th><span class='material-icons $cellVisibility' title='Person har fået leveret pizza' style='cursor: help'>local_pizza</span></th>";
             if ($tableArrivedAtDoor[$tableId] == 1)
-                echo "<th><span class='material-icons' title='Person købte billet ved ankomst' style='cursor: help'>sensor_door</span></th>";
+                $cellVisibility = '';
+            else 
+                $cellVisibility = 'hidden';
+            echo "<th><span class='material-icons $cellVisibility' title='Person købte billet ved ankomst' style='cursor: help'>sensor_door</span></th>";
             echo "<th>Pris</th>";
             echo "<th></th>";
 
@@ -485,10 +497,7 @@
                 else if ($payed[$i] == "0-i" OR $payed[$i] == "1-i") echo "class='crewpayed'";
                 else if (in_array($payed[$i], $paymentMethodsId)) echo "class='payed'";
                 echo ">
-                    <form id='$i-pay' method='POST'>
-                    <input type='hidden' name='userId' value='$userid[$i]'>
-                    <input type='hidden' name='post' value='paymentUpdate'>
-                    <select name='paymentOption'  onchange='document.getElementById(\"$i-pay\").submit()'>
+                    <select name='paymentOption' id='paymentOption-$i' onchange='participantUpdate(\"paymentOption\",$i,$tableId,$userid[$i])'>
                         <option value='0'";
                     if ($payed[$i] == 0) echo "selected";
                         echo">Ingen</option>";
@@ -498,7 +507,6 @@
                     echo">$paymentMethods[$j]</option>";
                 }
                 echo "</select>
-                    </form>
                 </td>";
 
                 // data
@@ -512,81 +520,73 @@
                     $lineData['Betaling'] = '';
                 }
 
-                if ($tableArrived[$tableId] == 1) {
-                    // Arrived
-                    echo "<td style='text-align: center'>";
-                    echo "<form id='$i-arrived' method='POST'>";
-                    echo "<input type='hidden' name='post' value='arrivedtUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
-                    echo "<input type='hidden' name='arrived' value='0'>";
-                    echo "<input id='arrived-$i' type='checkbox' class='inputCheckbox' name='arrived' value='1' onchange='document.getElementById(\"$i-arrived\").submit()'";
-                    if ($arrived[$i] == 1) echo "checked";
-                    echo ">";
-                    echo "</form>";
-                    echo "</td>";
+                // Arrived
+                if ($tableArrived[$tableId] == 1) 
+                    $cellVisibility = '';
+                else 
+                    $cellVisibility = 'hidden';
+                echo "<td style='text-align: center' class='$cellVisibility'>";
+                echo "<input id='arrived-$i' type='checkbox' class='inputCheckbox' name='arrived' value='1' onchange='participantUpdate(\"arrivedtUpdate\",$i,$tableId,$userid[$i])'";
+                if ($arrived[$i] == 1) echo "checked";
+                echo ">";
+                echo "</td>";
 
-                    // data
-                    if ($arrived[$i] == 1)
-                        $lineData['Ankommet'] = 'Ja';
-                    else 
-                        $lineData['Ankommet'] = 'Nej';
-                }
+                // data
+                if ($arrived[$i] == 1)
+                    $lineData['Ankommet'] = 'Ja';
+                else 
+                    $lineData['Ankommet'] = 'Nej';
 
-                if ($tableCrew[$tableId] == 1) {
-                    // Crew
-                    echo "<td style='text-align: center'>";
-                    echo "<form id='$i-crew' method='POST'>";
-                    echo "<input type='hidden' name='post' value='crewUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
-                    echo "<input type='hidden' name='crew' value='0'>";
-                    echo "<input id='crew-$i' type='checkbox' class='inputCheckbox' name='crew' value='1' onchange='document.getElementById(\"$i-crew\").submit()'";
-                    if ($crew[$i] == 1) {echo "checked"; $price = 0;}
-                    echo ">";
-                    echo "</form>";
-                    echo "</td>";
+                // Crew
+                if ($tableCrew[$tableId] == 1) 
+                    $cellVisibility = '';
+                else 
+                    $cellVisibility = 'hidden';
+                echo "<td style='text-align: center' class='$cellVisibility'>";
+                echo "<input id='crew-$i' type='checkbox' class='inputCheckbox' name='crew' value='1' onchange='participantUpdate(\"crewUpdate\",$i,$tableId,$userid[$i])'";
+                if ($crew[$i] == 1) {echo "checked"; $price = 0;}
+                echo ">";
+                echo "</td>";
 
-                    // data
-                    if ($crew[$i] == 1)
-                        $lineData['Crew'] = 'Ja';
-                    else 
-                        $lineData['Crew'] = 'Nej';
-                }
+                // data
+                if ($crew[$i] == 1)
+                    $lineData['Crew'] = 'Ja';
+                else 
+                    $lineData['Crew'] = 'Nej';
 
-                if ($tablePizza[$tableId] == 1){
-                    // Pizza leveret
-                    echo "<td style='text-align: center'>";
-                    echo "<form id='$i-pizza' method='POST'>";
-                    echo "<input type='hidden' name='post' value='pizzaUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
-                    echo "<input type='hidden' name='pizza' value='0'>";
-                    echo "<input id='pizza-$i' type='checkbox' class='inputCheckbox' name='pizza' value='1' onchange='document.getElementById(\"$i-pizza\").submit()'";
-                    if ($pizza[$i] == 1) echo "checked";
-                    echo ">";
-                    echo "</form>";
-                    echo "</td>";
+                // Pizza leveret
+                if ($tablePizza[$tableId] == 1) 
+                    $cellVisibility = '';
+                else 
+                    $cellVisibility = 'hidden';
+                echo "<td style='text-align: center' class='$cellVisibility'>";
+                echo "<input id='pizza-$i' type='checkbox' class='inputCheckbox' name='pizza' value='1' onchange='participantUpdate(\"pizzaUpdate\",$i,$tableId,$userid[$i])'";
+                if ($pizza[$i] == 1) echo "checked";
+                echo ">";
+                echo "</td>";
 
-                    // data
-                    if ($pizza[$i] == 1)
-                        $lineData['Pizza'] = 'Ja';
-                    else 
-                        $lineData['Pizza'] = 'Nej';
-                }
+                // data
+                if ($pizza[$i] == 1)
+                    $lineData['Pizza'] = 'Ja';
+                else 
+                    $lineData['Pizza'] = 'Nej';
 
-                if ($tableArrivedAtDoor[$tableId] == 1){
-                    // arrivedAtDoor tracking
-                    echo "<td style='text-align: center'>";
-                    echo "<form id='$i-arrivedAtDoor' method='POST'>";
-                    echo "<input type='hidden' name='post' value='arrivedAtDoorUpdate'><input type='hidden' name='userId' value='$userid[$i]'>";
-                    echo "<input type='hidden' name='arrivedAtDoor' value='0'>";
-                    echo "<input id='arrivedAtDoor-$i' type='checkbox' class='inputCheckbox' name='arrivedAtDoor' value='1' onchange='document.getElementById(\"$i-arrivedAtDoor\").submit()'";
-                    if ($arrivedAtDoor[$i] == 1) echo "checked";
-                    echo ">";
-                    echo "</form>";
-                    echo "</td>";
+                // arrivedAtDoor tracking
+                if ($tableArrivedAtDoor[$tableId] == 1) 
+                    $cellVisibility = '';
+                else 
+                    $cellVisibility = 'hidden';
+                echo "<td style='text-align: center' class='$cellVisibility'>";
+                echo "<input id='arrivedAtDoor-$i' type='checkbox' class='inputCheckbox' name='arrivedAtDoor' value='1' onchange='participantUpdate(\"pizzaUpdate\",$i,$tableId,$userid[$i])'";
+                if ($arrivedAtDoor[$i] == 1) echo "checked";
+                echo ">";
+                echo "</td>";
 
-                    // data
-                    if ($arrivedAtDoor[$i] == 1)
-                        $lineData['arrivedAtDoor'] = 'Ja';
-                    else 
-                        $lineData['arrivedAtDoor'] = 'Nej';
-                }
+                // data
+                if ($arrivedAtDoor[$i] == 1)
+                    $lineData['arrivedAtDoor'] = 'Ja';
+                else 
+                    $lineData['arrivedAtDoor'] = 'Nej';
 
                 // Price
                 $price = floatval($price) + floatval($priceExtra);
