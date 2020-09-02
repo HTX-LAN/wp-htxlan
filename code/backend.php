@@ -58,6 +58,8 @@
             }
         }
         $stmt->close();
+
+        add_submenu_page('HTXLan', 'HTX LAN widgets', 'Andre widget', 'manage_options', 'HTX_lan_other_widgets', 'HTX_lan_other_widgets_function');
     }
 
 
@@ -150,24 +152,30 @@
 
 
     // admin submenu
-    // admin submenu page content - HTX LAN tildmelder liste
+    // HTX LAN tildmelder liste
     function HTX_lan_participants_list_function(){
         require "ParticipantList.php";
     }
 
-    // admin submenu page content - HTX LAN tildmeldings side laver
+    // HTX LAN tildmeldings side laver
     function HTX_lan_create_function(){
         require "formCreator.php";
     }
 
-    // admin submenu page content - HTX LAN tildmeldings side laver
+    // HTX LAN tildmeldings side laver
     function HTX_lan_economic_function(){
         // Økonomi side, som har alting med økonomi at gøre
         require "economic.php";
     }
 
+    // HTX lan team viewing page
     function HTX_lan_teams_function(){
         require "teams.php";
+    }
+
+    // HTX Lan participant count widget
+    function HTX_lan_other_widgets_function(){
+        require "other_widgets.php";
     }
 
 ?>

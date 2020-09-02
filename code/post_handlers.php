@@ -947,4 +947,54 @@ function htx_dublicate_form() {
     }
 }
 
+// Widgets
+function htx_live_participant_count() {
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid'])) {
+        $response = new stdClass();
+        header('Content-type: application/json');
+        try {
+            global $wpdb;
+            $link = database_connection();
+            $tableId = intval($_POST['formid']);
+            $link->autocommit(FALSE); //turn on transactions
+
+            // Check if form exist
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT id FROM $table_name WHERE id = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) throw new Exception("Form does not exist");
+            $stmt->close();
+
+            // Get participant count
+            $table_name = $wpdb->prefix . 'htx_form_users';
+            $stmt = $link->prepare("SELECT tableId FROM `$table_name` WHERE tableId = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) $number = 0;
+            else if ($result->num_rows < 0) throw new Exception("Form does not exist");
+            else $number = $result->num_rows;
+            $stmt->close();
+
+            $response->success = 'true';
+            $response->number = $number;
+            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+        } catch(Exception $e) {
+            $response->success = 'false';
+            $response->number = '0';
+            $response->error = $e->getMessage();
+            $link->rollback(); //remove all queries from queue if error (undo)
+        }
+
+        echo json_encode($response);
+        wp_die();
+    }
+} 
+
 ?>

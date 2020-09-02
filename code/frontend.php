@@ -11,9 +11,27 @@
     frontend_update();
     function frontend_update(){
         add_shortcode('HTX_Tilmeldningsblanket','HTX_lan_tilmdeldingsblanket_function');
+        add_shortcode('HTX_participantCount','HTX_lan_participantCount_function');
     }
 
-    //perform the shortcode output
+    // Ajax
+    add_action( 'wp_enqueue_scripts', 'my_scripts' );
+    function my_scripts() {
+        $plugin_dir = ABSPATH . 'wp-content/plugins/wp-htxlan/';
+
+        // Scripts that needs ajax
+        wp_enqueue_script( 'htx_live_participant_count', plugin_dir_url( __FILE__ ) . 'JS/frontend.js', array('jquery'), '1.0.0', true );
+
+        wp_localize_script( 'htx_live_participant_count', 'widgetAjax', array(
+            'ajaxurl' => admin_url( 'admin-ajax.php' ),
+            'security' => wp_create_nonce( 'ACxxB2EVpJeh3DxBe95F6qfhkwCjX8222CMEA7m3A79rf2N22xy23E4MMQgUsvBsSAtEhNHznckQ9ej4zHGmZnXkhvSHhmxzTYdEBv8BbNQNUaLpbq9mb7Q' )
+        ));
+    }
+    add_action('wp_ajax_htx_live_participant_count', 'htx_live_participant_count');
+    add_action('wp_ajax_nopriv_htx_live_participant_count', 'htx_live_participant_count');
+
+
+    // Perform the shortcode output for form
     function HTX_lan_tilmdeldingsblanket_function($atts = array()){
         // Custom connection to database
         $link = database_connection();
@@ -469,4 +487,62 @@
         // Returning html code
         return $html;
     }
+
+    // Perform shortcode for participant count
+    function HTX_lan_participantCount_function($atts = array()) {
+        // Custom connection to database
+        $link = database_connection();
+        global $wpdb;
+
+        // add to $html, to return it at the end -> It is how to do shortcodes in Wordpress
+        $html = "";
+
+        // Check and get form from shortcode
+        if (!isset($atts['form'])) $tableId = 0; else $tableId = intval($atts['form']);
+
+        // Checking form id
+        $table_name = $wpdb->prefix . 'htx_form_tables';
+        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ?");
+        $stmt->bind_param("i", $tableId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows === 0) return "<i>Ups, der gik noget galt.</i>";
+        $stmt->close();
+
+        // Get participant count
+        $table_name = $wpdb->prefix . 'htx_form_users';
+        $stmt = $link->prepare("SELECT tableId FROM `$table_name` WHERE tableId = ?");
+        $stmt->bind_param("i", $tableId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if($result->num_rows === 0) $number = 0;
+        else if ($result->num_rows < 0) return "<i>Ups, der gik noget galt.</i>";
+        else $number = $result->num_rows;
+        $stmt->close();
+
+        if (isset($atts['countdown']) and $atts['countdown'] == 'true' and isset($atts['countdownfrom']) and intval($atts['countdownfrom']) >= 0) {
+            $number = intval($atts['countdownfrom'])-$number;
+
+            if ($number < 0) $number = 0;
+        } else {
+            $atts['countdown'] = 'false';
+            $atts['countdownfrom'] = 0;
+        }
+
+        if (isset($atts['live']) and $atts['live'] == 'true') {
+            $html .= "\n
+            <script>setTimeout(function(){
+                function liveParticipant() {\n
+                    liveParticipantCount(\"".$tableId."\",\"".$atts['countdown']."\",\"".$atts['countdownfrom']."\",\"liveUpdateCount$tableId\")}\n
+                    setTimeout(liveParticipant(), 1000);\n
+                }, 500);\n
+            </script>";
+        }
+
+        $html .= "\n<span id='liveUpdateCount$tableId'>$number</span>";
+
+        return $html;
+
+    }
+    
 ?>
