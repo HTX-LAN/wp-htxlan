@@ -19,7 +19,7 @@ function submitForm(id) {
     document.getElementById(id).submit();
 }
 
-function HTXJS_deleteForm(formid) {
+function HTXJS_deleteForm(formid,countdown,countDownFrom) {
     var confirmDelete = confirm("Er du sikker på at du vil slette denne formular?\nDette er en permanent handling!");
     if (confirmDelete == true) {
         var id = informationwindowInsert(2, "Arbejder på det...");

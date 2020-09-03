@@ -71,25 +71,32 @@
         }
         if($res->num_rows == 0) {
             //Table does not exist - create it
-            $sql = "CREATE TABLE $table_name (
+            $wpdb_collate = $wpdb->collate;
+            $sql =
+            "CREATE TABLE {$table_name} (
             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
             active INT NOT NULL DEFAULT 1,
             favorit INT DEFAULT 0,
             shortcode TEXT,
             tableName TEXT,
             tableDescription TEXT,
-            registration INT DEFUALT 1,
+            registration INT DEFAULT 1,
             arrived INT DEFAULT 1,
-            arrivedAtDoor INT DEFUALT 0,
+            arrivedAtDoor INT DEFAULT 0,
             crew INT DEFAULT 1,
             pizza INT DEFAULT 0,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            ) $charset_collate;";
+            ) COLLATE {$wpdb_collate}";
             dbDelta( $sql );
+            
             // Insert standard values
             $one = 'Standard formular'; $two = "HTX_Tilmeldningsblanket"; $three = 'HTX Tilmelding 1'; $four = 1;
             $stmt = $link->prepare("INSERT INTO $table_name (tableDescription, shortcode, tableName, favorit) VALUES (?, ?, ?, ?)");
+            if(!$stmt) {
+                //Failed to query database
+                throw new Exception($link->error);
+            }
             $stmt->bind_param("sssi", $one, $two, $three, $four);
             $stmt->execute();
             $stmt->close();
