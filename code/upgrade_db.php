@@ -10,7 +10,7 @@
 
             $db_error = false;
             $table_name = $wpdb->prefix . 'htx_settings';
-            $stmt = $link->prepare("SELECT * FROM $table_name WHERE settingName = 'databaseVersion' and active = 2 and type = 'databaseVersion' limit 1");
+            $stmt = $link->prepare("SELECT * FROM $table_name WHERE settingName = 'databaseVersion' and type = 'databaseVersion' limit 1");
             if(!$stmt)
                 throw new Exception($link->error);
             $stmt->execute();
