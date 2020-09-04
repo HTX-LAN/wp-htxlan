@@ -44,7 +44,7 @@
 
                     // Update version number
                     $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.1' WHERE settingName = 'databaseVersion' and active = 2 and type = 'databaseVersion'");
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.1' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
                     if(!$stmt)
                         throw new Exception($link->error);
                     $stmt->execute();
@@ -65,7 +65,7 @@
 
                     // Update version number
                     $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.2' WHERE settingName = 'databaseVersion' and active = 2 and type = 'databaseVersion'");
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.2' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
                     if(!$stmt)
                         throw new Exception($link->error);
                     $stmt->execute();
@@ -93,7 +93,7 @@
 
                     // Update version number
                     $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.3' WHERE settingName = 'databaseVersion' and active = 2 and type = 'databaseVersion'");
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.3' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
                     if(!$stmt)
                         throw new Exception($link->error);
                     $stmt->execute();
@@ -104,7 +104,7 @@
 
                 // Update version number
                 $table_name = $wpdb->prefix . 'htx_settings';
-                $stmt = $link->prepare("UPDATE $table_name SET value = ? WHERE settingName = 'databaseVersion' and active = 2 and type = 'databaseVersion'");
+                $stmt = $link->prepare("UPDATE $table_name SET value = ? WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
                 if(!$stmt)
                     throw new Exception($link->error);
                 $stmt->bind_param("s", $databaseVersion);
