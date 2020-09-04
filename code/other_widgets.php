@@ -67,9 +67,6 @@
             }
         }
 
-        // Post handling
-        participantList_post($tableId);
-
         // Dropdown menu
         // Starting dropdown menu
         echo "<p><label for='form_choose'>Formular: </label>";

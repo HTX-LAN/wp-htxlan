@@ -1,24 +1,18 @@
 <?php
-    //Prevent direct file access
-    if(!defined('ABSPATH')) {
-        header("Location: ../../../../");
-        die();
-    }
-
     // Functions and scripts written in php
 
     // frontend post handling
     function HTX_frontend_post($tableId) {
-        // Database connection
-        $link = database_connection();
-        global $wpdb;
-
-        // Check tableId
-        if (!is_numeric($tableId)) return "Sql injection attempt";
-        $tableId = intval($tableId);
-
         // Post handling
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            // Database connection
+            $link = database_connection();
+            global $wpdb;
+
+            // Check tableId
+            if (!is_numeric($tableId)) return "Sql injection attempt";
+            $tableId = intval($tableId);
+
             switch  ($_POST['submit']) {
                 // New submission
                 case 'new':
@@ -226,7 +220,7 @@
                         $inputName = $inputValue = "";
                         $table_name = $wpdb->prefix . 'htx_form';
                         $stmt = $link->prepare("INSERT INTO `$table_name` (name, value, userId, tableId) VALUES (?, ?, ?, ?)");
-                        $stmt->bind_param("ssii", $inputName, $inputValue, intval($formUserId), intval($tableId));
+                        $stmt->bind_param("ssii", $inputName, $inputValue, $formUserId, $tableId);
                         for ($i=0; $i < count($columnNameBack); $i++) {
                             $specialPostArrayStart = array();
                             $inputName = $columnNameBack[$i];
@@ -360,8 +354,12 @@
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
                         throw $e;
-                        if ($registration == 1) return $errorRegistration;
-                        else return $error;
+                        if ($registration == 1) 
+                            $return = $errorRegistration;
+                        else 
+                            $return = $error;
+                        return $return;
+                        
                     }
 
                     // Error handling (Needs to be more specifik)
@@ -395,6 +393,7 @@
                 break;
                 default: return "Noget gik galt🤔";
             }
+        } else {
         }
     }
 
@@ -468,227 +467,4 @@
         return $url;
     }
 
-    // Participant list post handling from backend
-        // function participantList_post($tableId){
-        //     // Post handling
-        //     // Database connection
-        //     $link = database_connection();
-        //     global $wpdb;
-
-
-
-        //     // Post handling
-        //     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        //         switch  ($_POST['post']) {
-        //             case 'paymentUpdate':
-        //                 try {
-        //                     $link->autocommit(FALSE); //turn on transactions
-        //                     // Checking user id
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
-        //                     $stmt->bind_param("ii", $tableId, intval($_POST['userId']));
-        //                     $stmt->execute();
-        //                     $result = $stmt->get_result();
-        //                     if($result->num_rows === 0) {
-        //                         echo "Bruger findes ikke længere";
-        //                         $link->rollback(); //remove all queries from queue if error (undo)
-        //                         break;
-        //                     }
-        //                     $stmt->close();
-
-        //                     // Getting and checking new payment id
-        //                     // Payment type
-        //                     $paymentMethods = array("Kontant", "Mobilepay");
-        //                     $paymentMethodsId = array("0", "0-f", "1-f");
-        //                     if (!isset($_POST['paymentOption']) AND !in_array($_POST['paymentOption'], $paymentMethodsId)) break;
-
-
-        //                     // Sending new payment id to server
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("UPDATE $table_name SET payed = ? WHERE id = ?");
-        //                     $stmt->bind_param("si", $_POST['paymentOption'], $_POST['userId']);
-        //                     $stmt->execute();
-        //                     $stmt->close();
-
-        //                     $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        //                     echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev opdateret')}, 500);</script>"; //User feedback
-        //                 } catch(Exception $e) {
-        //                     $link->rollback(); //remove all queries from queue if error (undo)
-        //                     throw $e;
-        //                 }
-        //             break;
-        //             case "arrivedtUpdate":
-        //                 try {
-        //                     $link->autocommit(FALSE); //turn on transactions
-        //                     // Checking user id
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
-        //                     $stmt->bind_param("ii", $tableId, intval($_POST['userId']));
-        //                     $stmt->execute();
-        //                     $result = $stmt->get_result();
-        //                     if($result->num_rows === 0) {
-        //                         echo "Bruger findes ikke længere";
-        //                         $link->rollback(); //remove all queries from queue if error (undo)
-        //                         break;
-        //                     }
-        //                     $stmt->close();
-
-        //                     // Getting and checking new payment id
-        //                     // Payment type
-        //                     if ($_POST['arrived'] != "0" AND $_POST['arrived'] != "1") break;
-
-
-        //                     // Sending new payment id to server
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("UPDATE $table_name SET arrived = ? WHERE id = ?");
-        //                     $stmt->bind_param("ii", $_POST['arrived'], $_POST['userId']);
-        //                     $stmt->execute();
-        //                     $stmt->close();
-
-        //                     $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        //                     echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev opdateret')}, 500);</script>"; //User feedback
-        //                 } catch(Exception $e) {
-        //                     $link->rollback(); //remove all queries from queue if error (undo)
-        //                     throw $e;
-        //                 }
-        //             break;
-        //             case "arrivedAtDoorUpdate":
-        //                 try {
-        //                     $link->autocommit(FALSE); //turn on transactions
-        //                     // Checking user id
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
-        //                     $stmt->bind_param("ii", $tableId, intval($_POST['userId']));
-        //                     $stmt->execute();
-        //                     $result = $stmt->get_result();
-        //                     if($result->num_rows === 0) {
-        //                         echo "Bruger findes ikke længere";
-        //                         $link->rollback(); //remove all queries from queue if error (undo)
-        //                         break;
-        //                     }
-        //                     $stmt->close();
-
-        //                     // Getting and checking new payment id
-        //                     // Payment type
-        //                     if ($_POST['arrivedAtDoor'] != "0" AND $_POST['arrivedAtDoor'] != "1") break;
-
-
-        //                     // Sending new payment id to server
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("UPDATE $table_name SET arrivedAtDoor = ? WHERE id = ?");
-        //                     $stmt->bind_param("ii", $_POST['arrivedAtDoor'], $_POST['userId']);
-        //                     $stmt->execute();
-        //                     $stmt->close();
-
-        //                     $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        //                     echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev opdateret')}, 500);</script>"; //User feedback
-        //                 } catch(Exception $e) {
-        //                     $link->rollback(); //remove all queries from queue if error (undo)
-        //                     throw $e;
-        //                 }
-        //             break;
-        //             case "crewUpdate":
-        //                 try {
-        //                     $link->autocommit(FALSE); //turn on transactions
-        //                     // Checking user id
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
-        //                     $stmt->bind_param("ii", $tableId, intval($_POST['userId']));
-        //                     $stmt->execute();
-        //                     $result = $stmt->get_result();
-        //                     if($result->num_rows === 0) {
-        //                         echo "Bruger findes ikke længere";
-        //                         $link->rollback(); //remove all queries from queue if error (undo)
-        //                         break;
-        //                     }
-        //                     $stmt->close();
-
-        //                     // Getting and checking new payment id
-        //                     // Payment type
-        //                     if ($_POST['crew'] != "0" AND $_POST['crew'] != "1") break;
-
-
-        //                     // Sending new payment id to server
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("UPDATE $table_name SET crew = ? WHERE id = ?");
-        //                     $stmt->bind_param("ii", $_POST['crew'], $_POST['userId']);
-        //                     $stmt->execute();
-        //                     $stmt->close();
-
-        //                     $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        //                     echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev opdateret')}, 500);</script>"; //User feedback
-        //                 } catch(Exception $e) {
-        //                     $link->rollback(); //remove all queries from queue if error (undo)
-        //                     throw $e;
-        //                 }
-        //             break;
-        //             case "pizzaUpdate":
-        //                 try {
-        //                     $link->autocommit(FALSE); //turn on transactions
-        //                     // Checking user id
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableID = ? and active = 1 and id = ?");
-        //                     $stmt->bind_param("ii", $tableId, intval($_POST['userId']));
-        //                     $stmt->execute();
-        //                     $result = $stmt->get_result();
-        //                     if($result->num_rows === 0) {
-        //                         echo "Bruger findes ikke længere";
-        //                         $link->rollback(); //remove all queries from queue if error (undo)
-        //                         break;
-        //                     }
-        //                     $stmt->close();
-
-        //                     // Getting and checking new payment id
-        //                     // Payment type
-        //                     if ($_POST['pizza'] != "0" AND $_POST['pizza'] != "1") break;
-
-
-        //                     // Sending new payment id to server
-        //                     $table_name = $wpdb->prefix . 'htx_form_users';
-        //                     $stmt = $link->prepare("UPDATE $table_name SET pizza = ? WHERE id = ?");
-        //                     $stmt->bind_param("ii", $_POST['pizza'], $_POST['userId']);
-        //                     $stmt->execute();
-        //                     $stmt->close();
-
-        //                     $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        //                     echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev opdateret')}, 500);</script>"; //User feedback
-        //                 } catch(Exception $e) {
-        //                     $link->rollback(); //remove all queries from queue if error (undo)
-        //                     throw $e;
-        //                 }
-        //             break;
-        //         }
-        //     }
-        //     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        //         if ($_POST['delete'] == "deleteSubmission") {
-        //             // Deleting submission
-        //             try {
-        //                 $link->autocommit(FALSE); //turn on transactions
-        //                 // Delete user id
-        //                 $table_name = $wpdb->prefix . 'htx_form_users';
-        //                 $stmt = $link->prepare("DELETE FROM `$table_name` WHERE tableID = ? and id = ?");
-        //                 $stmt->bind_param("ii", $tableId, intval($_POST['userid']));
-        //                 $stmt->execute();
-        //                 $result = $stmt->get_result();
-        //                 if($result->num_rows === 0) echo "Ingen bruger med det id";
-        //                 $stmt->close();
-
-        //                 // Delete form elements user submittet
-        //                 $table_name = $wpdb->prefix . 'htx_form';
-        //                 $stmt = $link->prepare("DELETE FROM `$table_name` WHERE tableID = ? and userId = ?");
-        //                 $stmt->bind_param("ii", $tableId, intval($_POST['userid']));
-        //                 $stmt->execute();
-        //                 $result = $stmt->get_result();
-        //                 if($result->num_rows === 0) echo "Ingen submission elementer med det id";
-        //                 $stmt->close();
-
-        //                 $link->autocommit(TRUE); //turn off transactions + commit queued queries
-        //                 echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev slettet')}, 100);</script>"; //User feedback
-        //             } catch(Exception $e) {
-        //                 $link->rollback(); //remove all queries from queue if error (undo)
-        //                 throw $e;
-        //             }
-        //         }
-        //     }
-    // }
 ?>

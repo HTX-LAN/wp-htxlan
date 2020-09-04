@@ -144,7 +144,12 @@ function htx_update_form() {
             $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ?, arrivedAtDoor = ? WHERE id = ?");
             if(!$stmt)
                 throw new Exception($link->error);
-            $stmt->bind_param("ssiiiiii", $_POST['tableName'], $_POST['tableDescription'],intval($_POST['arrived']),intval($_POST['crew']),intval($_POST['pizza']),intval($_POST['registration']),intval($_POST['arrivedAtDoor']), $_POST['formid']);
+            $stmt->bind_param("ssiiiiii", $_POST['tableName'], $_POST['tableDescription'],$arrived,$crew,$pizza,$registration,$arrivedAtDoor, $_POST['formid']);
+            $arrived = intval($_POST['arrived']);
+            $crew = intval($_POST['crew']);
+            $pizza = intval($_POST['pizza']);
+            $registration = intval($_POST['registration']);
+            $arrivedAtDoor = intval($_POST['arrivedAtDoor']);
             $stmt->execute();
             $stmt->close();
             $link->autocommit(TRUE); //turn off transactions + commit queued queries
@@ -419,7 +424,11 @@ function htx_update_column() {
                         // Id for line
                         $lineId = intval($_POST['settingId-'.$i]);
                         if (intval($_POST['settingActive-'.$lineId]) != 0) $active = 1; else $active = 0;
-                        $stmt1->bind_param("ssiiii", htmlspecialchars(trim($_POST['settingName-'.$lineId])), htmlspecialchars(trim($_POST['settingValue-'.$lineId])), intval($_POST['settingSorting-'.$lineId]), $active, intval($_POST['settingExpence-'.$lineId]), $lineId);
+                        $settingNameParam = htmlspecialchars(trim($_POST['settingName-'.$lineId]));
+                        $settingValueParam = htmlspecialchars(trim($_POST['settingValue-'.$lineId]));
+                        $settingSortingParam = intval($_POST['settingSorting-'.$lineId]);
+                        $settingExpenceParam = intval($_POST['settingExpence-'.$lineId]);
+                        $stmt1->bind_param("ssiiii", $settingNameParam, $settingValueParam, $settingSortingParam, $active, $settingExpenceParam, $lineId);
                         $stmt1->execute();
                     }
 
@@ -519,7 +528,15 @@ function htx_update_column() {
             }
             
 
-            $stmt1->bind_param("ssisiiissssssi", htmlspecialchars(trim($_POST['name'])), $formatPost, $speciealPost, $specialPostArray, intval($_POST['sorting']), $required, intval($_POST['disabled']), $placeholderText, htmlspecialchars(trim($_POST['teams'])), $formatExtra, $specialNameExtra,$specialnameExtra2,$specialNameExtra3,$setting);
+            $stmt1->bind_param("ssisiiissssssi", $nameParam, $formatPost, $speciealPost, $specialPostArray, $sortingParam, $required, $disabledParam, $placeholderText, $teamsParam, $formatExtra, $specialNameExtra,$specialnameExtra2,$specialNameExtra3,$setting);
+
+            $nameParam = htmlspecialchars(trim($_POST['name']));
+            $sortingParam = intval($_POST['sorting']);
+            $disabledParam = intval($_POST['disabled']);
+            $teamsParam = htmlspecialchars(trim($_POST['teams']));
+            
+
+
             // Updating special, and inserting as array
 
             $stmt1->execute();
@@ -869,9 +886,7 @@ function htx_dublicate_form() {
                     if ($columnSpecialNameExtra2 == "" or $columnSpecialNameExtra2 == null or $columnSpecialNameExtra2 == NULL) $columnSpecialNameExtra2New[$i] = ""; 
                     else $columnSpecialNameExtra2New[$i] = $settignNewId[$columnSpecialNameExtra2[$i]];
 
-                    $stmt->bind_param("ssssssssssssssssssi", $columnActive[$i], $columnNameFront[$i], $columnNameBack[$i], $columnSettingCatNew[$i], $columnFormat[$i],
-                    $columnType[$i], $columnSpecial[$i], $columnSpecialName[$i], $columnPlaceholderText[$i], $columnTeamsNew[$i], $columnFormatExtra[$i], $columnSpecialNameExtra[$i],
-                    $columnSpecialNameExtra2New[$i], $columnSpecialNameExtra3[$i], $columnSpecialNameExtra4[$i], $columnSorting[$i],$columnDisabled[$i],$columnRequired[$i], $tableNewId);
+                    $stmt->bind_param("ssssssssssssssssssi", $columnActive[$i], $columnNameFront[$i], $columnNameBack[$i], $columnSettingCatNew[$i], $columnFormat[$i],$columnType[$i], $columnSpecial[$i], $columnSpecialName[$i], $columnPlaceholderText[$i], $columnTeamsNew[$i], $columnFormatExtra[$i], $columnSpecialNameExtra[$i],$columnSpecialNameExtra2New[$i], $columnSpecialNameExtra3[$i], $columnSpecialNameExtra4[$i], $columnSorting[$i],$columnDisabled[$i],$columnRequired[$i], $tableNewId);
                     $stmt->execute();
                     $columnNewId[$columnId[$i]] = $link->insert_id;
 
