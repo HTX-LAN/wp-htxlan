@@ -512,6 +512,10 @@
             // Column info
             $table_name = $wpdb->prefix . 'htx_column';
             $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND id = ?");
+            if(!$stmt){
+                throw new Exception($link->error);
+                echo $link->error;
+            }
             $stmt->bind_param("ii", $tableId, intval($setting));
             $stmt->execute();
             $result = $stmt->get_result();
