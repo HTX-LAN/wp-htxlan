@@ -414,7 +414,7 @@
         // Settings menu
         echo "<div class='formCreator_settings' id='formCreator_settings'>";
         if (isset($_GET['setting']) AND in_array($_GET['setting'],$settingIds)) {
-            $setting = $_GET['setting'];
+            $setting = intval($_GET['setting']);
 
             // Function for show if other element has special value
             function HTX_formcreator_showElementIf($elementValues,$allElementValues,$tableId) {
@@ -512,7 +512,11 @@
             // Column info
             $table_name = $wpdb->prefix . 'htx_column';
             $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableid = ? AND id = ?");
-            $stmt->bind_param("ii", $tableId, intval($setting));
+            if(!$stmt){
+                throw new Exception($link->error);
+                echo $link->error;
+            }
+            $stmt->bind_param("ii", $tableId, $setting);
             $stmt->execute();
             $result = $stmt->get_result();
             if($result->num_rows === 0) echo "Noget gik galt"; else {

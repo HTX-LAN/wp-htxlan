@@ -64,9 +64,6 @@
             }
         }
 
-        // Post handling
-        participantList_post($tableId);
-
         // Dropdown menu
         // Starting dropdown menu
         echo "<p><h3>Formular:</h3> ";

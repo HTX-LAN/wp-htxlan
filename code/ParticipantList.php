@@ -67,10 +67,6 @@
                 }
             }
         }
-            
-
-        // Post handling
-        // participantList_post($tableId);
 
         // Dropdown menu
         // Starting dropdown menu
@@ -207,6 +203,8 @@
         // Users
         $table_name = $wpdb->prefix . 'htx_form_users';
         $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND active = 1");
+        if(!$stmt)
+                throw new Exception($link->error);
         $stmt->bind_param("i", $tableId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -258,22 +256,22 @@
                 $cellVisibility = '';
             else 
                 $cellVisibility = 'hidden';
-                echo "<th><span class='material-icons $cellVisibility' title='Ankommet' style='cursor: help'>flight_land</span></th>";
+                echo "<th class='$cellVisibility'><span class='material-icons' title='Ankommet' style='cursor: help'>flight_land</span></th>";
             if ($tableCrew[$tableId] == 1)
             $cellVisibility = '';
             else 
                 $cellVisibility = 'hidden';
-                echo "<th><span class='material-icons $cellVisibility' title='Person er en del af crew' style='cursor: help'>people_alt</span></th>";
+                echo "<th class='$cellVisibility'><span class='material-icons' title='Person er en del af crew' style='cursor: help'>people_alt</span></th>";
             if ($tablePizza[$tableId] == 1)
                 $cellVisibility = '';
             else 
                 $cellVisibility = 'hidden';
-                echo "<th><span class='material-icons $cellVisibility' title='Person har fået leveret pizza' style='cursor: help'>local_pizza</span></th>";
+                echo "<th class='$cellVisibility'><span class='material-icons' title='Person har fået leveret pizza' style='cursor: help'>local_pizza</span></th>";
             if ($tableArrivedAtDoor[$tableId] == 1)
                 $cellVisibility = '';
             else 
                 $cellVisibility = 'hidden';
-            echo "<th><span class='material-icons $cellVisibility' title='Person købte billet ved ankomst' style='cursor: help'>sensor_door</span></th>";
+            echo "<th class='$cellVisibility'><span class='material-icons' title='Person købte billet ved ankomst' style='cursor: help'>sensor_door</span></th>";
             echo "<th>Pris</th>";
             echo "<th></th>";
 

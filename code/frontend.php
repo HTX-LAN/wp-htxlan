@@ -1,10 +1,4 @@
 <?php
-    //Prevent direct file access
-    if(!defined('ABSPATH')) {
-        header("Location: ../../../../");
-        die();
-    }
-
     // Frontend php site
 
     // Shortcode for blancket
@@ -33,6 +27,7 @@
 
     // Perform the shortcode output for form
     function HTX_lan_tilmdeldingsblanket_function($atts = array()){
+        
         // Custom connection to database
         $link = database_connection();
         global $wpdb;
