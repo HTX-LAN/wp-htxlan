@@ -1,6 +1,6 @@
 // Function for downloading data
-function downloadData()
-{
+function downloadData() {
+
     var csv = Papa.unparse(tableCSVContent);
 
     var csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
@@ -39,4 +39,9 @@ function participantUpdate(cell,rowId,formId,userId) {
             console.log(data.error);
         }
     });
+}
+
+
+function participantOpenUpdate(submissionId) {
+    
 }
