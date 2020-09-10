@@ -378,6 +378,8 @@
                             echo "<i style='color: red'>-</i>";
                             echo "</td>";
 
+                            $userData[$userid[$i]][$columnNameBack[$index]] = $row2['value'];
+
                             // Data for download
                             $lineData[$columnNameFront[$index]] = '-';
                         }
@@ -501,6 +503,7 @@
                                         $lineData[$columnNameFront[$index]] .= htmlspecialchars($row2['value']);
                                     }
                                 }
+                                $userData[$userid[$i]][$row2['name']] = $row2['value'];
                             }
                             echo "</td>";
                         }
@@ -648,7 +651,6 @@
         // Participant edit
         if (isset($_GET['editUser']) and $_GET['editUser'] != "" AND $_GET['editUser'] != '0' AND in_array($_GET['editUser'],$userid)) {
             $userId = $_GET['editUser'];
-            
             echo "<div id='userEdit' style='margin-top: 2rem;'>";
             echo "<h3>Opdater tilmelding - $userId</h3>";
             for ($i=0; $i < count($columnNameFront); $i++) {
@@ -660,6 +662,9 @@
                 if ($disabled[$i] == 1) $disabledClass = "hidden"; else $disabledClass = "";
                 // Main writing of input
                 $html .= "\n<div id='$columnId[$i]-div'>";
+                $_POST[$columnNameBack[$i]] = $userData[$userId][$columnNameBack[$i]];
+                if (!in_array($userData[$userId][$columnNameBack[$i]],$settingNameID))
+                $_POST[$columnNameBack[$i]."Other"] = $userData[$userId][$columnNameBack[$i]];
                 switch ($columnType[$i]) {
                     case "dropdown":
                         $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
@@ -717,8 +722,12 @@
     
                             // Other input option
                             if (in_array('otherInput',$specialName[$i])) {
+                                if (isset($_POST[$columnNameBack[$i]."Other"]) and $_POST[$columnNameBack[$i]."Other"] != "")
+                                    $otherInputValue = $_POST[$columnNameBack[$i]."Other"];
+                                else 
+                                    $otherInputValue = "";
                                 $html .= "\n<small><i><label>Andet: </label>";
-                                $html .= "\n<input name='$columnNameBack[$i]Other' type='text' placeholder='Andet' id='$columnId[$i]-input-other' style='max-width: 250px; margin-top: 10px' value='".$_POST[$columnNameBack[$i]."Other"]."'>";
+                                $html .= "\n<input name='$columnNameBack[$i]Other' type='text' placeholder='Andet' id='$columnId[$i]-input-other' style='max-width: 250px; margin-top: 10px' value='$otherInputValue'>";
                                 $html .= "\n</i></small>";
                             }
                         }
@@ -850,6 +859,7 @@
                         $html .= "\n</p>";
                     break;
                     case "checkbox":
+                        $_POST[$columnNameBack[$i]] = explode(",",$userData[$userId][$columnNameBack[$i]]);
                         $html .= "\n<p class='$disabledClass'><label id='$columnId[$i]-input'>$columnNameFront[$i]$requiredStar</label><br>";
                         // Getting settings category
                         $table_name = $wpdb->prefix . 'htx_settings_cat';
@@ -918,14 +928,15 @@
                         }
                     break;
                     default:
+                        if ($columnNameBack[$i] == 'email') $inputDisabled = 'disabled'; else $inputDisabled = '';
                         if ($format[$i] == 'textarea') $inputMethod = 'textarea'; else $inputMethod = 'input';
                         $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                        $html .= "\n<$inputMethod id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' oninput='HTX_frontend_js();";
+                        $html .= "\n<$inputMethod $inputDisabled id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' oninput='HTX_frontend_js();";
                         if ($format[$i] == 'range') $html .= "document.getElementById(\"$columnId[$i]-rangeValue\").innerHTML = document.getElementById(\"$columnId[$i]-input\").value;' min='$formatExtra[$i]' max='$specialNameExtra3[$i]' style='padding: 0px;' ";
                         else $html .= "'";
                         if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]' ";
                         $html .= "class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
-                        if ($format[$i] == 'textarea') $html .= "\n</textarea>";
+                        if ($format[$i] == 'textarea') $html .= "\n".$_POST[$columnNameBack[$i]]."\n</textarea>";
                         if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
                         if ($format[$i] == 'range') $html .= "\n<small>værdi: <span id='$columnId[$i]-rangeValue'>$placeholderText[$i]</span></small>";
                         $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
@@ -935,6 +946,86 @@
                 echo $html;
             }
 
+            $html = "";
+            // Writing script for showing elements based on other elements
+            $html .= "\n<script>function HTX_frontend_js() {";
+            // input field
+            $inputtypeTextfield = array('inputbox', 'dropdown', 'user dropdown');
+            for ($i=0; $i < count($columnId); $i++) {
+                if (in_array('show', $specialName[$i])) {
+                    if ($specialNameExtra[$i] != "") {
+                        // Transfering special name extra 2
+                        $html .= "\n var isValue = ".json_encode($specialNameExtra2[$i]).";";
+                        if (in_array($columnTypeID[$specialNameExtra[$i]], $inputtypeTextfield)) {
+                            // Use -input
+                            if ($formatID[$specialNameExtra[$i]] == 'number' AND $columnTypeID[$specialNameExtra[$i]] == 'inputbox') {
+                                if (preg_match('/[<>=!]{1}+[=]?+\d+/', htmlspecialchars_decode($specialNameExtra2[$i][0]), $output_array)) {
+                                    $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
+                                    $html .= "\n if (thatValue $output_array[0]) 
+                                        document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                        else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                                }
+                            } else {
+                                $html .= "\n thatValue = document.getElementById('$specialNameExtra[$i]-input').value;";
+                                $html .= "\n if (isValue.includes(thatValue)) 
+                                    document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                    else document.getElementById('$columnId[$i]-div').classList.add('hidden');";
+                            }
+                        } else if ($columnTypeID[$specialNameExtra[$i]] == 'radio') {
+                            // Use -radio
+                            $html .= "\n
+                            $('.$specialNameExtra[$i]-radio').each(function() {
+                                thatValue = $(this).val()
+                                if($(this).is(':checked')) {
+                                    if (isValue.includes(thatValue)) 
+                                        document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                } else {
+                                    if (isValue.includes(thatValue)) 
+                                        document.getElementById('$columnId[$i]-div').classList.add('hidden');
+                                }
+                            });";
+                        } else if ($columnTypeID[$specialNameExtra[$i]] == 'checkbox') {
+                            // Use -checkbox
+                            $html .= "\n
+                            $('.$specialNameExtra[$i]-checkbox').each(function() {
+                                thatValue = $(this).val()
+                                if($(this).is(':checked')) {
+                                    if (isValue.includes(thatValue)) 
+                                        document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                } else {
+                                    if (isValue.includes(thatValue)) 
+                                        document.getElementById('$columnId[$i]-div').classList.add('hidden');
+                                }
+                            });";
+                        } else {
+                            // do nothing
+                        }
+                    }
+                }
+            }
+            $html .= "\n};setTimeout(() => {HTX_frontend_js()}, 500);</script>";
+            
+            $html .= "\n<input name='tableId' value='$tableId' style='display: none'></p>";
+    
+            // Ending form with submit and reset buttons
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) exit('Something went wrong...');
+            while($row = $result->fetch_assoc()) {
+                $html .= "\n<p><button type='submit' name='submit' value='new'>";
+                if ($row['registration'] == 1) {
+                    $html .= "Tilmeld";
+                } else {
+                    $html .= "Indsend";
+                }
+                $html .= "</button> <button type='reset' name='reset'>Nulstil</button></p></form>";
+            }
+            $stmt->close();
+
+            echo $html;
 
             echo "</div>";
         }
