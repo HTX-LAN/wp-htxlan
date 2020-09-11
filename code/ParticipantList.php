@@ -9,6 +9,7 @@
     // Widgets and style
     HTX_load_standard_backend();
     wp_enqueue_script( 'participantList_script', "/wp-content/plugins/wp-htxlan/code/JS/participant.js");
+    wp_enqueue_style( 'frontendForm', "/wp-content/plugins/wp-htxlan/code/CSS/form-participant.css");
 
     // Getting start information for database connection
     global $wpdb;
@@ -17,6 +18,10 @@
 
     // Non user editable inputs saved
     $nonUserInput = array('text area', 'price','spacing');
+
+    // Price handling array
+    $possiblePriceFunctions = array("price_intrance", "price_extra");
+    $priceSet = false;
 
     // Header
     echo "<h1>HTX Lan tilmeldinger</h1>";
@@ -84,6 +89,8 @@
         // Ending dropdown
         echo "</select></form><br></p>";
 
+        // Posthandling for user edit area
+        $postError = HTX_participant_edit_post($tableId);
 
         // Possible to edit what to show on this page
         echo "<button class='btn normalBtn' style='margin-bottom: 1rem;' onclick='showTeamColumnSettings()'>Ændre viste felter</button><br>";
@@ -651,7 +658,11 @@
         // Participant edit
         if (isset($_GET['editUser']) and $_GET['editUser'] != "" AND $_GET['editUser'] != '0' AND in_array($_GET['editUser'],$userid)) {
             $userId = $_GET['editUser'];
-            echo "<div id='userEdit' style='margin-top: 2rem;'>";
+            echo "<p style='height: 1rem;'></p>";
+            echo "\n<script>var price = {};</script>";
+            echo "<div>".$postError."</div>";
+            echo "<form name='editForm-$i' id='editForm-$i' method='POST'><div id='userEdit' style='margin-top: 2rem;'>";
+            echo "<input type='hidden' name='userId' value='$userId'>";
             echo "<h3>Opdater tilmelding - $userId</h3>";
             for ($i=0; $i < count($columnNameFront); $i++) {
                 $html = "";
@@ -1015,13 +1026,13 @@
             $result = $stmt->get_result();
             if($result->num_rows === 0) exit('Something went wrong...');
             while($row = $result->fetch_assoc()) {
-                $html .= "\n<p><button type='submit' name='submit' value='new'>";
+                $html .= "\n<p><button type='submit' name='submit' value='update' class='btn updateBtn'>";
                 if ($row['registration'] == 1) {
                     $html .= "Tilmeld";
                 } else {
                     $html .= "Indsend";
                 }
-                $html .= "</button> <button type='reset' name='reset'>Nulstil</button></p></form>";
+                $html .= "</button> <button type='reset' name='reset' class='btn cancelBtn'>Nulstil</button></p></form>";
             }
             $stmt->close();
 
