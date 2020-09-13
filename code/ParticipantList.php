@@ -653,7 +653,10 @@
         echo "<div>";
         echo "<script>tableCSVContent = ".json_encode($dataForDownload).";</script>\n";
         echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.2.0/papaparse.min.js" integrity="sha512-rKFvwjvE4liWPlFnvH4ZhRDfNZ9FOpdkD/BU5gAIA3VS3vOQrQ5BjKgbO3kxebKhHdHcNUHLqxQYSoxee9UwgA==" crossorigin="anonymous"></script>'."\n";
-        echo "<button class='btn updateBtn' onclick='downloadData();'>Download data</button>";
+        echo "<button class='btn updateBtn' onclick='";
+        if ($participantError == 0) echo "downloadData()";
+        else echo "informationwindowInsert(2,\"Der var ingen data at downloade\")";
+        echo "'>Download data</button>";
         echo "</div>";
 
         // Participant edit
