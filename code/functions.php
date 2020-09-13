@@ -621,10 +621,15 @@
                                 $stmt2->execute();
                                 $result2 = $stmt2->get_result();
                                 if($result2->num_rows === 0) {} else {
-                                    if (htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]]))) != ""){
-                                        $link->rollback(); //remove all queries from queue if error (undo)
-                                        return $errorUnique.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorUniqueSmall.$redBorder3.$endSpan;
+                                    while($row2 = $result2->fetch_assoc()) {
+                                        if ($row2['userId'] != $formUserId) {
+                                            if (htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]]))) != ""){
+                                                $link->rollback(); //remove all queries from queue if error (undo)
+                                                return $errorUnique.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorUniqueSmall.$redBorder3.$endSpan;
+                                            }
+                                        }
                                     }
+                                    
                                 }
                                 $stmt2->close();
                             }
