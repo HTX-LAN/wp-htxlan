@@ -391,7 +391,7 @@
                     else $html .= "'";
                     if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]' ";
                     $html .= "class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
-                    if ($format[$i] == 'textarea') $html .= "\n</textarea>";
+                    if ($format[$i] == 'textarea') $html .= "\n".$_POST[$columnNameBack[$i]]."\n</textarea>";
                     if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
                     if ($format[$i] == 'range') $html .= "\n<small>værdi: <span id='$columnId[$i]-rangeValue'>$placeholderText[$i]</span></small>";
                     $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
