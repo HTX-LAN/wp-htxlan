@@ -781,7 +781,38 @@
                 break;
                 default: return "Noget gik galt🤔";
             }
-        } else {
+        } else if (isset($_POST['delete'])) {
+            if ($_POST['delete'] == "deleteSubmission") {
+                $link = database_connection();
+                global $wpdb;
+                // Deleting submission
+                try {
+                    $link->autocommit(FALSE); //turn on transactions
+                    // Delete user id
+                    $table_name = $wpdb->prefix . 'htx_form_users';
+                    $stmt = $link->prepare("DELETE FROM `$table_name` WHERE tableID = ? and id = ?");
+                    $stmt->bind_param("ii", $tableId, intval($_POST['userid']));
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    if($result->num_rows === 0) echo "Ingen bruger med det id";
+                    $stmt->close();
+
+                    // Delete form elements user submittet
+                    $table_name = $wpdb->prefix . 'htx_form';
+                    $stmt = $link->prepare("DELETE FROM `$table_name` WHERE tableID = ? and userId = ?");
+                    $stmt->bind_param("ii", $tableId, intval($_POST['userid']));
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    if($result->num_rows === 0) echo "Ingen submission elementer med det id";
+                    $stmt->close();
+
+                    $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                    echo "<script>setTimeout(() => {informationwindowInsert(1,'Linjen blev slettet')}, 300);</script>"; //User feedback
+                } catch(Exception $e) {
+                    $link->rollback(); //remove all queries from queue if error (undo)
+                    throw $e;
+                }
+            }
         }
     }
 
