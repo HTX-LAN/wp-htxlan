@@ -178,7 +178,7 @@
     echo "<form method='POST'>";
     // Columns:
     $table_name = $wpdb->prefix . 'htx_column';
-    $stmt = $link->prepare("SELECT * FROM `$table_name` where (active = 1 and tableId = ?) AND NOT(columnType = 'text area' OR columnType = 'price' OR columnType = 'spacing')");
+    $stmt = $link->prepare("SELECT * FROM `$table_name` where (active = 1 and tableId = ?) AND NOT(columnType = 'text area' OR columnType = 'price' OR columnType = 'spacing') order by sorting");
     $stmt->bind_param("i", $tableId);
     $stmt->execute();
     $result = $stmt->get_result();
