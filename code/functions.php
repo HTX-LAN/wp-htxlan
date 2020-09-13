@@ -600,6 +600,19 @@
                             $specialPostArrayStart = array();
                             $inputName = $columnNameBack[$i];
 
+                            // Check if database record exist
+                            $stmt2 = $link->prepare("SELECT * FROM `$table_name` WHERE name = ? and userId = ? and tableId = ?");
+                            $stmt2->bind_param("sii", $inputName, $formUserId, $tableId);
+                            $stmt2->execute();
+                            $result2 = $stmt2->get_result();
+                            if($result2->num_rows === 0) {
+                                $stmt3 = $link->prepare("INSERT INTO `$table_name` (name, userId, tableId) VALUES (?, ?, ?)");
+                                $stmt3->bind_param("sii", $inputName, $formUserId, $tableId);
+                                $stmt3->execute();
+                                $stmt3->close();
+                            }
+                            $stmt2->close();
+
                             // Check if input for column should be unique
                             if (in_array('unique',$specialName[$i])) {
                                 $table_name2 = $wpdb->prefix . 'htx_form';
