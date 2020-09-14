@@ -600,6 +600,9 @@
                             $specialPostArrayStart = array();
                             $inputName = $columnNameBack[$i];
 
+                            // Skip email editing
+                            if ($columnNameBack[$i] == 'email') continue;
+
                             // Check if database record exist
                             $stmt2 = $link->prepare("SELECT * FROM `$table_name` WHERE name = ? and userId = ? and tableId = ?");
                             $stmt2->bind_param("sii", $inputName, $formUserId, $tableId);
