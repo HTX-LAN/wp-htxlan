@@ -796,10 +796,11 @@
                 // Deleting submission
                 try {
                     $link->autocommit(FALSE); //turn on transactions
+                    $userId = intval($_POST['userid']);
                     // Delete user id
                     $table_name = $wpdb->prefix . 'htx_form_users';
                     $stmt = $link->prepare("DELETE FROM `$table_name` WHERE tableID = ? and id = ?");
-                    $stmt->bind_param("ii", $tableId, intval($_POST['userid']));
+                    $stmt->bind_param("ii", $tableId, $userId);
                     $stmt->execute();
                     $result = $stmt->get_result();
                     if($result->num_rows === 0) echo "Ingen bruger med det id";
@@ -808,7 +809,7 @@
                     // Delete form elements user submittet
                     $table_name = $wpdb->prefix . 'htx_form';
                     $stmt = $link->prepare("DELETE FROM `$table_name` WHERE tableID = ? and userId = ?");
-                    $stmt->bind_param("ii", $tableId, intval($_POST['userid']));
+                    $stmt->bind_param("ii", $tableId, $userId);
                     $stmt->execute();
                     $result = $stmt->get_result();
                     if($result->num_rows === 0) echo "Ingen submission elementer med det id";
