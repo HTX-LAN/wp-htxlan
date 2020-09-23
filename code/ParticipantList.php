@@ -577,7 +577,7 @@
                 else 
                     $cellVisibility = 'hidden';
                 echo "<td style='text-align: center' class='$cellVisibility'>";
-                echo "<input id='crew-$i' type='checkbox' class='inputCheckbox' name='crew' value='1' onchange='participantUpdate(\"crewUpdate\",$i,$tableId,$userIds[$i])'";
+                echo "<input id='crew-$i' type='checkbox' class='inputCheckbox' name='crew' value='1' onchange='participantUpdate(\"crewUpdate\",$i,$tableId,$userIds[$i],$price)'";
                 if ($crew[$i] == 1) {echo "checked"; $price = 0;}
                 echo ">";
                 echo "</td>";
@@ -624,7 +624,7 @@
 
                 // Price
                 $price = floatval($price) + floatval($priceExtra);
-                echo "<td>$price,-</td>";
+                echo "<td><span id='price-$i'>$price</span>,-</td>";
 
                 // data
                 $lineData['Pris'] = floatval($price);

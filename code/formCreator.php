@@ -645,6 +645,7 @@
                             $stmt2->execute();
                             $result2 = $stmt2->get_result();
                             if($result2->num_rows === 0) echo "<p>Ingen indstillinger for dropdown</p>"; else {
+                                echo "<div class='dropdownPossibilities'>";
                                 while($row2 = $result2->fetch_assoc()) {
                                     $row2['id'];
                                     $row2['settingName'];
@@ -663,12 +664,12 @@
                                             $row3['id'];
                                             $row3['settingName'];
                                             $rowSettingId = $row3['value'];
-
+                                            echo "<div id='dropdownElement-".$row3['id']."' class='dropdownPossibilitiesElement' style='order: ".$row3['sorting']."'>";
                                             echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox settingName' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
                                             echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox settingValue' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
                                             if (!in_array($possibleFunctionsNonInput[1], $specialName)) $expenceDisabled = 'hidden'; else $expenceDisabled = '';
                                             echo "<div class='$expenceDisabled'><label for='extraSettingExpence-$i'>Udgift</label> <input type='text' id='extraSettingExpence-$i' class='inputBox settingExpence' name='settingExpence-".$row3['id']."' value='".$row3['expence']."''></div>";
-                                            echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox settingSorting' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
+                                            echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox settingSorting' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."' oninput='document.getElementById(\"dropdownElement-".$row3['id']."\").style.order = this.value'></div>";
                                             echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox settingActive' name='settingActive-".$row3['id']."' value='0'";
                                             if ($row3['active'] == 0) echo "checked";
                                             echo "></div>";
@@ -677,9 +678,11 @@
                                             echo "<div style='width: 100%;margin-bottom:1.75rem;'><button type='submit' name='deleteSetting' value='".$row3['id']."' class='btn deleteBtn' onclick='HTXJS_deleteSetting(" . $row3['id'] . ")'>Slet</button></div>";
 
                                             $i++;
+                                            echo "</div>";
                                         }
 
                                     }
+                                    echo "</div>";
                                     $stmt3->close();
                                     echo "<input class='inputBox hidden' id='settingsTrue' value='1'>";
                                     echo "<input class='inputBox hidden' id='settingsAmount' value='$i'>";
@@ -755,6 +758,7 @@
                             $result2 = $stmt2->get_result();
                             if($result2->num_rows === 0) echo "<p>Ingen indstillinger for dropdown</p>"; else {
                                 while($row2 = $result2->fetch_assoc()) {
+                                    echo "<div class='dropdownPossibilities'>";
                                     $row2['id'];
                                     $row2['settingName'];
                                     $row2['special'];
@@ -773,24 +777,25 @@
                                             $row3['id'];
                                             $row3['settingName'];
                                             $rowSettingId = $row3['value'];
-
+                                            echo "<div id='dropdownElement-".$row3['id']."' class='dropdownPossibilitiesElement' style='order: ".$row3['sorting']."'>";
                                             echo "<div><label for='extraSettingName-$i'>Navn</label> <input type='text' id='extraSettingName-$i' class='inputBox settingName' name='settingName-".$row3['id']."' value='".$row3['settingName']."'></div>";
                                             echo "<div><label for='extraSettingValue-$i'>Værdi</label> <input type='text' id='extraSettingValue-$i' class='inputBox settingValue' name='settingValue-".$row3['id']."' value='".$row3['value']."''></div>";
                                             if (!in_array($possibleFunctionsNonInput[1], $specialName)) $expenceDisabled = 'hidden'; else $expenceDisabled = '';
                                             echo "<div class='$expenceDisabled'><label for='extraSettingExpence-$i'>Udgift</label> <input type='text' id='extraSettingExpence-$i' class='inputBox settingExpence' name='settingExpence-".$row3['id']."' value='".$row3['expence']."''></div>";
-                                            echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox settingSorting' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."'></div>";
+                                            echo "<div><label for='extraSettingSorting-$i'>Sortering</label> <input type='number' step='1' min='0' id='extraSettingSorting-$i' class='inputBox settingSorting' name='settingSorting-".$row3['id']."' value='".$row3['sorting']."' oninput='document.getElementById(\"dropdownElement-".$row3['id']."\").style.order = this.value'></div>";
                                             echo "<div><label for='extraSettingDisabled-$i'>Deaktiveret </label><input id='extraSettingDisabled-$i' type='checkbox' class='inputCheckbox settingActive' name='settingActive-".$row3['id']."' value='0'";
                                             if ($row3['active'] == 0) echo "checked";
                                             echo "></div>";
                                             echo "<input class='inputBox hidden settingId' name='settingId-$i' value='".$row3['id']."'>";
                                             echo "<button type='submit' name='submit' value='updateSetting' class='hidden'>Opdater</button>";
                                             echo "<div style='width: 100%;margin-bottom:1.75rem;'><button type='submit' name='deleteSetting' value='".$row3['id']."' class='btn deleteBtn' onclick='HTXJS_deleteSetting(" . $row3['id'] . ")'>Slet</button></div>";
-
+                                            echo "</div>";
                                             $i++;
                                         }
 
                                     }
                                     $stmt3->close();
+                                    echo "</div>";
                                     echo "<input class='inputBox hidden' id='settingsTrue' value='1'>";
                                     echo "<input class='inputBox hidden' id='settingsAmount' value='$i'>";
                                     echo "<input class='inputBox hidden' id='settingsId' value='". $row2['id']."'>";
