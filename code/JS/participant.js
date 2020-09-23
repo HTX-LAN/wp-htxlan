@@ -20,7 +20,7 @@ function downloadData() {
     tempLink.click();
 }
 
-function participantUpdate(cell,rowId,formId,userId) {
+function participantUpdate(cell,rowId,formId,userId,price) {
     var form = {
         formid: formId,
         userId: userId,
@@ -34,7 +34,16 @@ function participantUpdate(cell,rowId,formId,userId) {
         action: "htx_participant_update"
     };
     $.post(ajaxurl, form, function(data) {
-        if(data.success == false) {
+        if(data.success == true) {
+            if (cell == 'crewUpdate') {
+                currentPrice = parseFloat(document.getElementById('price-'+rowId).innerHTML);
+                if ($('#crew-'+rowId).is(":checked")){
+                    document.getElementById('price-'+rowId).innerHTML = (currentPrice - parseFloat(price));
+                } else {
+                    document.getElementById('price-'+rowId).innerHTML = (currentPrice + parseFloat(price));
+                }
+            }
+        } else {
             informationwindowInsert(3, "Rækken blev ikke opdateret");
             console.log(data.error);
         }
