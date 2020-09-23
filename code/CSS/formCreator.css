@@ -64,6 +64,15 @@
     width: 100%;
 }
 
+/* Dropdown */
+.dropdownPossibilities {
+    display: flex;
+    flex-direction: column;
+}
+.dropdownPossibilitiesElement {
+    width: 100%;
+}
+
 /* Icons */
 .settingIcon {
     float: right;
