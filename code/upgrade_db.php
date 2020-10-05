@@ -54,7 +54,7 @@
                 }
                 
                 if ($serverDatabaseversion < 0.2) {
-                    // Some action here to update databse to 0.1
+                    // Added registration
                     $table_name = $wpdb->prefix . 'htx_form_tables';
                     $command = "ALTER TABLE $table_name ADD `registration` INT NOT NULL DEFAULT '1' AFTER `tableDescription`";
                     $stmt = $link->prepare("$command");
@@ -75,21 +75,13 @@
                 }
 
                 if ($serverDatabaseversion < 0.3) {
-                    // Some action here to update databse to 0.1
+                    // Added arrived at dor
                     $table_name = $wpdb->prefix . 'htx_form_tables';
                     $command = "ALTER TABLE $table_name ADD `arrivedAtDoor` INT NOT NULL DEFAULT '0' AFTER `arrived`";
                     $stmt = $link->prepare("$command");
                     if(!$stmt)
                         throw new Exception($link->error);
                     $stmt->execute();
-
-                    $table_name = $wpdb->prefix . 'htx_form_users';
-                    $command = "ALTER TABLE $table_name ADD `arrivedAtDoor` INT NOT NULL DEFAULT '0' AFTER `arrived`";
-                    $stmt = $link->prepare("$command");
-                    if(!$stmt)
-                        throw new Exception($link->error);
-                    $stmt->execute();
-                    $stmt->close();
 
                     // Update version number
                     $table_name = $wpdb->prefix . 'htx_settings';
@@ -100,6 +92,26 @@
                     $stmt->close();
 
                     $serverDatabaseversion = 0.3;
+                }
+
+                if ($serverDatabaseversion < 0.4) {
+                    // Added support for open and close form dates and times
+                    $table_name = $wpdb->prefix . 'htx_form_tables';
+                    $command = "ALTER TABLE `$table_name` ADD `openForm` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `pizza`, ADD `closeForm` DATETIME NULL DEFAULT NULL AFTER `openForm`";
+                    $stmt = $link->prepare("$command");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+
+                    // Update version number
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.3' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+                    $stmt->close();
+
+                    $serverDatabaseversion = 0.4;
                 }
 
                 // Update version number

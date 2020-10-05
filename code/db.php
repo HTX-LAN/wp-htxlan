@@ -55,6 +55,8 @@
             pizza INT default 0,
             email TEXT,
             lastEditedBy TEXT,
+            `openForm` datetime NOT NULL DEFAULT current_timestamp(),
+            `closeForm` datetime DEFAULT NULL,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) $charset_collate;";
