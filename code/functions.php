@@ -138,14 +138,12 @@
 
                         // Check if mail exist, and only return error if table is not a registration form
                         if ($registration == 1) {
-                            $stmt->close();
                             $table_name = $wpdb->prefix . 'htx_form_users';
                             $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
                             $stmt->bind_param("si", $email, $tableId);
                             $stmt->execute();
                             $result = $stmt->get_result();
                             if($result->num_rows === 0) {} else return $errorEmail;
-                            $stmt->close();
                         } 
                         
                         // Convert values to the right format
@@ -378,6 +376,26 @@
                                 Formularen blev indsendt
                             </span>
                         </div></div>";
+
+                        // Email notification
+                        // $headers[] = 'From: HTX LAN <me@themikkel.dk>';
+                        $message = "<html>
+                        <head>
+                        <title>Tilmelding modtager</title>
+                        </head>
+                        <body>
+                        <h1>Din tilmelding til HTX-LAN er modtaget</h1>
+                        <p>Vi glæder os til at se dig til LAN d. 13 november kl 17, hvor der skal spilles igennem hele natten.</p>
+                        <p>Billet nummer: $formUserId</p>
+                        <p>Hvis du får problemmer til LAN med din tilmelding kan du vise dit billet nummer.</p>
+                        <br>
+                        <p>Hvis du har nogen spørgsmål, er du velkommen til at kontakte os på <a href='mailto:info@htx-lan.dk'>info@htx-lan.dk</a></p>
+                        </body>
+                        </html>";
+                        $headers = "MIME-Version: 1.0" . "\r\n";
+                        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+                        $subject = "Din tilmelding er modtaget - HTX LAN";
+                        wp_mail($email, $subject, $message, $headers);
                     } else {
                         $succes = "<div class='form_success'>
                         <div class='form_success_icon'>
