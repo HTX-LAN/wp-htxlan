@@ -141,15 +141,26 @@ function htx_update_form() {
             $link = database_connection();
             $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_form_tables';
-            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ?, arrivedAtDoor = ? WHERE id = ?");
+            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ?, arrivedAtDoor = ?, closeFormActive = ?, openForm = ?, closeForm = ? WHERE id = ?");
             if(!$stmt)
                 throw new Exception($link->error);
-            $stmt->bind_param("ssiiiiii", $_POST['tableName'], $_POST['tableDescription'],$arrived,$crew,$pizza,$registration,$arrivedAtDoor, $_POST['formid']);
+            $stmt->bind_param("ssiiiiiissi", $_POST['tableName'], $_POST['tableDescription'],$arrived,$crew,$pizza,$registration,$arrivedAtDoor, $closeFormActive, $openDate, $closeDate, $_POST['formid']);
             $arrived = intval($_POST['arrived']);
             $crew = intval($_POST['crew']);
             $pizza = intval($_POST['pizza']);
             $registration = intval($_POST['registration']);
             $arrivedAtDoor = intval($_POST['arrivedAtDoor']);
+            $response->open = $_POST['tableOpenDate'];
+            if (strtotime($_POST['tableOpenDate']) == false)
+                throw new Exception('Date format not supported');
+            else 
+                $openDate = date('Y-m-d H:i:s', strtotime($_POST['tableOpenDate']));
+            if (strtotime($_POST['tableCloseDate']) == false)
+                throw new Exception('Date format not supported');
+            else 
+                $closeDate = date('Y-m-d H:i:s', strtotime($_POST['tableCloseDate']));
+            if (strtotime($openDate) > strtotime($closeDate))
+                throw new Exception('Close date, shall not be before start date');
             $stmt->execute();
             $stmt->close();
             $link->autocommit(TRUE); //turn off transactions + commit queued queries

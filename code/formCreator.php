@@ -1318,12 +1318,12 @@
                     // Open and close datetime for form
                     echo "<h4>Dato of tid for åbning og lukning af formular</h4>";
                     echo "<div><label for='tableOpenDate'>Formularen åbner d.: </label> <input type='datetime-local' id='tableOpenDate' class='inputBox' name='tableOpenDate' value='".date('Y-m-d\TH:i', strtotime($row['openForm']))."'
-                    oninput='document.getElementById(\"tableCloseDate\").min = this.value;'></div>";
+                    oninput='document.getElementById(\"tableCloseDate\").min = this.value;' max='".date('Y-m-d\TH:i', strtotime($row['closeForm']))."'></div>";
                     echo "<div><input id='closeFormActive' type='checkbox' class='inputCheckbox special' name='closeFormActive' value='1'";
                     if ($row['closeFormActive'] == 1) {echo "checked"; $visible = '';} else $visible = 'hidden';
                     echo "onchange='if (this.checked) {document.getElementById(\"closeFormInput\").classList.remove(\"hidden\");} else {document.getElementById(\"closeFormInput\").classList.add(\"hidden\");}'><label for='closeFormActive'>Luk formular på dato </label></div>";
                     echo "<div class='$visible' id='closeFormInput'><label for='tableCloseDate'>Formularen lukker d.: </label> <input type='datetime-local' id='tableCloseDate' class='inputBox' name='tableCloseDate' value='".date('Y-m-d\TH:i', strtotime($row['closeForm']))."'
-                    oninput='document.getElementById(\"tableOpenDate\").max = this.value;'></div>";
+                    oninput='document.getElementById(\"tableOpenDate\").max = this.value;' min='".date('Y-m-d\TH:i', strtotime($row['openForm']))."'></div>";
                     
                     echo "<br>";
 
