@@ -54,6 +54,12 @@
         else {
             while($row = $result->fetch_assoc()) {
                 $formName = $row['tableName'];
+
+                // Cehck for open date
+                if (strtotime($row['openForm']) > strtotime('now'))
+                return "<p>Denne formular er endnu ikke tilgængelig.</p>\n<p>Formularen vil åbne d. ".date('d F Y', strtotime($row['openForm']))." kl: ".date('H:i', strtotime($row['openForm']));
+                if ($row['closeFormActive'] == 1 && strtotime($row['closeForm']) < strtotime('now'))
+                return "<p>Denne formular er desværre lukket.</p>\n<p>Formularen lukkede d. ".date('d F Y', strtotime($row['closeForm']))." kl: ".date('H:i', strtotime($row['closeForm']));
             }
         }
         $stmt->close();

@@ -150,16 +150,18 @@ function htx_update_form() {
             $pizza = intval($_POST['pizza']);
             $registration = intval($_POST['registration']);
             $arrivedAtDoor = intval($_POST['arrivedAtDoor']);
-            $response->open = $_POST['tableOpenDate'];
+            $closeFormActive = intval($_POST['closeFormActive']);
             if (strtotime($_POST['tableOpenDate']) == false)
                 throw new Exception('Date format not supported');
             else 
                 $openDate = date('Y-m-d H:i:s', strtotime($_POST['tableOpenDate']));
-            if (strtotime($_POST['tableCloseDate']) == false)
+            if (strtotime($_POST['tableCloseDate']) == false && $closeFormActive == 1)
                 throw new Exception('Date format not supported');
-            else 
+            else if (strtotime($_POST['tableCloseDate']) == false)
+                $closeDate = NULL;
+            else
                 $closeDate = date('Y-m-d H:i:s', strtotime($_POST['tableCloseDate']));
-            if (strtotime($openDate) > strtotime($closeDate))
+            if (strtotime($openDate) > strtotime($closeDate)  && $closeFormActive == 1)
                 throw new Exception('Close date, shall not be before start date');
             $stmt->execute();
             $stmt->close();
