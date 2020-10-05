@@ -31,7 +31,7 @@ Denne side viser alle tilmeldte
 - [x] Muligt at registrer person som betalt
 - [x] Muligt at registrer person som ankommet
 - [x] Muligt at slette tilmelding
-- [ ] Muligt at ændre tilmelding
+- [x] Muligt at ændre tilmelding
 - [x] Muligt at se endelige pris for tilmelding
 
 ### Form creator
@@ -39,6 +39,9 @@ Form creator, er hvor hver form ændres og sættes op
 - [x] Formularer tabel
   - [x] Vælge formular til redigering
   - [x] Opret ny formular
+  - [x] Sætte åbnings dato for formular
+  - [x] Sætte luknings dato for formular
+  - [x] Sætte om formular er en tilmeldings form eller bare en normal formular
 - [x] Redigering af formular
   - [x] Redigere formular informationer
   - [x] Slette formular
