@@ -50,6 +50,7 @@ function HTXJS_updateForm(formid) {
         arrivedAtDoor: $('#arrivedAtDoorInput').is(":checked") ? 1 : 0,
         crew: $('#crewInput').is(":checked") ? 1 : 0,
         pizza: $('#pizzaInput').is(":checked") ? 1 : 0,
+        closeFormActive: $('#pizzaInput').is(":checked") ? 1 : 0,
         action: "htx_update_form"
     }, function(data) {
         informationwindowremove(id);

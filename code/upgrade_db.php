@@ -97,7 +97,7 @@
                 if ($serverDatabaseversion < 0.4) {
                     // Added support for open and close form dates and times
                     $table_name = $wpdb->prefix . 'htx_form_tables';
-                    $command = "ALTER TABLE `$table_name` ADD `openForm` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `pizza`, ADD `closeForm` DATETIME NULL DEFAULT NULL AFTER `openForm`";
+                    $command = "ALTER TABLE `$table_name` ADD `openForm` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `pizza`, ADD `closeForm` DATETIME NULL DEFAULT NULL AFTER `openForm`, ADD `closeFormActive` INT NOT NULL DEFAULT '0' AFTER `closeForm`";
                     $stmt = $link->prepare("$command");
                     if(!$stmt)
                         throw new Exception($link->error);
