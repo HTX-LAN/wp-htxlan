@@ -105,13 +105,33 @@
 
                     // Update version number
                     $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.3' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.4' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
                     if(!$stmt)
                         throw new Exception($link->error);
                     $stmt->execute();
                     $stmt->close();
 
                     $serverDatabaseversion = 0.4;
+                }
+
+                if ($serverDatabaseversion < 0.5) {
+                    // Added support for open and close form dates and times
+                    $table_name = $wpdb->prefix . 'htx_form_tables';
+                    $command = "ALTER TABLE `$table_name` ADD `emailEnable` INT NOT NULL DEFAULT '0' AFTER `closeFormActive`, ADD `emailSender` TEXT NOT NULL AFTER `emailEnable`, ADD `emailSubject` TEXT NOT NULL AFTER `emailSender`, ADD `emailText` MEDIUMTEXT NOT NULL AFTER `emailSubject`";
+                    $stmt = $link->prepare("$command");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+
+                    // Update version number
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.5' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+                    $stmt->close();
+
+                    $serverDatabaseversion = 0.5;
                 }
 
                 // Update version number

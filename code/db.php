@@ -87,6 +87,13 @@
             arrivedAtDoor INT DEFAULT 0,
             crew INT DEFAULT 1,
             pizza INT DEFAULT 0,
+            openForm DATETIME DEFAULT CURRENT_TIMESTAMP,
+            closeForm DATETIME DEFAULT NULL,
+            closeFormActive INT DEFAULT 0,
+            emailEnable INT DEFAULT 0,
+            emailSender TEXT,
+            emailSubject TEXT,
+            emailText MEDIUMTEXT,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) COLLATE {$wpdb_collate}";

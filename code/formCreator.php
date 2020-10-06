@@ -1327,11 +1327,36 @@
                     
                     echo "<br>";
 
+                    // Email option
+                    echo "<h4>Email</h4>";
+                    echo "<div><input id='emailEnable' type='checkbox' class='inputCheckbox special' name='emailEnable' value='1'";
+                    echo "onchange='if (this.checked) {document.getElementById(\"emailField\").classList.remove(\"hidden\");} else {document.getElementById(\"emailField\").classList.add(\"hidden\");}'";
+                    if ($row['emailEnable'] == 1) {echo "checked"; $visible = '';} else $visible = 'hidden';
+                    echo "><label for='emailEnable'>Aktiver email </label></div>";
+                    echo "<br>";
+
+                    echo "<div id ='emailField' class='$visible'>";
+                    echo "<div><label for='emailSender'>Afsender email: <span class='material-icons' style='font-size: 15px; cursor: help;'
+                    title='Eksempler:\nresevation@example.com\nResevation Reminder <resevation@example.com>\n\nDenne indstilling kan blive overskrevet af andre plugins.'";
+                    echo ">info</span></label> <input type='email' id='emailSender' class='inputBox' name='emailSender' value='{$row['emailSender']}'></div>";
+                    echo "<div><label for='emailSubject'>Email emne: </label> <input type='email' id='emailSubject' class='inputBox' name='emailSubject' value='{$row['emailSubject']}'></div>";
+                    echo "<label for='emailText' >Email indhold: <span class='material-icons' style='font-size: 15px; cursor: help;'
+                    title='Email understøtter HTML'";
+                    echo ">info</span></label>";
+                    echo "<textarea id='emailText' style='width: 100%'>".html_entity_decode($row['emailText'])."</textarea>";
+                    echo "<p><b>Variabler:</b></p>";
+                    echo "<p>%submissionNumber%<br>";
+                    echo "%email%<br>";
+                    echo "%ticketPriceTotal%<br>%ticketPriceIntrance%<br>%ticketPriceExtra%</p>";
+                    echo "</div>";
+
+                    echo "<br><br>";
+
                     // Data for table
                     // Shortcode
-                    echo "<div><label>Shortcode </label> <br><i>[$tableShortcode form='$tableId']</i></div>";
+                    echo "<div><label><b>Shortcode: </b></label> <br>[$tableShortcode form='$tableId']</div><br>";
                     // Shortcode
-                    echo "<div><label>Dato oprettet </label> <br><i>$taleDateCreate</i></div>";
+                    echo "<div><label><b>Dato oprettet: </b></label> <br><i>$taleDateCreate</i></div>";
 
                     echo "<br>";
 

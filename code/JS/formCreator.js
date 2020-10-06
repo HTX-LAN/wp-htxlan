@@ -53,6 +53,10 @@ function HTXJS_updateForm(formid) {
         closeFormActive: $('#closeFormActive').is(":checked") ? 1 : 0,
         tableOpenDate: $('#tableOpenDate').val(),
         tableCloseDate: $('#tableCloseDate').val(),
+        emailEnable: $('#emailEnable').is(":checked") ? 1 : 0,
+        emailSender: $('#emailSender').val(),
+        emailSubject: $('#emailSubject').val(),
+        emailText: $('#emailText').val(),
         action: "htx_update_form"
     }, function(data) {
         informationwindowremove(id);
