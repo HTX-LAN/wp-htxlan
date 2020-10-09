@@ -444,8 +444,8 @@ function htx_update_column() {
                         $settingNameParam = htmlspecialchars(trim($_POST['settingName-'.$lineId]));
                         $settingValueParam = htmlspecialchars(trim($_POST['settingValue-'.$lineId]));
                         $settingSortingParam = intval($_POST['settingSorting-'.$lineId]);
-                        $settingExpenceParam = intval($_POST['settingExpence-'.$lineId]);
-                        $stmt1->bind_param("ssiiii", $settingNameParam, $settingValueParam, $settingSortingParam, $active, $settingExpenceParam, $lineId);
+                        $settingExpenceParam = floatval($_POST['settingExpence-'.$lineId]);
+                        $stmt1->bind_param("ssiisi", $settingNameParam, $settingValueParam, $settingSortingParam, $active, $settingExpenceParam, $lineId);
                         $stmt1->execute();
                     }
 
