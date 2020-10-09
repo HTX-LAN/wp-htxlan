@@ -123,9 +123,19 @@
                                 $registration = 1;
                             else 
                                 $registration = 0;
+                            if ($row['emailEnable'] == 1) 
+                                $emailEnable = 1;
+                            else 
+                                $emailEnable = 0;
+                            $emailSender = $row['emaiSender'];
+                            $emailText = html_entity_decode($row['emailText']);
+                            $emailSubject = $row['emailSubject'];
                         }
                         $stmt->close();
-                        
+                        // Starting price
+                        $price = 0;
+                        $priceExtra = 0;
+                        $possiblePriceFunctions = array("price_intrance", "price_extra");
 
                         // Checking values
                         // Sanatize email
@@ -138,14 +148,12 @@
 
                         // Check if mail exist, and only return error if table is not a registration form
                         if ($registration == 1) {
-                            $stmt->close();
                             $table_name = $wpdb->prefix . 'htx_form_users';
                             $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE email = ? AND tableId = ?");
                             $stmt->bind_param("si", $email, $tableId);
                             $stmt->execute();
                             $result = $stmt->get_result();
                             if($result->num_rows === 0) {} else return $errorEmail;
-                            $stmt->close();
                         } 
                         
                         // Convert values to the right format
@@ -189,10 +197,12 @@
                                             } else {
                                                 if (in_array('noneInput',explode(",", $row['specialName']))) {
                                                     $columnSettingsId[$row['id']][] = "0";
+                                                    $columnSettingsValue[$row['id']][] = 0;
                                                 }
                                                 
                                                 while($row3 = $result3->fetch_assoc()) {
                                                     $columnSettingsId[$row['id']][] = $row3['id'];
+                                                    $columnSettingsValue[$row['id']][$row3['id']] = $row3['value'];
                                                 }
                                             }
                                             $stmt3->close();
@@ -250,6 +260,12 @@
                                             return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
                                         }
                                         $specialPostArrayStart[] = $specials;
+                                        if (in_array('price_intrance', $specialName[$i]) && $columnSettingsValue[$columnId[$i]][$specials] != "") {
+                                            $price = $price + floatval($columnSettingsValue[$columnId[$i]][$specials]);
+                                        } else if (in_array('price_extra', $specialName[$i]) && $columnSettingsValue[$columnId[$i]][$specials] != ""){
+                                            $priceExtra = $priceExtra + floatval($columnSettingsValue[$columnId[$i]][$specials]);
+                                        }
+
                                     }
                                     $inputValue = implode(",", $specialPostArrayStart);
                                 } else $inputValue = "";
@@ -321,8 +337,14 @@
                                     } else if (!in_array($_POST[$columnNameBack[$i]], $columnSettingsId[$columnId[$i]]) AND $_POST[$columnNameBack[$i]] != "") {
                                         $link->rollback(); //remove all queries from queue if error (undo)
                                         return $errorSettings.$columnNameFront[$i].$redBorder1.$columnId[$i].$redBorder2.$errorSettingsSmall.$redBorder3.$endSpan;
-                                    } else 
+                                    } else {
                                         $inputValue = htmlspecialchars(intval(trim($_POST[$columnNameBack[$i]])));
+                                        if (in_array('price_intrance', $specialName[$i]) && $columnSettingsValue[$columnId[$i]][$_POST[$columnNameBack[$i]]] != "") {
+                                            $price = $price + floatval($columnSettingsValue[$columnId[$i]][$_POST[$columnNameBack[$i]]]);
+                                        } else if (in_array('price_extra', $specialName[$i]) && $columnSettingsValue[$columnId[$i]][$_POST[$columnNameBack[$i]]] != ""){
+                                            $priceExtra = $priceExtra + floatval($columnSettingsValue[$columnId[$i]][$_POST[$columnNameBack[$i]]]);
+                                        }
+                                    }
                                 } else {
                                     // Setting does not have settings, and are an user input
                                     // Check if column format is email
@@ -349,11 +371,12 @@
 
                             $stmt->execute();
                         }
+                        $priceTotal = $price+$priceExtra;
                         $stmt->close();
                         $link->autocommit(TRUE); //turn off transactions + commit queued queries
                     } catch(Exception $e) {
                         $link->rollback(); //remove all queries from queue if error (undo)
-                        throw $e;
+                        // throw $e;
                         if ($registration == 1) 
                             $return = $errorRegistration;
                         else 
@@ -388,6 +411,22 @@
                                 Tilmeldingen blev tilføjet
                             </span>
                         </div></div>";
+                    }
+                    // Email notification
+                    if ($emailEnable == 1) {
+                        $headers = array();
+                        // Prepping email
+                        $message = str_replace("%submissionNumber%", "$formUserId", $emailText);
+                        $message = str_replace("%email%", "$email", $message);
+                        $message = str_replace("%ticketPriceTotal%", "$priceTotal", $message);
+                        $message = str_replace("%ticketPriceIntrance%", "$price", $message);
+                        $message = str_replace("%ticketPriceExtra%", "$priceExtra", $message);
+                        $headers[] = "From: $emailSender";
+                        $headers[] = "MIME-Version: 1.0" . "\r\n";
+                        $headers[] = "Content-type:text/html;charset=UTF-8" . "\r\n";
+                        $subject = $emailSubject;
+                        // Sending email
+                        wp_mail($email, $subject, $message, $headers);
                     }
                     return $succes;
                 break;

@@ -50,6 +50,13 @@ function HTXJS_updateForm(formid) {
         arrivedAtDoor: $('#arrivedAtDoorInput').is(":checked") ? 1 : 0,
         crew: $('#crewInput').is(":checked") ? 1 : 0,
         pizza: $('#pizzaInput').is(":checked") ? 1 : 0,
+        closeFormActive: $('#closeFormActive').is(":checked") ? 1 : 0,
+        tableOpenDate: $('#tableOpenDate').val(),
+        tableCloseDate: $('#tableCloseDate').val(),
+        emailEnable: $('#emailEnable').is(":checked") ? 1 : 0,
+        emailSender: $('#emailSender').val(),
+        emailSubject: $('#emailSubject').val(),
+        emailText: $('#emailText').val(),
         action: "htx_update_form"
     }, function(data) {
         informationwindowremove(id);

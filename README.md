@@ -39,3 +39,8 @@ Standard opsætning:
 - Telefon
 
 Ud af disse, kan E-mail ikke ændres, fordi denne bruges til at registrere brugere
+
+### Mail
+Dette plugin bruger `wp_mail`, og derved er det vigtigt denne funktion er sat ordentlig op.
+
+Under udviklingen af dette plugin brugte vi [dette plugin](https://da.wordpress.org/plugins/wp-mail-smtp/), for at sætte mail funktionen op.

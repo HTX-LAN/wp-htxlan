@@ -141,15 +141,32 @@ function htx_update_form() {
             $link = database_connection();
             $link->autocommit(FALSE); //turn on transactions
             $table_name = $wpdb->prefix . 'htx_form_tables';
-            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ?, arrivedAtDoor = ? WHERE id = ?");
+            $stmt = $link->prepare("UPDATE $table_name SET tableName = ?, tableDescription = ?, arrived = ?, crew = ?, pizza = ?, registration = ?, arrivedAtDoor = ?, closeFormActive = ?, openForm = ?, closeForm = ?, emailEnable = ?, emailSender = ?, emailText = ?, emailSubject = ? WHERE id = ?");
             if(!$stmt)
                 throw new Exception($link->error);
-            $stmt->bind_param("ssiiiiii", $_POST['tableName'], $_POST['tableDescription'],$arrived,$crew,$pizza,$registration,$arrivedAtDoor, $_POST['formid']);
+            $stmt->bind_param("ssiiiiiississsi", $_POST['tableName'], $_POST['tableDescription'],$arrived,$crew,$pizza,$registration,$arrivedAtDoor, $closeFormActive, $openDate, $closeDate, $emailEnable, $emailSender, $emailText, $emailSubject, $_POST['formid']);
             $arrived = intval($_POST['arrived']);
             $crew = intval($_POST['crew']);
             $pizza = intval($_POST['pizza']);
             $registration = intval($_POST['registration']);
             $arrivedAtDoor = intval($_POST['arrivedAtDoor']);
+            $closeFormActive = intval($_POST['closeFormActive']);
+            if (strtotime($_POST['tableOpenDate']) == false)
+                throw new Exception('Date format not supported');
+            else 
+                $openDate = date('Y-m-d H:i:s', strtotime($_POST['tableOpenDate']));
+            if (strtotime($_POST['tableCloseDate']) == false && $closeFormActive == 1)
+                throw new Exception('Date format not supported');
+            else if (strtotime($_POST['tableCloseDate']) == false)
+                $closeDate = NULL;
+            else
+                $closeDate = date('Y-m-d H:i:s', strtotime($_POST['tableCloseDate']));
+            if (strtotime($openDate) > strtotime($closeDate)  && $closeFormActive == 1)
+                throw new Exception('Close date, shall not be before start date');
+            $emailEnable = intval($_POST['emailEnable']);
+            $emailSender = $_POST['emailSender'];
+            $emailText = htmlentities($_POST['emailText']);
+            $emailSubject = $_POST['emailSubject'];
             $stmt->execute();
             $stmt->close();
             $link->autocommit(TRUE); //turn off transactions + commit queued queries
@@ -427,8 +444,8 @@ function htx_update_column() {
                         $settingNameParam = htmlspecialchars(trim($_POST['settingName-'.$lineId]));
                         $settingValueParam = htmlspecialchars(trim($_POST['settingValue-'.$lineId]));
                         $settingSortingParam = intval($_POST['settingSorting-'.$lineId]);
-                        $settingExpenceParam = intval($_POST['settingExpence-'.$lineId]);
-                        $stmt1->bind_param("ssiiii", $settingNameParam, $settingValueParam, $settingSortingParam, $active, $settingExpenceParam, $lineId);
+                        $settingExpenceParam = floatval($_POST['settingExpence-'.$lineId]);
+                        $stmt1->bind_param("ssiisi", $settingNameParam, $settingValueParam, $settingSortingParam, $active, $settingExpenceParam, $lineId);
                         $stmt1->execute();
                     }
 

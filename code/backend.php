@@ -114,9 +114,9 @@
             // Writes windows for forms
             echo "<div class='main-backend-area'>";
             for ($i=0; $i < count($tableIds); $i++) { 
-                echo "<div class='Quickselect-card' onclick='document.getElementById(\"gotoFormCreatorTable-$tableIds[$i]\").submit();// Form submission'>
-                    <form id='gotoFormCreatorTable-$tableIds[$i]' method='GET'>
-                    <input type='hidden' name='page' value='HTX_lan_create_form'>
+                echo "<div class='Quickselect-card' onclick='document.getElementById(\"gotoParticipantTable-$tableIds[$i]\").submit();// Form submission'>
+                    <form id='gotoParticipantTable-$tableIds[$i]' method='GET'>
+                    <input type='hidden' name='page' value='HTX_lan_participants_list'>
                     <input type='hidden' name='form' value='$tableIds[$i]'>";
                 echo "<h3>$tableNames[$i]</h3>";
                 if ($tableDescription[$i] != "")
