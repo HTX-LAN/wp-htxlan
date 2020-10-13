@@ -129,288 +129,31 @@
         $html .= "\n<script>var price = {};</script>";
         // Writing for every column entry
         for ($i=0; $i < count($columnNameFront); $i++) {
-            // Setup for required label
-            if ($required[$i] == 1) {$isRequired = "required"; $requiredStar = "<i style='color: red'>*</i>";} else {$isRequired = ""; $requiredStar = "";}
-            if (in_array('unique',$specialName[$i])) $requiredStar .= " <i title='Dette input skal være unikt for hver tilmelding' style='cursor: help'>(unikt)</i>"; else $requiredStar .= "";
-            // Setup for disabled
-            if ($disabled[$i] == 1) $disabledClass = "hidden"; else $disabledClass = "";
-            // Main writing of input
-            $html .= "\n<div id='$columnId[$i]-div'>";
-            switch ($columnType[$i]) {
-                case "dropdown":
-                    $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                    // Getting settings category
-                    $table_name = $wpdb->prefix . 'htx_settings_cat';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? LIMIT 1");
-                    $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
-                        while($row = $result->fetch_assoc()) {
-                            $setting_cat_settingId = $row['id'];
-                        }
-                    }
-                    $stmt->close();
-
-                    // Getting dropdown content
-                    $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? ORDER BY sorting");
-                    $stmt->bind_param("i", $setting_cat_settingId);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0)  {return $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value=''>";} else {
-                        // Price function
-                        if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunction'; else $priceClass = '';
-                        if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
-                        
-                        // Writing first part of dropdown
-                        $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' oninput='HTX_frontend_js()' class='dropdown $disabledClass $priceClass' $priceFunction $isRequired>";
-                        
-                        // None input option
-                        if (in_array('noneInput',$specialName[$i])) {
-                            if($_POST[$columnNameBack[$i]] == 0) $postSelected = 'selected'; else $postSelected = '';
-                            $html .= "\n<option value='0' $postSelected></option>";
-                        }
-
-                        // Writing dropdown options
-                        while($row = $result->fetch_assoc()) {
-                            // Getting data
-                            $setting_settingName = $row['settingName'];
-                            $setting_id = $row['id'];
-
-                            // Set as selected from post
-                            if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'selected'; else $postSelected = '';
-
-                            // Write data
-                            $html .= "\n<option value='$setting_id' $postSelected>".$setting_settingName."</option>";
-
-                            if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
-                                $html .= "\n<script>price['$setting_id']='".$row['value']."';</script>";
-                        }
-
-                        // Finishing dropdown
-                        $html .= "\n</select>";
-
-                        // Other input option
-                        if (in_array('otherInput',$specialName[$i])) {
-                            $html .= "\n<small><i><label>Andet: </label>";
-                            $html .= "\n<input name='$columnNameBack[$i]Other' type='text' placeholder='Andet' id='$columnId[$i]-input-other' style='max-width: 250px; margin-top: 10px' value='".$_POST[$columnNameBack[$i]."Other"]."'>";
-                            $html .= "\n</i></small>";
-                        }
-                    }
-                    $stmt->close();
-                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
-                    $html .= "\n</p>";
-                break;
-                case "user dropdown":
-                    $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                    // Getting settings category
-                    $table_name = $wpdb->prefix . 'htx_settings_cat';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? LIMIT 1");
-                    $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
-                        while($row = $result->fetch_assoc()) {
-                            $setting_cat_settingId = $row['id'];
-                        }
-                    }
-                    $stmt->close();
-
-                    // Getting dropdown content
-                    $table_name = $wpdb->prefix . 'htx_settings';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE settingId = ? ORDER BY sorting AND settingName");
-                    $stmt->bind_param("i", $setting_cat_settingId);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0)  {return $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her <input type='hidden' name='name='$columnNameBack[$i]' value=''>";} else {
-                        
-                        // Writing first part of dropdown
-                        $html .= "\n<select id='$columnId[$i]-input' name='$columnNameBack[$i]' id='extraUserSettingDropdown-$i' oninput='HTX_frontend_js()' class='dropdown $disabledClass' $isRequired>";
-
-                        // None input option
-                        if (in_array('noneInput',$specialName[$i])) {
-                            if($_POST[$columnNameBack[$i]] == 0) $postSelected = 'selected'; else $postSelected = '';
-                            $html .= "\n<option value='0' $postSelected></option>";
-                        }
-
-                        // Writing dropdown options
-                        while($row = $result->fetch_assoc()) {
-                            // Getting data
-                            $setting_settingName = $row['settingName'];
-                            $setting_id = $row['id'];
-
-                            // Set as selected from post
-                            if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'selected'; else $postSelected = '';
-
-                            // Write data
-                            $html .= "\n<option value='$setting_id' $postSelected>".$setting_settingName."</option>";
-                        }
-
-                        // Finishing dropdown
-                        $html .= "\n</select>";
-
-                        // Possible to add a new input
-                        $html .= "\n<small><i><label>Andet: </label>";
-                        $html .= "\n<input name='$columnNameBack[$i]-extra' type='$format[$i]' id='extraUserSetting-$i' 
-                        class='inputBox  $disabledClass' style='width: unset; margin-top: 5px;' value='".htmlspecialchars($_POST[$columnNameBack[$i].'-extra'])."'></i></small>";
-                    }
-                    $stmt->close();
-                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
-                    $html .= "\n</p>";
-                break;
-                case "radio":
-                    $html .= "\n<p class='$disabledClass'><label id='$columnId[$i]-input'>$columnNameFront[$i]$requiredStar</label><br>";
-                    // Getting settings category
-                    $table_name = $wpdb->prefix . 'htx_settings_cat';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
-                    $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
-                        while($row2 = $result->fetch_assoc()) {
-                            $setting_cat_settingId = $row2['id'];
-                        }
-                        // Disabled handling
-                        if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
-
-                        // Getting radio content
-                        $table_name3 = $wpdb->prefix . 'htx_settings';
-                        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
-                        $stmt3->bind_param("i", $setting_cat_settingId);
-                        $stmt3->execute();
-                        $result3 = $stmt3->get_result();
-                        if($result3->num_rows === 0) $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value='' disabled>"; else {
-                            // Price function
-                            if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunctionRadio'; else $priceClass = '';
-                            if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
-
-                            // None input option
-                            if (in_array('noneInput',$specialName[$i])) {
-                                if($_POST[$columnNameBack[$i]] == 0) $postSelected = 'checked="checked"'; else $postSelected = '';
-                                $html .= "\n<input type='radio' id='$columnNameBack[$i]-0' name='$columnNameBack[$i]' oninput='HTX_frontend_js()' value='0' class='inputBox $columnId[$i]-radio $disabledClass $priceClass' $priceFunction $postSelected>
-                                <label for='$columnNameBack[$i]-0'><i>Intet</i></label><br>";
-
-                                // Price for javascript
-                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
-                                    $html .= "\n<script>price[0]='0';</script>";
-                            }
-                            while($row3 = $result3->fetch_assoc()) {
-                                // Getting data
-                                $setting_settingName = $row3['settingName'];
-                                $setting_id = $row3['id'];
-
-                                // Set as selected from post
-                                if($_POST[$columnNameBack[$i]] == $setting_id) $postSelected = 'checked="checked"'; else $postSelected = '';
-
-                                // Write data
-                                $html .= "\n<input type='radio' id='$columnNameBack[$i]-$setting_id' name='$columnNameBack[$i]' oninput='HTX_frontend_js()' value='$setting_id' class='inputBox $columnId[$i]-radio $disabledClass $priceClass' $priceFunction $postSelected>
-                                <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label><br>";
-
-                                // Price for javascript
-                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
-                                    $html .= "\n<script>price['$setting_id']='".$row3['value']."';</script>";
-
-                            }
-                            // Other input option
-                            if (in_array('otherInput',$specialName[$i])) {
-                                $html .= "\n<small><i><label>Andet: </label>";
-                                $html .= "\n<input name='$columnNameBack[$i]Other' type='text' placeholder='Andet' id='$columnId[$i]-input-other' style='max-width: 250px; margin-top: 10px'>";
-                                $html .= "\n</i></small>";
-                            }
-                        }
-                        $stmt3->close();
-                    }
-                    $stmt->close();
-                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
-                    $html .= "\n</p>";
-                break;
-                case "checkbox":
-                    $html .= "\n<p class='$disabledClass'><label id='$columnId[$i]-input'>$columnNameFront[$i]$requiredStar</label><br>";
-                    // Getting settings category
-                    $table_name = $wpdb->prefix . 'htx_settings_cat';
-                    $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE tableId = ? AND  id = ? AND active = 1 LIMIT 1");
-                    $stmt->bind_param("ii", $tableId,  $settingCat[$i]);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    if($result->num_rows === 0)  {return HTX_frontend_sql_notworking();} else {
-                        while($row2 = $result->fetch_assoc()) {
-                            $setting_cat_settingId = $row2['id'];
-                        }
-                        // Disabled handling
-                        if ($disabled == 1) $disabledClass = "disabled"; else $disabledClass = "";
-
-                        // Getting radio content
-                        $table_name3 = $wpdb->prefix . 'htx_settings';
-                        $stmt3 = $link->prepare("SELECT * FROM `$table_name3` WHERE settingId = ? AND active = 1 ORDER by sorting ASC, value ASC");
-                        $stmt3->bind_param("i", $setting_cat_settingId);
-                        $stmt3->execute();
-                        $result3 = $stmt3->get_result();
-                        if($result3->num_rows === 0) $html .= "\nDer er på nuværende tidspunkt ingen mulige valg her<input type='hidden' name='name='$columnNameBack[$i]' value='' disabled>"; else {
-                            $html .= "\n<div class='formCreator_flexRow'>";
-                            while($row3 = $result3->fetch_assoc()) {
-                                // Getting data
-                                $setting_settingName = $row3['settingName'];
-                                $setting_id = $row3['id'];
-
-                                // Set as selected from post
-                                if (isset($_POST[$columnNameBack[$i]])) {
-                                    if(in_array($setting_id, $_POST[$columnNameBack[$i]])) $postSelected = 'checked="checked"'; else $postSelected = '';
-                                }
-
-                                // Price function
-                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceClass = 'priceFunctionCheckbox'; else $priceClass = '';
-                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0) $priceFunction = "onchange='HTXJS_price_update()'"; else $priceFunction = '';
-
-                                // Write data
-                                $html .= "\n<div class='checkboxDiv'><input type='checkbox' id='$columnNameBack[$i]-$setting_id' oninput='HTX_frontend_js()' class='$priceClass $columnId[$i]-checkbox' name='".$columnNameBack[$i]."[]' $priceFunction value='$setting_id' $postSelected>
-                                <label for='$columnNameBack[$i]-$setting_id'>$setting_settingName</label></div>";
-
-                                // Price for javascript
-                                if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
-                                    $html .= "\n<script>price['$setting_id']='".$row3['value']."';</script>";
-                            }
-                            $html .= "\n</div>";
-                        }
-                        $stmt3->close();
-                    }
-                    $stmt->close();
-                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
-                    $html .= "\n</p>";
-                break;
-                case "text area":
-                    $html .= "\n<h5 id='$columnId[$i]-input'>$columnNameFront[$i]</h5>";
-                    $html .= "\n<p>$placeholderText[$i]</p>";
-                break;
-                case "spacing":
-                    $html .= "\n<div style='width: 100%; height: ".$placeholderText[$i]."rem; margin: 0px; padding: 0px;'></div>";
-                break;
-                case "price":
-                    if ($priceSet == false) {
-                        if (!in_array($format[$i], $possiblePrice)) $format[$i] = "";
-                        $html .= "\n<h5 id='$columnId[$i]-input'>$columnNameFront[$i]</h5>";
-                        $html .= "\n<p>$placeholderText[$i] <span id='priceLine' onload=\"HTXJS_price_update()\">0</span> $format[$i]</p><script>setTimeout(() => {HTXJS_price_update()}, 500);</script>";
-                        $priceSet = true;
-                    }
-                break;
-                default:
-                    if ($format[$i] == 'textarea') $inputMethod = 'textarea'; else $inputMethod = 'input';
-                    $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
-                    $html .= "\n<$inputMethod id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' oninput='HTX_frontend_js();";
-                    if ($format[$i] == 'range') $html .= "document.getElementById(\"$columnId[$i]-rangeValue\").innerHTML = document.getElementById(\"$columnId[$i]-input\").value;' min='$formatExtra[$i]' max='$specialNameExtra3[$i]' style='padding: 0px;' ";
-                    else {
-                        $html .= "' ";
-                        if (in_array('minChar', $specialName[$i])) $html .= "minlength='".$minChar[$i]."' ";
-                        if (in_array('maxChar', $specialName[$i])) $html .= "maxlength='".$maxChar[$i]."' ";
-                    }
-                    if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]' ";
-                    $html .= "class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
-                    if ($format[$i] == 'textarea') $html .= "\n".$_POST[$columnNameBack[$i]]."\n</textarea>";
-                    if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
-                    if ($format[$i] == 'range') $html .= "\n<small>værdi: <span id='$columnId[$i]-rangeValue'>$placeholderText[$i]</span></small>";
-                    $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
-                    $html .= "\n</p>";
-            }
+            if (isset($_POST[$columnNameBack[$i]])) $POST = $_POST[$columnNameBack[$i]]; else if ($columnType[$i] == 'checkbox') $POST = array(); else $POST = "";
+            if (isset($_POST[$columnNameBack[$i].'-extra'])) $POSTextra = $_POST[$columnNameBack[$i].'-extra']; else $POSTextra = "";
+            $ColumnInfo = array(
+                "columnId" => $columnId[$i],
+                "columnNameFront" => $columnNameFront[$i],
+                "columnNameBack" => $columnNameBack[$i],
+                "format" => $format[$i],
+                "columnType" => $columnType[$i],
+                "special" => $special[$i],
+                "specialName" => $specialName[$i],
+                "specialNameExtra" => $specialNameExtra[$i],
+                "specialNameExtra2" => $specialNameExtra2[$i],
+                "specialNameExtra3" => $specialNameExtra3[$i],
+                "minChar" => $minChar[$i],
+                "maxChar" => $maxChar[$i],
+                "placeholderText" => $placeholderText[$i],
+                "formatExtra" => $formatExtra[$i],
+                "sorting" => $sorting[$i],
+                "disabled" => $disabled[$i],
+                "required" => $required[$i],
+                "settingCat" => $settingCat[$i],
+                "POST" => $POST,
+                "POSTextra" => $POSTextra
+            );
+            $html .= HTX_frontend_switch($ColumnInfo, $tableId, $possiblePriceFunctions, $i, $priceSet, $possiblePrice);
             $html .= "\n</div>";
         }
         // Writing script for showing elements based on other elements
