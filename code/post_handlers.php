@@ -444,8 +444,8 @@ function htx_update_column() {
                         $settingNameParam = htmlspecialchars(trim($_POST['settingName-'.$lineId]));
                         $settingValueParam = htmlspecialchars(trim($_POST['settingValue-'.$lineId]));
                         $settingSortingParam = intval($_POST['settingSorting-'.$lineId]);
-                        $settingExpenceParam = intval($_POST['settingExpence-'.$lineId]);
-                        $stmt1->bind_param("ssiiii", $settingNameParam, $settingValueParam, $settingSortingParam, $active, $settingExpenceParam, $lineId);
+                        $settingExpenceParam = floatval($_POST['settingExpence-'.$lineId]);
+                        $stmt1->bind_param("ssiisi", $settingNameParam, $settingValueParam, $settingSortingParam, $active, $settingExpenceParam, $lineId);
                         $stmt1->execute();
                     }
 
@@ -729,6 +729,9 @@ function htx_dublicate_form() {
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid'])) {
         $response = new stdClass();
         header('Content-type: application/json');
+        ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
         if(!current_user_can("manage_options"))
             {return;$response->error = "Missing permission";}
 
@@ -760,13 +763,29 @@ function htx_dublicate_form() {
                     $tablePiza = $row['pizza'];
                     $tableArrivedAtDoor = $row['arrivedAtDoor'];
                     $tableRegistration = $row['registration'];
+                    $tableOpenForm = $row['openForm'];
+                    $tableCloseForm = $row['closeForm'];
+                    $tableCloseFormActive = intval($row['closeFormActive']);
+                    $tableEmailEnable = $row['emailEnable'];
+                    $tableEmailSender = $row['emailSender'];
+                    $tableEmailSubject = $row['emailSubject'];
+                    $tableEmailText = $row['emailText'];
                 }
                 $stmt->close();
 
                 // Make new table
-                $stmt = $link->prepare("INSERT INTO `$table_name` (active, favorit, shortcode, tableName, tableDescription, arrived, crew, pizza, arrivedAtDoor, registration) VALUES (?,0,'HTX_Tilmeldningsblanket',?,?,?,?,?,?,?)");
-                $stmt->bind_param("issiiiii", $tableActive, $tableName, $tableDescription,$tableArrived,$tableCrew,$tablePiza,$tableArrivedAtDoor,$tableRegistration);
-                $stmt->execute();
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, favorit, shortcode, tableName, tableDescription, arrived, crew, pizza, arrivedAtDoor, registration, openForm, closeForm, closeFormActive, emailEnable, emailSender, emailSubject, emailText) VALUES (?,0,'HTX_Tilmeldningsblanket',?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                if(!$stmt)
+                    throw new Exception($link->error);
+                $stmt->bind_param("issiiiiisssssss", $tableActive, $tableName, $tableDescription,$tableArrived,$tableCrew,$tablePiza,$tableArrivedAtDoor,$tableRegistration, $tableOpenForm, $tableCloseForm, $tableCloseFormActive,$tableEmailEnable,$tableEmailSender,$tableEmailSubject,$tableEmailText);
+                if(!$stmt)
+                    throw new Exception($link->error);
+                if ($stmt->execute()) { 
+                    // it worked
+                } else {
+                    // it didn't
+                    throw new Exception("New table was not added.\n Error code: ".$stmt->error);
+                }
                 $tableNewId = $link->insert_id;
                 $stmt->close();
             }
@@ -851,15 +870,16 @@ function htx_dublicate_form() {
                     $usersArrived[] = $row['arrived'];
                     $usersCrew[] = $row['crew'];
                     $usersPizza[] = $row['pizza'];
-                    $usersPrice[] = $row['price'];
                     $usersEmail[] = $row['email'];
                 }
                 $stmt->close();
 
                 // Make new users
-                $stmt = $link->prepare("INSERT INTO `$table_name` (active, payed, arrived, crew, pizza, price, email, tableId) VALUES (?,?,?,?,?,?,?,?)");
-                for ($i=0; $i < count($settingId); $i++) { 
-                    $stmt->bind_param("isiiissi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPizza[$i], $usersPrice[$i], $usersEmail[$i], $tableNewId);
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, payed, arrived, crew, pizza, email, tableId) VALUES (?,?,?,?,?,?,?)");
+                if(!$stmt)
+                throw new Exception($link->error);
+                for ($i=0; $i < count($usersId); $i++) { 
+                    $stmt->bind_param("isiissi", $usersActive[$i], $usersPayed[$i], $usersArrived[$i], $usersCrew[$i], $usersPizza[$i], $usersEmail[$i], $tableNewId);
                     $stmt->execute();
                     $usersNewId[$usersId[$i]] = $link->insert_id;
                 }
@@ -907,10 +927,13 @@ function htx_dublicate_form() {
                 $stmt = $link->prepare("INSERT INTO `$table_name` (active, columnNameFront, columnNameBack, settingCat, format, columnType, special, specialName, placeholderText, teams, formatExtra, specialNameExtra, specialNameExtra2, specialNameExtra3, specialNameExtra4, minChar, maxChar, sorting, disabled, required, tableId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
                 if(!$stmt)
                     throw new Exception($link->error);
+                
                 for ($i=0; $i < count($columnId); $i++) { 
-                    if ($columnSettingCat == 0 or $columnSettingCat == null) $columnSettingCatNew[$i] = 0; else $columnSettingCatNew[$i] = $settignCatNewId[$columnSettingCat[$i]];
-                    if ($columnTeams == "" or $columnTeams == null) $columnTeamsNew[$i] = ""; else $columnTeamsNew[$i] = $settignNewId[$columnTeams[$i]];
-                    if ($columnSpecialNameExtra2 == "" or $columnSpecialNameExtra2 == null or $columnSpecialNameExtra2 == NULL) $columnSpecialNameExtra2New[$i] = ""; 
+                    if ($columnSettingCat[$i] == 0 or $columnSettingCat[$i] == null or $columnSettingCat[$i] == NULL) $columnSettingCatNew[$i] = 0; 
+                        else $columnSettingCatNew[$i] = $settignCatNewId[$columnSettingCat[$i]];
+                    if ($columnTeams[$i] == "" or $columnTeams[$i] == null) $columnTeamsNew[$i] = "";
+                        else $columnTeamsNew[$i] = $settignNewId[$columnTeams[$i]];
+                    if ($columnSpecialNameExtra2[$i] == "" or $columnSpecialNameExtra2[$i] == null or $columnSpecialNameExtra2[$i] == NULL) $columnSpecialNameExtra2New[$i] = ""; 
                     else $columnSpecialNameExtra2New[$i] = $settignNewId[$columnSpecialNameExtra2[$i]];
 
                     $stmt->bind_param("sssssssssssssssiisssi", $columnActive[$i], $columnNameFront[$i], $columnNameBack[$i], $columnSettingCatNew[$i], $columnFormat[$i],$columnType[$i], $columnSpecial[$i], $columnSpecialName[$i], $columnPlaceholderText[$i], $columnTeamsNew[$i], $columnFormatExtra[$i], $columnSpecialNameExtra[$i],$columnSpecialNameExtra2New[$i], $columnSpecialNameExtra3[$i], $columnSpecialNameExtra4[$i], $columnMinChar[$i], $columnMaxChar[$i], $columnSorting[$i],$columnDisabled[$i],$columnRequired[$i], $tableNewId);
@@ -928,10 +951,12 @@ function htx_dublicate_form() {
                 $stmt = $link->prepare("UPDATE `$table_name` SET specialNameExtra = ? WHERE id = ?");
                 if(!$stmt)
                     throw new Exception($link->error);
-                for ($i=0; $i < count($updateSpecialNameExtra); $i++) { 
-                    $stmt->bind_param("ii", $columnNewId[$columnSpecialNameExtra[$updateSpecialNameExtraI[$i]]] ,$updateSpecialNameExtra[$i]);
-                    $stmt->execute();
-                    $response->newSpecialNameExtra[] = $columnNewId[$columnSpecialNameExtra[$updateSpecialNameExtraI[$i]]];
+                if (isset($updateSpecialNameExtra)) {
+                    for ($i=0; $i < count($updateSpecialNameExtra); $i++) { 
+                        $stmt->bind_param("ii", $columnNewId[$columnSpecialNameExtra[$updateSpecialNameExtraI[$i]]] ,$updateSpecialNameExtra[$i]);
+                        $stmt->execute();
+                        $response->newSpecialNameExtra[] = $columnNewId[$columnSpecialNameExtra[$updateSpecialNameExtraI[$i]]];
+                    }
                 }
                 $stmt->close();
             }
@@ -953,7 +978,7 @@ function htx_dublicate_form() {
                     $formUserId[] = $row['userId'];
                     $formName[] = $row['name'];
                     $formValue[] = $row['value'];
-                }
+                }   
                 $stmt->close();
 
                 // Make new submissions
@@ -967,7 +992,7 @@ function htx_dublicate_form() {
                     }
                     $stmt->bind_param("ssssi", $formActive[$i], $usersNewId[$formUserId[$i]], $formName[$i], $formValue[$i], $tableNewId);
                     $stmt->execute();
-                    $formNewId[$usersId[$i]] = $link->insert_id;
+                    $formNewId[$formUserId[$i]] = $link->insert_id;
                 }
                 $stmt->close();
             }
@@ -978,6 +1003,7 @@ function htx_dublicate_form() {
             $response->success = true;
             $response->id = $tableId;
             $response->newName = $tableName;
+            $response->tableId = $tableNewId;
         } catch(Exception $e) {
             $response->success = false;
             $response->error = $e->getMessage();

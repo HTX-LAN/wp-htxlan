@@ -414,15 +414,16 @@
                     }
                     // Email notification
                     if ($emailEnable == 1) {
+                        $headers = array();
                         // Prepping email
                         $message = str_replace("%submissionNumber%", "$formUserId", $emailText);
                         $message = str_replace("%email%", "$email", $message);
                         $message = str_replace("%ticketPriceTotal%", "$priceTotal", $message);
                         $message = str_replace("%ticketPriceIntrance%", "$price", $message);
                         $message = str_replace("%ticketPriceExtra%", "$priceExtra", $message);
-                        $headers = "From: $emailSender";
-                        $headers .= "MIME-Version: 1.0" . "\r\n";
-                        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+                        $headers[] = "From: $emailSender";
+                        $headers[] = "MIME-Version: 1.0" . "\r\n";
+                        $headers[] = "Content-type:text/html;charset=UTF-8" . "\r\n";
                         $subject = $emailSubject;
                         // Sending email
                         wp_mail($email, $subject, $message, $headers);
