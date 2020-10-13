@@ -109,8 +109,8 @@
         $possibleFunctionsName = array('Indgangs pris', 'Ekstra pris', 'Turneringer' ,'Hold valg','Vis kun hvis krav er mødt');
         $possibleFunctionsNonInput = array('price_intrance', 'price_extra', 'tournament');
         $possibleFunctionsNonInputName = array('Indgangs pris', 'Ekstra pris', 'Turneringer');
-        $possibleFunctionsInput = array('unique');
-        $possibleFunctionsInputName = array('Unikt for hver tilmelding');
+        $possibleFunctionsInput = array('unique','maxChar','minChar');
+        $possibleFunctionsInputName = array('Unikt for hver tilmelding','Maks karakter input','Minimum karakter input');
         $possibleUniceFunctions = array('price_intrance', 'price_extra');
         $possibleUniceFunction = array("onchange='HTXJS_unCheckFunctionCheckbox(\"1\")'","onchange='HTXJS_unCheckFunctionCheckbox(\"0\")'");
         $possibleFunctionsAll = array('teams','show');
@@ -150,6 +150,8 @@
                 $specialNameExtra = $row['specialNameExtra'];
                 $specialNameExtra2 = explode(",", $row['specialNameExtra2']);
                 $specialNameExtra3 = $row['specialNameExtra3'];
+                $minChar = $row['minChar'];
+                $maxChar = $row['maxChar'];
                 $placeholderText = $row['placeholderText'];
                 $formatExtra = $row['formatExtra'];
                 $teams = $row['teams'];
@@ -170,6 +172,8 @@
                     "specialNameExtra" => $specialNameExtra,
                     "specialNameExtra2" => $specialNameExtra2,
                     "specialNameExtra3" => $specialNameExtra3,
+                    "minChar" => $minChar,
+                    "maxChar" => $maxChar,
                     "placeholderText" => $placeholderText,
                     "formatExtra" => $formatExtra,
                     "teams" => $teams,
@@ -533,6 +537,9 @@
                     $specialNameExtra = $row['specialNameExtra'];
                     $specialNameExtra2 = explode(",", $row['specialNameExtra2']);
                     $specialNameExtra3 = $row['specialNameExtra3'];
+                    $specialNameExtra4 = $row['specialNameExtra4'];
+                    $minChar = $row['minChar'];
+                    $maxChar = $row['maxChar'];
                     $placeholderText = $row['placeholderText'];
                     $formatExtra = $row['formatExtra'];
                     $teams = $row['teams'];
@@ -554,6 +561,9 @@
                         "specialNameExtra" => $specialNameExtra,
                         "specialNameExtra2" => $specialNameExtra2,
                         "specialNameExtra3" => $specialNameExtra3,
+                        "specialNameExtra4" => $specialNameExtra4,
+                        "minChar" => $minChar,
+                        "maxChar" => $maxChar,
                         "placeholderText" => $placeholderText,
                         "formatExtra" => $formatExtra,
                         "teams" => $teams,
@@ -1095,24 +1105,23 @@
                             } else {
                                 echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
                             }
+                            // Min character amount
+                            if (in_array('minChar', $specialName)) {
+                                echo "<div>";
+                                echo "<label for='minChar'>Minimum antal karakterer i input</label><br>
+                                <input id='minChar' class='inputBox' type='number' name='minChar' value='$minChar'>";
+                                echo "</div>";
+                            } else echo "<input type='hidden' value='0' id='minChar' name='minChar'>";
+                            if (in_array('maxChar', $specialName)) {
+                                echo "<div>";
+                                echo "<label for='maxChar'>Maksimum antal karakterer i input</label><br>
+                                <input id='maxChar' class='inputBox' type='number' name='maxChar' value='$maxChar'>";
+                                echo "</div>";
+                            } else echo "<input type='hidden' value='250' id='maxChar' name='maxChar'>";
                             // function - show if criteria is met
                             HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
-                            // Choose what tournament team should go to
-                            if (in_array('teams', $specialName)) {
-                                echo "<div>
-                                    <label for='settingTeams'>Vælg turnering hold skal vælges til </label><br>
-                                    <select id='settingTeams' class='inputBox' name='teams'>";
-                                echo "<option value=''>Ingen</option>";
-                                for ($i=0; $i < count($torunamentId); $i++) { 
-                                    if ($torunamentId[$i] == $teams) $selected = "selected"; else $selected = "";
-                                    echo "<option value='$torunamentId[$i]' $selected>$torunamentName[$i]</option>";
-                                }
-                                echo "</select></div>";
-                            } else {
-                                echo "<input type='hidden' id='settingTeams' class='inputBox' name='teams' value=''>";
-                            }
 
                             // Other settings
                             echo "<p>Diverse indstillinger</p>";

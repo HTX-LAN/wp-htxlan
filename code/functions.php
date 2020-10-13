@@ -863,6 +863,9 @@
         }
     }
 
+    function HTX_frontend_switch() {
+        
+    }
 
     function database_connection() {
         // Connecting to database, with custom variable

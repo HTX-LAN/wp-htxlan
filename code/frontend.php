@@ -96,6 +96,8 @@
                 $specialNameExtra[] = $row['specialNameExtra'];
                 $specialNameExtra2[] = explode(",", $row['specialNameExtra2']);
                 $specialNameExtra3[] = $row['specialNameExtra3'];
+                $minChar[] = $row['minChar'];
+                $maxChar[] = $row['maxChar'];
                 $placeholderText[] = $row['placeholderText'];
                 $sorting[] = $row['sorting'];
                 $disabled[] = $row['disabled'];
@@ -112,6 +114,8 @@
                 $specialNameExtraID[$row['id']] = $row['specialNameExtra'];
                 $specialNameExtra2ID[$row['id']] = explode(",", $row['specialNameExtra2']);
                 $specialNameExtra3ID[$row['id']] = $row['specialNameExtra3'];
+                $minCharID[$row['id']] = $row['minChar'];
+                $maxCharID[$row['id']] = $row['maxChar'];
                 $placeholderTextID[$row['id']] = $row['placeholderText'];
                 $sortingID[$row['id']] = $row['sorting'];
                 $disabledID[$row['id']] = $row['disabled'];
@@ -394,7 +398,11 @@
                     $html .= "\n<p class='$disabledClass'><label>$columnNameFront[$i]$requiredStar</label>";
                     $html .= "\n<$inputMethod id='$columnId[$i]-input' name='$columnNameBack[$i]' type='$format[$i]' placeholder='$placeholderText[$i]' oninput='HTX_frontend_js();";
                     if ($format[$i] == 'range') $html .= "document.getElementById(\"$columnId[$i]-rangeValue\").innerHTML = document.getElementById(\"$columnId[$i]-input\").value;' min='$formatExtra[$i]' max='$specialNameExtra3[$i]' style='padding: 0px;' ";
-                    else $html .= "'";
+                    else {
+                        $html .= "' ";
+                        if (in_array('minChar', $specialName[$i])) $html .= "minlength='".$minChar[$i]."' ";
+                        if (in_array('maxChar', $specialName[$i])) $html .= "maxlength='".$maxChar[$i]."' ";
+                    }
                     if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]' ";
                     $html .= "class='inputBox  $disabledClass' value='".$_POST[$columnNameBack[$i]]."' $isRequired>";
                     if ($format[$i] == 'textarea') $html .= "\n".$_POST[$columnNameBack[$i]]."\n</textarea>";

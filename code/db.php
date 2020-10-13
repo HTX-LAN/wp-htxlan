@@ -139,6 +139,8 @@
             specialNameExtra2 TEXT,
             specialNameExtra3 TEXT,
             specialNameExtra4 TEXT,
+            minChar INT DEFUALT 0,
+            maxChar INT DEFUALT 250,
             sorting INT,
             disabled INT DEFAULT 0,
             required INT,

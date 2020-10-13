@@ -458,7 +458,7 @@ function htx_update_column() {
             if (in_array(htmlspecialchars(trim($_POST['format'])), $possibleFormat) OR in_array(trim($_POST['format']), $possiblePrice)) $formatPost = htmlspecialchars(trim($_POST['format'])); else $formatPost = $possibleFormat[0];
             if (htmlspecialchars(trim($_POST['name'])) == "") throw new Exception("No name given.");
             $table_name = $wpdb->prefix . 'htx_column';
-            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ?, formatExtra = ?, specialNameExtra = ?, specialnameExtra2 = ?, specialnameExtra3 = ? WHERE id = ?");
+            $stmt1 = $link->prepare("UPDATE `$table_name` SET columnNameFront = ?, format = ?, special = ?, specialName = ?, sorting = ?, required = ?, disabled = ?, placeholderText = ?, teams = ?, formatExtra = ?, specialNameExtra = ?, specialnameExtra2 = ?, specialnameExtra3 = ?, minChar = ?, maxChar = ? WHERE id = ?");
             if(!$stmt1)
                 throw new Exception($link->error);
 
@@ -543,9 +543,17 @@ function htx_update_column() {
                 // None
                 $specialnameExtra2 = "";
             }
+
+            // Character count
+            if (in_array('minChar', explode(",", $specialPostArray))) {
+                $minChar = intval($_POST['minChar']);
+            } else $minChar = 0;
+            if (in_array('maxChar', explode(",", $specialPostArray))) {
+                $maxChar = intval($_POST['maxChar']);
+            } else $maxChar = 250;
             
 
-            $stmt1->bind_param("ssisiiissssssi", $nameParam, $formatPost, $speciealPost, $specialPostArray, $sortingParam, $required, $disabledParam, $placeholderText, $teamsParam, $formatExtra, $specialNameExtra,$specialnameExtra2,$specialNameExtra3,$setting);
+            $stmt1->bind_param("ssisiiissssssiii", $nameParam, $formatPost, $speciealPost, $specialPostArray, $sortingParam, $required, $disabledParam, $placeholderText, $teamsParam, $formatExtra, $specialNameExtra,$specialnameExtra2,$specialNameExtra3,$minChar,$maxChar,$setting);
 
             $nameParam = htmlspecialchars(trim($_POST['name']));
             $sortingParam = intval($_POST['sorting']);
@@ -886,6 +894,8 @@ function htx_dublicate_form() {
                     $columnSpecialNameExtra2[] = $row['specialNameExtra2'];
                     $columnSpecialNameExtra3[] = $row['specialNameExtra3'];
                     $columnSpecialNameExtra4[] = $row['specialNameExtra4'];
+                    $columnMinChar[] = $row['minChar'];
+                    $columnMaxChar[] = $row['maxChar'];
                     $columnSorting[] = $row['sorting'];
                     $columnDisabled[] = $row['disabled'];
                     $columnRequired[] = $row['required'];
@@ -894,7 +904,7 @@ function htx_dublicate_form() {
                 $stmt->close();
 
                 // Make new columns
-                $stmt = $link->prepare("INSERT INTO `$table_name` (active, columnNameFront, columnNameBack, settingCat, format, columnType, special, specialName, placeholderText, teams, formatExtra, specialNameExtra, specialNameExtra2, specialNameExtra3, specialNameExtra4, sorting, disabled, required, tableId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                $stmt = $link->prepare("INSERT INTO `$table_name` (active, columnNameFront, columnNameBack, settingCat, format, columnType, special, specialName, placeholderText, teams, formatExtra, specialNameExtra, specialNameExtra2, specialNameExtra3, specialNameExtra4, minChar, maxChar, sorting, disabled, required, tableId) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
                 if(!$stmt)
                     throw new Exception($link->error);
                 for ($i=0; $i < count($columnId); $i++) { 
@@ -903,7 +913,7 @@ function htx_dublicate_form() {
                     if ($columnSpecialNameExtra2 == "" or $columnSpecialNameExtra2 == null or $columnSpecialNameExtra2 == NULL) $columnSpecialNameExtra2New[$i] = ""; 
                     else $columnSpecialNameExtra2New[$i] = $settignNewId[$columnSpecialNameExtra2[$i]];
 
-                    $stmt->bind_param("ssssssssssssssssssi", $columnActive[$i], $columnNameFront[$i], $columnNameBack[$i], $columnSettingCatNew[$i], $columnFormat[$i],$columnType[$i], $columnSpecial[$i], $columnSpecialName[$i], $columnPlaceholderText[$i], $columnTeamsNew[$i], $columnFormatExtra[$i], $columnSpecialNameExtra[$i],$columnSpecialNameExtra2New[$i], $columnSpecialNameExtra3[$i], $columnSpecialNameExtra4[$i], $columnSorting[$i],$columnDisabled[$i],$columnRequired[$i], $tableNewId);
+                    $stmt->bind_param("sssssssssssssssiisssi", $columnActive[$i], $columnNameFront[$i], $columnNameBack[$i], $columnSettingCatNew[$i], $columnFormat[$i],$columnType[$i], $columnSpecial[$i], $columnSpecialName[$i], $columnPlaceholderText[$i], $columnTeamsNew[$i], $columnFormatExtra[$i], $columnSpecialNameExtra[$i],$columnSpecialNameExtra2New[$i], $columnSpecialNameExtra3[$i], $columnSpecialNameExtra4[$i], $columnMinChar[$i], $columnMaxChar[$i], $columnSorting[$i],$columnDisabled[$i],$columnRequired[$i], $tableNewId);
                     $stmt->execute();
                     $columnNewId[$columnId[$i]] = $link->insert_id;
 
