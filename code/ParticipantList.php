@@ -267,7 +267,6 @@
 
             // Pre main column
             echo "<th></th>";
-            echo "<th></th>";
             echo "<th onClick='sortTable(1,1,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer' class='table_header'>
             <span>Id</span>
             <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_1'></span></th>";
@@ -367,8 +366,7 @@
                 $price = 0;
                 $priceExtra = 0;
 
-                echo "<td></td>";
-
+                echo "<tr>";
                 echo "<form method='GET' id='openEdit-$userIds[$i]'><tr class='InfoTableRow'>";
                 echo "<td onclick='document.forms[\"openEdit-$userIds[$i]\"].submit();'><span class='material-icons' style='cursor: pointer'>edit</span></td>";
                 echo "<input type='hidden' value='".$_GET['page']."' name='page'>";
@@ -647,6 +645,7 @@
                 </td>";
 
                 array_push($dataForDownload, $lineData);
+                echo "<tr>";
             }
 
         }
