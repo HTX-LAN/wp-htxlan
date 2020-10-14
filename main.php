@@ -3,7 +3,7 @@
     * Plugin Name: HTX-Lan
     * Plugin URI: https://htx-lan.github.io/wp-htxlan/
     * Description: Event plugin designet for lan parties, and used by HTX-lan.dk
-    * Version: 0.1.16
+    * Version: 0.1.17
     * Author: Mikkel Albrechtsen & Frej Alexander Nielsen
     * Author URI: https://htx-lan.github.io/wp-htxlan/authors
     */
