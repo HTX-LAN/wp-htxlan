@@ -547,9 +547,11 @@ function htx_update_column() {
             // Character count
             if (in_array('minChar', explode(",", $specialPostArray))) {
                 $minChar = intval($_POST['minChar']);
+                if ($minChar < 0) $minChar = 0;
             } else $minChar = 0;
             if (in_array('maxChar', explode(",", $specialPostArray))) {
                 $maxChar = intval($_POST['maxChar']);
+                if ($maxChar < 0) $maxChar = 0;
             } else $maxChar = 250;
             
 

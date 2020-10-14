@@ -241,8 +241,8 @@
                     $specialNameExtra[] = $row3['specialNameExtra'];
                     $specialNameExtra2[] = explode(",", $row3['specialNameExtra2']);
                     $specialNameExtra3[] = $row3['specialNameExtra3'];
-                    $minChar[] = $row['minChar'];
-                    $maxChar[] = $row['maxChar'];
+                    $minChar[] = $row3['minChar'];
+                    $maxChar[] = $row3['maxChar'];
                     $disabled[] = $row3['disabled'];
                     $settingCat[] = $row3['settingCat'];
 

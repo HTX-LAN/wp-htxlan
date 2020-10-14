@@ -274,3 +274,9 @@ input[type="color"] {
 .form_success_smalltext {
     color: var(--submit-color-primary);
 }
+.charAmount {
+    color: #787878;
+}
+.charAmountWarning {
+    color: var(--delete-color-primary)
+}

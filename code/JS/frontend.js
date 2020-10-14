@@ -36,3 +36,64 @@ function liveParticipantCount(tableId,countDown,countDownFrom,id) {
     }
     liveParticipantCountLoop()
 }
+
+function HTX_charAmount(i, id) {
+    // Getting input length
+    input = document.getElementById(id).value;
+    inputLength = input.length;
+
+    // Setting element for alert
+    alertElement = document.getElementById('charAmount-'+i);
+
+    // Getting char type
+    type = document.getElementById('char-'+i).value;
+    
+    switch (type) {
+        case 'both':
+            // Getting values
+            min = document.getElementById('minChar-'+i).value;
+            max = document.getElementById('maxChar-'+i).value;
+
+            // Checking length
+            if (inputLength < min) {
+                alertElement.innerHTML = `venligst indtast et svar længere end eller lig med ${min} tegn. ${inputLength}/${max}`;
+                alertElement.classList.add('charAmountWarning');
+            } else if (inputLength > max) {
+                alertElement.innerHTML = `venligst indtast et svar kortere end eller lig med ${max} tegn. ${inputLength}/${max}`;
+                alertElement.classList.add('charAmountWarning');
+            } else {
+                alertElement.innerHTML = `${inputLength}/${max}`
+                alertElement.classList.remove('charAmountWarning')
+            }
+        break;
+        case 'min':
+            // Getting min value
+            min = document.getElementById('minChar-'+i).value;
+            
+            // Checking length
+            if (inputLength < min) {
+                alertElement.innerHTML = `venligst indtast et svar længere end eller lig med ${min} tegn.`;
+                alertElement.classList.add('charAmountWarning');
+            }  else {
+                alertElement.innerHTML = ""
+                alertElement.classList.remove('charAmountWarning')
+            }
+        break;
+        case 'max':
+            // Getting max value
+            max = document.getElementById('maxChar-'+i).value;
+
+            // Checking length
+            if (inputLength > max) {
+                alertElement.innerHTML = `venligst indtast et svar kortere end eller lig med ${max} tegn. ${inputLength}/${max}`;
+                alertElement.classList.add('charAmountWarning');
+            } else {
+                alertElement.innerHTML = `${inputLength}/${max}`
+                alertElement.classList.remove('charAmountWarning')
+            }
+        break;
+        default: // none
+
+        break;
+    }
+}
