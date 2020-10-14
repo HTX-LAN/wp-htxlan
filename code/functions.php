@@ -544,6 +544,10 @@
                         elementInput = document.getElementById(inputId+'-input');
                         elementInput.setAttribute('style', 'border-color:red;color: red;');
                         text = '";
+                    $redBorder2_extra = "';
+                        elementInput = document.getElementById(inputId);
+                        elementInput.setAttribute('style', 'border-color:red;color: red;');
+                        text = '";
                     $redBorder3 = "';
                         elementText = document.getElementById(inputId+'-text');
                         elementText.innerHTML = text;
@@ -593,6 +597,29 @@
                             </span>
                         </div></div>";
                     $errorInvalidEmailSmall = "Denne email er ikke gyldig.";
+
+                    $errorInvalidLengthMin = "<div class='form_warning'>
+                    <div class='form_warning_icon'>
+                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    </div>
+                    <div class='form_warning_text'>
+                        <span>
+                            Det indtastet svar var for kort.
+                        </span>
+                    </div></div>";
+                    $errorInvalidLengthMinSmall = "Venligst ændre svaret til minimum at have det angivet antal tegn.";
+
+                    $errorInvalidLengthMax = "<div class='form_warning'>
+                    <div class='form_warning_icon'>
+                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    </div>
+                    <div class='form_warning_text'>
+                        <span>
+                            Det indtastet svar var for langt.
+                        </span>
+                    </div></div>";
+                    $errorInvalidLengthMaxSmall = "Venligst ændre svaret til maksimalt at have det angivet antal tegn.";
+
                     try {
                         // Check that the form trying to submit to, is the right one
                         $table_name = $wpdb->prefix . 'htx_form_tables';
@@ -635,6 +662,8 @@
                                 $columnType[] = $row['columnType'];
                                 $special[] = $row['special'];
                                 $specialName[] = explode(",", $row['specialName']);
+                                $minChar[] = $row['minChar'];
+                                $maxChar[] = $row['maxChar'];
                                 $placeholderText[] = $row['placeholderText'];
                                 $sorting[] = $row['sorting'];
                                 $required[] = $row['required'];
@@ -785,6 +814,13 @@
                                         $stmt2 = $link->prepare("INSERT INTO `$table_name2` (settingName, value, settingId, active, sorting, type) VALUES (?, ?, ?, 1, 10, 'user dropdown')");
                                         if(!$stmt2)
                                             throw new Exception($link->error);
+                                        // Cehck if input is inside length
+                                        if (in_array('maxChar', $specialName[$i])){
+                                            if (strlen(trim($_POST[$columnNameBack[$i].'-extra'])) > $maxChar[$i]){
+                                                $link->rollback(); //remove all queries from queue if error (undo)
+                                                return $errorInvalidLengthMax.$redBorder1."extraUserSetting-$i".$redBorder2_extra.$errorInvalidLengthMaxSmall.$redBorder3;
+                                            }
+                                        }
                                         $stmt2->bind_param("ssi", htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))), htmlspecialchars(strval(trim($_POST[$columnNameBack[$i].'-extra']))), $settingCatId);
                                         $stmt2->execute();
                                         $inputValue = intval($link->insert_id);
@@ -823,6 +859,19 @@
                                         $inputValue = floatval(trim($_POST[$columnNameBack[$i]]));
                                     } else {
                                         $inputValue = htmlspecialchars(strval(trim($_POST[$columnNameBack[$i]])));
+                                    }
+                                    // Cehck if input is inside length
+                                    if (in_array('minChar', $specialName[$i])){
+                                        if (strlen(trim($_POST[$columnNameBack[$i]])) < $minChar[$i]){
+                                            $link->rollback(); //remove all queries from queue if error (undo)
+                                            return $errorInvalidLengthMin.$redBorder1.$columnId[$i].$redBorder2.$errorInvalidLengthMinSmall.$redBorder3;
+                                        }
+                                    }
+                                    if (in_array('maxChar', $specialName[$i])){
+                                        if (strlen(trim($_POST[$columnNameBack[$i]])) > $maxChar[$i]){
+                                            $link->rollback(); //remove all queries from queue if error (undo)
+                                            return $errorInvalidLengthMax.$redBorder1.$columnId[$i].$redBorder2.$errorInvalidLengthMaxSmall.$redBorder3;
+                                        }
                                     }
                                 }
                             }

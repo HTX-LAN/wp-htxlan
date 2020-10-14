@@ -267,6 +267,7 @@
 
             // Pre main column
             echo "<th></th>";
+            echo "<th></th>";
             echo "<th onClick='sortTable(1,1,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer' class='table_header'>
             <span>Id</span>
             <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_1'></span></th>";
@@ -365,6 +366,8 @@
                 // Starting price
                 $price = 0;
                 $priceExtra = 0;
+
+                echo "<td></td>";
 
                 echo "<form method='GET' id='openEdit-$userIds[$i]'><tr class='InfoTableRow'>";
                 echo "<td onclick='document.forms[\"openEdit-$userIds[$i]\"].submit();'><span class='material-icons' style='cursor: pointer'>edit</span></td>";
@@ -674,7 +677,7 @@
                 echo "<h3>Opdater tilmelding - $userId</h3>";
                 for ($i=0; $i < count($columnNameFront); $i++) {
                     $html = "";
-                    if (isset($_POST[$columnNameBack[$i]])) $POST = $_POST[$columnNameBack[$i]]; else if ($columnType[$i] == 'checkbox') $POST = array(); else $POST = "";
+                    $POST = $userData[$userId][$columnNameBack[$i]];
                     if (isset($_POST[$columnNameBack[$i].'-extra'])) $POSTextra = $_POST[$columnNameBack[$i].'-extra']; else $POSTextra = "";
                     $ColumnInfo = array(
                         "columnId" => $columnId[$i],
