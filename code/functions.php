@@ -926,7 +926,7 @@
                 break;
                 default: return "Noget gik galt🤔";
             }
-        } else if (isset($_POST['delete'])) {
+        } else if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST['delete'])) {
             if ($_POST['delete'] == "deleteSubmission") {
                 $link = database_connection();
                 global $wpdb;
@@ -958,6 +958,174 @@
                     $link->rollback(); //remove all queries from queue if error (undo)
                     throw $e;
                 }
+            }
+        } else if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST['massAction'])) {
+            // Database connection
+            $link = database_connection();
+            global $wpdb;
+
+            // Check tableId
+            if (!is_numeric($tableId)) return "Sql injection attempt";
+            $tableId = intval($tableId);
+
+            switch  ($_POST['massAction']) {
+                case "massAction_email";
+                    // Error messages
+                    $errorUser = "<div class='form_warning'>
+                    <div class='form_warning_icon'>
+                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    </div>
+                    <div class='form_warning_text'>
+                        <span>
+                            Der er nogle brugere, som ikke længere eksistere
+                        </span>
+                    </div></div>";
+                    $errorText = "<div class='form_warning'>
+                    <div class='form_warning_icon'>
+                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    </div>
+                    <div class='form_warning_text'>
+                        <span>
+                            Der blev ikke angivet nogen email tekst.
+                        </span>
+                    </div></div>";
+
+                    try {
+                        $link->autocommit(FALSE); //turn off transactions
+                        // Check that the form trying to submit to, is the right one
+                        $table_name = $wpdb->prefix . 'htx_form_tables';
+                        $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ?");
+                        $stmt->bind_param("i", $tableId);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if($result->num_rows != 1) {
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            return "Formularen findes ikke";
+                        }
+                        while($row = $result->fetch_assoc()) {
+                            $tableName = $row['tableName'];
+                            $fromEmail = $row['emailSender'];
+                        }
+                        $stmt->close();
+
+                        // Check every user id
+                        $users = explode(",",$_POST['massAction_users']);
+                        // Check that the user trying to submit to, is the right one
+                        for ($i=0; $i < count($users); $i++) { 
+                            $table_name = $wpdb->prefix . 'htx_form_users';
+                            $stmt = $link->prepare("SELECT * FROM `$table_name` WHERE id = ?");
+                            $stmt->bind_param("i", $users[$i]);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            if($result->num_rows != 1) {
+                                $link->rollback(); //remove all queries from queue if error (undo)
+                                return $errorUser;
+                            } else {
+                                while($row = $result->fetch_assoc()) {
+                                    $emails[] = $row['email'];
+                                }
+                            }
+                            $stmt->close();
+                        }
+
+                        // Check email sender
+                        if (isset($_POST['emailSender'])) {
+                            $emailSender = trim($_POST['emailSender']);
+                            if (strlen($emailSender) < 1 and strlen($fromEmail) < 1) {
+                                // set no from, and let wp_mail handle it
+                                $emailSender = "";
+                            } else if (strlen($emailSender) < 1) {
+                                $emailSender = $fromEmail;
+                            }
+                        } else {
+                            if (strlen($fromEmail) < 1) {
+                                // set no from, and let wp_mail handle it
+                                $emailSender = "";
+                            } else {
+                                $emailSender = $fromEmail;
+                            }
+                        }
+
+                        // Check email recipitant
+                        if (isset($_POST['emailReciever'])) {
+                            $emailReciever = trim($_POST['emailReciever']);
+                            if (strlen($emailReciever) < 1 and strlen($fromEmail) < 1) {
+                                // set no from, and let wp_mail handle it
+                                $emailReciever = "Undisclosed Recipients <no-reply@".remove_http(site_url()).">";
+                            } else if (strlen($emailReciever) < 1) {
+                                $emailReciever = $fromEmail;
+                            } else {
+                                $emailReciever = "Undisclosed Recipients <$emailReciever>";
+                            }
+                        } else {
+                            if (strlen($fromEmail) < 1) {
+                                $emailReciever = "Undisclosed Recipients <no-reply@".remove_http(site_url()).">";
+                            } else {
+                                $emailReciever = $fromEmail;
+                            }
+                        }
+
+                        // Check subject is set
+                        if (isset($_POST['emailsubject'])) {
+                            $emailSubject = trim($_POST['emailsubject']);
+                            if (strlen($emailSubject) < 1) {
+                                // Email subject is not set - Setting standard
+                                $emailSubject = "Email for $tableName";
+                            }
+                        } else {
+                            // Email subject is not set - Setting standard
+                            $emailSubject = "Email for $tableName";
+                        }
+
+                        // Check email text is set
+                        if (isset($_POST['emailtext']) and strlen($_POST['emailtext']) > 0) {
+                            $emailText = $_POST['emailtext'];
+                        } else {
+                            $link->rollback(); //remove all queries from queue if error (undo)
+                            return $errorText;
+                        }
+
+                        // Headers
+                        $headers = array();
+                        $headers[] = "From: $emailSender";
+                        $headers[] = "Reply-To: $emailSender";
+                        $headers[] = "MIME-Version: 1.0" . "\r\n";
+                        $headers[] = "Content-type:text/html;charset=UTF-8" . "\r\n";
+
+                        foreach($emails as $email){
+                            $headers[] = 'Bcc: '.$email;
+                        }
+
+                        // Sending email
+                        wp_mail($emailReciever, $emailSubject, $emailText, $headers);
+
+                        $link->autocommit(TRUE); //turn off transactions + commit queued queries
+                        return "<div class='form_success'>
+                        <div class='form_success_icon'>
+                            <span class='material-icons form_success_icon_span'>done_outline</span>
+                        </div>
+                        <div class='form_success_text'>
+                            <span>
+                                Emails er blevet afsendt!
+                            </span>
+                        </div></div>";
+                    } catch(Exception $e) {
+                        $link->rollback(); //remove all queries from queue if error (undo)
+                        throw $e;                        
+                    }
+                    
+                break;
+                default:
+                    return "<div class='form_warning'>
+                    <div class='form_warning_icon'>
+                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    </div>
+                    <div class='form_warning_text'>
+                        <span>
+                            Der var ikke angivet nogen masse ændring funktion
+                        </span>
+                    </div></div>";
+                break;
             }
         }
     }
@@ -1363,5 +1531,16 @@
 
         return $url;
     }
+
+    // Script to get domain
+    function remove_http($url) {
+        $disallowed = array('http://', 'https://', 'http://www.', 'https://www.');
+        foreach($disallowed as $d) {
+           if(strpos($url, $d) === 0) {
+              return str_replace($d, '', $url);
+           }
+        }
+        return $url;
+     }
 
 ?>

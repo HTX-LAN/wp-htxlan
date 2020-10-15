@@ -731,9 +731,6 @@ function htx_dublicate_form() {
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid'])) {
         $response = new stdClass();
         header('Content-type: application/json');
-        ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
         if(!current_user_can("manage_options"))
             {return;$response->error = "Missing permission";}
 

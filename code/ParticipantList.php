@@ -40,6 +40,7 @@
             $tableArrivedAtDoor[$row['id']] = $row['arrivedAtDoor'];
             $tableCrew[$row['id']] = $row['crew'];
             $tablePizza[$row['id']] = $row['pizza'];
+            $emailSender[$row['id']] = $row['emailSender'];
         }
 
         // Getting table id
@@ -266,8 +267,8 @@
             $stmt3->close();
 
             // Pre main column
+            echo "<th><input type='checkbox' class='userid-checkbox-master' id='userid-checkbox-master' value='1' onchange='HTX_participant_massAction_master();'></th>";
             echo "<th></th>";
-            // echo "<th></th>";
             echo "<th onClick='sortTable(1,1,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer' class='table_header'>
             <span>Id</span>
             <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_1'></span></th>";
@@ -367,8 +368,8 @@
                 $price = 0;
                 $priceExtra = 0;
 
-                echo "<form method='GET' id='openEdit-$userIds[$i]'><tr class='InfoTableRow'>";
-                // echo "<td></td>";
+                echo "<tr class='InfoTableRow'><form method='GET' id='openEdit-$userIds[$i]'>";
+                echo "<td style='padding-left: 0.5rem;'><input name='userid-$userIds[$i]' id='userid-$userIds[$i]' class='userid-checkbox' value='$userIds[$i]' type='checkbox' onchange='HTX_participant_massAction(\"userid-$userIds[$i]\",$userIds[$i]);'></td>";
                 echo "<td onclick='document.forms[\"openEdit-$userIds[$i]\"].submit();'><span class='material-icons' style='cursor: pointer'>edit</span></td>";
                 echo "<input type='hidden' value='".$_GET['page']."' name='page'>";
                 echo "<input type='hidden' value='$userIds[$i]' name='editUser'>";
@@ -398,7 +399,7 @@
                         }
                     } else {
                         if (!in_array($columnType[$index], $nonUserInput)) {
-                            echo "<td class='$shown[$index]'>";
+                            echo "<td class='$shown[$index]' id='$userIds[$i]-$columnNameBack[$index]'>";
                             while($row2 = $result2->fetch_assoc()) {
                                 // Checks if dropdown or other where value is an id
                                 if (in_array($row2['name'], $settingNameBacks)) {
@@ -664,6 +665,34 @@
         else echo "informationwindowInsert(2,\"Der var ingen data at downloade\")";
         echo "'>Download data</button>";
         echo "</div>";
+        echo "<p style='height: 1rem;'></p>";
+
+        echo "<div>".$postError."</div>";
+
+        // Mass action
+        echo "<div id='massAction' class='hidden'>";
+        echo "<input type='hidden' name='tableId' value='$tableId'>";
+        echo "<div><h3>Masse ændring</h3><select>
+            <option value='email'>send email</option>
+        </select>
+        </div>";
+        echo "<div id='massAction-email'><form name='massActionEmail' id='massActionEmail' method='POST'>";
+        echo "<input type='hidden' name='massAction_users' id='massAction_users' class='massAction_users' value=''>";
+        echo "<h4>Send email</h4>";
+        echo "<div><label for='emailSender'>Afsender email: <span class='material-icons' style='font-size: 15px; cursor: help;'
+            title='Eksempler:\nresevation@example.com\nResevation Reminder <resevation@example.com>\n\nDenne indstilling kan blive overskrevet af andre plugins.'";
+        echo ">info</span></label> <br><input type='text' id='emailSender' class='inputBox' name='emailSender' value='$emailSender[$tableId]' style='width:50%'></div>";
+        echo "<div><label for='emailReciever'>modtager email (Vil hedde 'Undisclosed Recipients'): <span class='material-icons' style='font-size: 15px; cursor: help;'
+            title='Eksempler:\nresevation@example.com\n\nVenligst kun brug mail, og derved ikke:\nResevation Reminder <resevation@example.com>\n\nNår mailen er sendt vil modtageren hedde: \"Undisclosed Recipients\"\n\nStandard: no-reply@".remove_http(site_url())."'";
+        echo ">info</span></label> <br><input type='email' id='emailReciever' class='inputBox' name='emailReciever' value='no-reply@".remove_http(site_url())."' style='width:50%'></div>";
+        echo "<div><label>Emne: </label><br><input type='text' name='emailsubject' id='massAction-email-subject' class='inputBox' style='width:50%'></div>";
+        echo "<div><label>Tekst: <span class='material-icons' style='font-size: 15px; cursor: help;' title='Email understøtter HTML'>info</span></label><br>
+            <textarea name='emailtext' id='massAction-email-text' class='inputBox' style='width:50%' oninput='document.getElementById(`massAction-email-preview`).innerHTML=this.value;'></textarea></div>";
+        echo "<div><button type='submit' name='massAction' value='massAction_email' class='btn updateBtn'>Send emails</button></div>";
+        echo "<div style='margin-top: 1rem;'><b>Email preview:</b></div>";
+        echo "<div id='massAction-email-preview' style='max-width: 100%;word-break: break-all;border:darkgrey solid 1px;border-radius:0.25rem;padding:0.5rem;'></div>";
+        echo "</form></div>";
+        echo "</div>";
 
         // Participant edit
         if ($participantError == 0) {
@@ -671,7 +700,6 @@
                 $userId = $_GET['editUser'];
                 echo "<p style='height: 1rem;'></p>";
                 echo "\n<script>var price = {};</script>";
-                echo "<div>".$postError."</div>";
                 echo "<form name='editForm-$i' id='editForm-$i' method='POST'><div id='userEdit' style='margin-top: 2rem;'>";
                 echo "<input type='hidden' name='userId' value='$userId'>";
                 echo "<h3>Opdater tilmelding - $userId</h3>";

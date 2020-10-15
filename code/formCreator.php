@@ -1355,7 +1355,7 @@
                     echo "<div id ='emailField' class='$visible'>";
                     echo "<div><label for='emailSender'>Afsender email: <span class='material-icons' style='font-size: 15px; cursor: help;'
                     title='Eksempler:\nresevation@example.com\nResevation Reminder <resevation@example.com>\n\nDenne indstilling kan blive overskrevet af andre plugins.'";
-                    echo ">info</span></label> <input type='email' id='emailSender' class='inputBox' name='emailSender' value='{$row['emailSender']}'></div>";
+                    echo ">info</span></label> <input type='text' id='emailSender' class='inputBox' name='emailSender' value='{$row['emailSender']}'></div>";
                     echo "<div><label for='emailSubject'>Email emne: </label> <input type='email' id='emailSubject' class='inputBox' name='emailSubject' value='{$row['emailSubject']}'></div>";
                     echo "<label for='emailText' >Email indhold: <span class='material-icons' style='font-size: 15px; cursor: help;'
                     title='Email understøtter HTML'";
