@@ -13,7 +13,11 @@ function HTXJS_price_update() {
             totalPrice += parseFloat(price[$(this).val()]);
         }
     });
-    document.getElementById('priceLine').innerHTML = totalPrice;
+    var element =  document.getElementById('priceLine');
+    if (typeof(element) != 'undefined' && element != null)
+    {
+        document.getElementById('priceLine').innerHTML = totalPrice;
+    }
 }
 
 function liveParticipantCount(tableId,countDown,countDownFrom,id) {
