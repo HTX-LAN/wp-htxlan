@@ -1,5 +1,5 @@
 # MIT License
-<br>[Tilbage til forsiden](/WPPlugin-HTXLan)<br>
+<br>[Tilbage til forsiden](/wp-htxlan)<br>
 
 <br>**Copyright (c) 2020 The0mikkel**
 

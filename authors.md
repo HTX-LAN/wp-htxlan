@@ -30,4 +30,4 @@ Sprog jeg arbejder i:
 - PHP
 - SQL
 
-<br>[Tilbage til forsiden](/WPPlugin-HTXLan)
+<br>[Tilbage til forsiden](/wp-htxlan)

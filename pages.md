@@ -1,6 +1,6 @@
 # Plugin sider
 *Denne fil indeholder en liste over sider pluginnet indeholder, samt funktionerne af siderne*
-<br>[Tilbage til forsiden](/WPPlugin-HTXLan)
+<br>[Tilbage til forsiden](/wp-htxlan)
 
 ## Sider
 - [Main plugin side](#main-plugin-side)
@@ -14,12 +14,10 @@
 ### Main plugin side
 Denne side har et overwiew af pluginnet
 
-- [ ] Vise alle formularer, samt antal tilmeldte per form
-- [ ] Farlige zone
+- [x] Vise alle formularer, samt antal tilmeldte per form
+- [x] Farlige zone
   - [x] Nulstil databaser
-  - [x] Opret databaser
-  - [ ] Slet alle tilmeldinger
-  - [x] Download data
+  - [x] Se status for databaser
 - [ ] Event liste *(Eventuelt)*
   - [ ] Mulighed for at oprette events, som økonomi kører på, samt forms
 
@@ -30,9 +28,12 @@ Denne side viser alle tilmeldte
 - [x] Vise den rigtige dropdown værdi i tabel
 - [x] Muligt at registrer person som betalt
 - [x] Muligt at registrer person som ankommet
+- [x] Muligt at registrer person som fået sin mad
+- [x] Muligt at registrer person som registreret som deltager ved døren
 - [x] Muligt at slette tilmelding
 - [x] Muligt at ændre tilmelding
 - [x] Muligt at se endelige pris for tilmelding
+- [x] Muligt at sende mails til en eller flere deltager på samme tid
 
 ### Form creator
 Form creator, er hvor hver form ændres og sættes op
@@ -42,20 +43,27 @@ Form creator, er hvor hver form ændres og sættes op
   - [x] Sætte åbnings dato for formular
   - [x] Sætte luknings dato for formular
   - [x] Sætte om formular er en tilmeldings form eller bare en normal formular
+  - [x] Opsætte email som bliver afsendt ved tilmelding
 - [x] Redigering af formular
   - [x] Redigere formular informationer
   - [x] Slette formular
   - [x] Rediger input felter
   - [x] Tilføj text input felt
     - [x] Muligt at give forskellige formater, som fx *numbers*, *text*, *color*, m.m.
-  - [x] Tilføj dropdown input felt
+  - [x] Tilføje dropdown input felt
   - [x] Tilføje elementer til dropdown inputs
-  - [x] Tilføj text område input
-  - [x] Tilføj radio input
-  - [x] Tilføj checkbox input
-  - [x] Tilføj dropdown med mulighed for at brugere kan tilføje elementer til
+  - [x] Tilføje textarea input
+  - [x] Tilføje radio input
+  - [x] Tilføje checkbox input
+  - [x] Tilføje dropdown med mulighed for at brugere kan tilføje elementer til
+  - [x] Tilføje spacing elementer
+  - [x] Tilføje tekst område med support for HTML
   - [x] Sætte input som *required*
   - [x] Deaktiver input, således at inputet ikke kan skrives i *Kan optimeres*
+  - [x] Sætte maks tegn antal
+  - [x] Sætte minimum tegn antal
+  - [x] Sætte input som unikt
+  - [x] Muligt at tilpasse format for input via regex
   - [x] Slette input felt
   - [x] Vis input i form baseret på andet inputs indhold
   - [x] Input påvirker pris for deltager
@@ -97,4 +105,4 @@ Side, hvor tidsplan kan sættes op
 
 
 ***Der vil blive tilføjet mere løbende***
-<br>[Tilbage til forsiden](/WPPlugin-HTXLan)
+<br>[Tilbage til forsiden](/wp-htxlan)
