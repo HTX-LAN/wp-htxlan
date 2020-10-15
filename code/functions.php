@@ -413,7 +413,7 @@
                                     }
                                 }
                             }
-                            if ($required[$i] == 1 AND $inputValue == "") {
+                            if ($required[$i] == 1 AND ($inputValue == "" OR $inputValue == false)) {
                                 $link->rollback(); //remove all queries from queue if error (undo)
                                 return $errorRequired.$redBorder1.$columnId[$i].$redBorder2.$errorRequiredSmall.$redBorder3.$endSpan;
                             }
@@ -875,7 +875,7 @@
                                     }
                                 }
                             }
-                            if ($required[$i] == 1 AND $inputValue == "" AND $columnNameBack[$i] != 'email') {
+                            if ($required[$i] == 1 AND ($inputValue == "" OR $inputValue == false) AND $columnNameBack[$i] != 'email') {
                                 $link->rollback(); //remove all queries from queue if error (undo)
                                 return $errorRequired.$redBorder1.$columnId[$i].$redBorder2.$errorRequiredSmall.$redBorder3.$endSpan;
                             }

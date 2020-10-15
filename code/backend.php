@@ -1,5 +1,4 @@
 <?php
-
     // Backend php page
 
     // Admin page creation
@@ -117,7 +116,7 @@
                 echo "<div class='Quickselect-card' onclick='document.getElementById(\"gotoParticipantTable-$tableIds[$i]\").submit();// Form submission'>
                     <form id='gotoParticipantTable-$tableIds[$i]' method='GET'>
                     <input type='hidden' name='page' value='HTX_lan_participants_list'>
-                    <input type='hidden' name='form' value='$tableIds[$i]'>";
+                    <input type='hidden' name='formular' value='$tableIds[$i]'>";
                 echo "<h3>$tableNames[$i]</h3>";
                 if ($tableDescription[$i] != "")
                     echo "<p><b><i>Beskrivelse:</b></i><br>$tableDescription[$i]</p>";
@@ -131,13 +130,6 @@
             echo "</div>";
         }
         $stmt->close();
-
-
-        // Statistics
-        // echo "<h3>Statestik</h3>";
-        // echo "<p>Antal tilmeldte: participentCount</p>";
-        // echo "<p>Antal input felter: inputCount</p>";
-
 
         // Danger zone - Reset tables - (Skal laves om til at køre direkte load på siden (reload med post), istedet for via jquery)
         echo "<h2>Farlig zone</h2>";

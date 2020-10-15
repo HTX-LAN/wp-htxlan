@@ -202,6 +202,7 @@ function htx_create_form() {
             $stmt->bind_param("ss", $shortcode, $Name);
             $stmt->execute();
             $newTableId = intval($link->insert_id);
+            if ($newTableId == 0) throw new Exception('Error creating new form.');
             $stmt->close();
 
             // Creating standard inputs (First- & lastname, email & phone)
