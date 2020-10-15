@@ -503,7 +503,7 @@ function htx_update_column() {
             if($result2->num_rows === 0) {} else {
                 while($row2 = $result2->fetch_assoc()) {
                     if ($row2['columnType'] == 'text area') 
-                        $placeholderText = trim($_POST['placeholder']);
+                        $placeholderText = htmlspecialchars($_POST['placeholder'],ENT_NOQUOTES);
                 }
             } 
             $stmt2->close();
@@ -731,9 +731,6 @@ function htx_dublicate_form() {
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid'])) {
         $response = new stdClass();
         header('Content-type: application/json');
-        ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
         if(!current_user_can("manage_options"))
             {return;$response->error = "Missing permission";}
 

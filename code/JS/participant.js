@@ -54,3 +54,58 @@ function participantUpdate(cell,rowId,formId,userId,price) {
 function participantOpenUpdate(submissionId) {
     
 }
+
+users = [];
+function HTX_participant_massAction(id,userid) {
+    // Get if checkbox is checked
+    checked = $('#'+id).is(":checked") ? 1 : 0;
+    // Edit array for user id
+    if (checked == 1) {
+        // Add user  id
+        users.push(`${userid}`);
+    } else {
+        // Remove user id
+        const index = users.indexOf(`${userid}`);
+        if (index > -1) {
+            users.splice(index, 1);
+        }
+    }
+    $('.massAction_users').each(function() {
+        $(this).val(users);
+    });
+    
+    if (users.length < 1) { // hide mass action
+        document.getElementById('massAction').classList.add('hidden')
+    } else { // Show mass action
+        document.getElementById('massAction').classList.remove('hidden')
+    }
+}
+function HTX_participant_massAction_master() {
+    // Get if checkbox is checked
+    checked = $('#userid-checkbox-master').is(":checked") ? 1 : 0;
+
+    // Check checkboxes
+    if (checked == 1) { // Check every checkbox
+        $('.userid-checkbox').prop('checked', true);
+
+        // Edit users array
+        users = [];
+        $('.userid-checkbox').each(function() {
+            if($(this).is(":checked")) {
+                users.push($(this).val());
+            }
+        });
+    } else { // Uncheck every checkbox
+        $('.userid-checkbox').prop('checked', false);
+        users = [];
+    }
+    $('.massAction_users').each(function() {
+        $(this).val(users);
+    });
+
+    if (users.length < 1) { // hide mass action
+        document.getElementById('massAction').classList.add('hidden')
+    } else { // Show mass action
+        document.getElementById('massAction').classList.remove('hidden')
+    }
+}

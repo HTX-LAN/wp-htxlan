@@ -1161,7 +1161,7 @@
                             // function - show if criteria is met
                             HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Placeholder text
-                            echo "<div><label for='settingPlaceholder'>Tekst </label><br><textarea id='settingPlaceholder' class='textArea' name='placeholderText'>$placeholderText</textarea></div>";
+                            echo "<div><label for='settingPlaceholder'>Tekst </label><br><textarea id='settingPlaceholder' class='textArea' name='placeholderText'>".stripslashes(html_entity_decode($placeholderText))."</textarea></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             
@@ -1355,7 +1355,7 @@
                     echo "<div id ='emailField' class='$visible'>";
                     echo "<div><label for='emailSender'>Afsender email: <span class='material-icons' style='font-size: 15px; cursor: help;'
                     title='Eksempler:\nresevation@example.com\nResevation Reminder <resevation@example.com>\n\nDenne indstilling kan blive overskrevet af andre plugins.'";
-                    echo ">info</span></label> <input type='email' id='emailSender' class='inputBox' name='emailSender' value='{$row['emailSender']}'></div>";
+                    echo ">info</span></label> <input type='text' id='emailSender' class='inputBox' name='emailSender' value='{$row['emailSender']}'></div>";
                     echo "<div><label for='emailSubject'>Email emne: </label> <input type='email' id='emailSubject' class='inputBox' name='emailSubject' value='{$row['emailSubject']}'></div>";
                     echo "<label for='emailText' >Email indhold: <span class='material-icons' style='font-size: 15px; cursor: help;'
                     title='Email understøtter HTML'";
