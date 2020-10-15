@@ -134,6 +134,26 @@
                     $serverDatabaseversion = 0.5;
                 }
 
+                if ($serverDatabaseversion < 0.6) {
+                    // Added support for open and close form dates and times
+                    $table_name = $wpdb->prefix . 'htx_column';
+                    $command = "ALTER TABLE `$table_name` ADD `minChar` INT DEFAULT '0' AFTER `specialNameExtra4`, ADD `maxChar` INT DEFAULT '250' AFTER `minChar`";
+                    $stmt = $link->prepare("$command");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+
+                    // Update version number
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.6' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+                    $stmt->close();
+
+                    $serverDatabaseversion = 0.6;
+                }
+
                 // Update version number
                 $table_name = $wpdb->prefix . 'htx_settings';
                 $stmt = $link->prepare("UPDATE $table_name SET value = ? WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");

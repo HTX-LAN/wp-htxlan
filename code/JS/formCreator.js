@@ -159,6 +159,8 @@ function HTXJS_updateColumn(setting, formid) {
         formatExtra: $('#settingTelformat').val(),
         specialNameExtra: $('#settingshow1').val(),
         specialNameExtra3: $('#settingSpecial3').val(),
+        minChar: $('#minChar').val(),
+        maxChar: $('#maxChar').val(),
         teams: $('#settingTeams').val(),
         required: $('#settingRequired').is(":checked") ? 1 : 0,
         disabled: $('#settingDisabled').is(":checked") ? 1 : 0,
