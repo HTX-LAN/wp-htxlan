@@ -9,7 +9,7 @@
     */
 
     // Setting newest database  version
-    $databaseVersion = 0.6;
+    $databaseVersion = 0.7;
 
     //Prevent direct file access
     if(!defined('ABSPATH')) {

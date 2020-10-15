@@ -121,7 +121,7 @@
         }
         if($res->num_rows == 0) {
             //Table does not exist - create it
-            $sql = "CREATE TABLE $table_name (
+            $sql = "CREATE TABLE {$table_name} (
             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
             tableId INT DEFAULT 1,
             active INT NOT NULL DEFAULT 1,
@@ -139,20 +139,24 @@
             specialNameExtra2 TEXT,
             specialNameExtra3 TEXT,
             specialNameExtra4 TEXT,
-            minChar INT DEFUALT 0,
-            maxChar INT DEFUALT 250,
+            minChar INT DEFAULT 0,
+            maxChar INT DEFAULT 250,
             sorting INT,
             disabled INT DEFAULT 0,
             required INT,
             dateCreate DATETIME DEFAULT CURRENT_TIMESTAMP,
             dateUpdate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            ) $charset_collate;";
+            ) COLLATE {$wpdb_collate};";
             dbDelta( $sql );
 
             //Insert default values
             try {
                 $link->autocommit(FALSE); //turn on transactions
                 $stmt = $link->prepare("INSERT INTO $table_name (tableId, columnNameFront, columnNameBack, format, columnType, special, specialName, sorting, placeholderText, required, settingCat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                if(!$stmt) {
+                    //Failed to query database
+                    throw new Exception($link->error);
+                }
                 $stmt->bind_param("issssssisii", $tableId, $columnNameFront, $columnNameBack, $format, $columnType, $special, $specialName, $sorting, $placeholderText, $required, $settingCat);
                 $tableId = 1;
                 $columnNameFront = "Fornavn"; $columnNameBack='firstName'; $format="text"; $columnType="inputbox"; $special=0; $specialName=""; $sorting = 1; $placeholderText = "John"; $required = 1; $settingCat = 0;

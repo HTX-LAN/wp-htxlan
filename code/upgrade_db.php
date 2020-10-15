@@ -97,7 +97,7 @@
                 if ($serverDatabaseversion < 0.4) {
                     // Added support for open and close form dates and times
                     $table_name = $wpdb->prefix . 'htx_form_tables';
-                    $command = "ALTER TABLE `$table_name` ADD `openForm` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `pizza`, ADD `closeForm` DATETIME NULL DEFAULT NULL AFTER `openForm`, ADD `closeFormActive` INT NOT NULL DEFAULT '0' AFTER `closeForm`";
+                    $command = "ALTER TABLE `$table_name` ADD `openForm` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `pizza`, ADD `closeForm` DATETIME DEFAULT NULL AFTER `openForm`, ADD `closeFormActive` INT NOT NULL DEFAULT '0' AFTER `closeForm`";
                     $stmt = $link->prepare("$command");
                     if(!$stmt)
                         throw new Exception($link->error);
@@ -152,6 +152,26 @@
                     $stmt->close();
 
                     $serverDatabaseversion = 0.6;
+                }
+
+                if ($serverDatabaseversion < 0.7) {
+                    // Added support for open and close form dates and times
+                    $table_name = $wpdb->prefix . 'htx_form_tables';
+                    $command = "ALTER TABLE $table_name CHANGE `emailSender` `emailSender` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL, CHANGE `emailSubject` `emailSubject` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL, CHANGE `emailText` `emailText` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL";
+                    $stmt = $link->prepare("$command");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+
+                    // Update version number
+                    $table_name = $wpdb->prefix . 'htx_settings';
+                    $stmt = $link->prepare("UPDATE $table_name SET value = '0.7' WHERE settingName = 'databaseVersion' and type = 'databaseVersion'");
+                    if(!$stmt)
+                        throw new Exception($link->error);
+                    $stmt->execute();
+                    $stmt->close();
+
+                    $serverDatabaseversion = 0.7;
                 }
 
                 // Update version number
