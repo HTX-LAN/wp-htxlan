@@ -117,7 +117,7 @@
                 echo "<div class='Quickselect-card' onclick='document.getElementById(\"gotoParticipantTable-$tableIds[$i]\").submit();// Form submission'>
                     <form id='gotoParticipantTable-$tableIds[$i]' method='GET'>
                     <input type='hidden' name='page' value='HTX_lan_participants_list'>
-                    <input type='hidden' name='form' value='$tableIds[$i]'>";
+                    <input type='hidden' name='formular' value='$tableIds[$i]'>";
                 echo "<h3>$tableNames[$i]</h3>";
                 if ($tableDescription[$i] != "")
                     echo "<p><b><i>Beskrivelse:</b></i><br>$tableDescription[$i]</p>";
