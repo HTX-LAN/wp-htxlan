@@ -377,7 +377,7 @@
 
                     break;
                     case "text area":
-                        echo "<p>$placeholderText</p>";
+                        echo "<p>".stripslashes(html_entity_decode($placeholderText))."</p>";
                     break;
                     case "price":
                         if ($format == 'text') $format = 'DKK';
