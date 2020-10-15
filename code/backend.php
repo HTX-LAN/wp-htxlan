@@ -1,5 +1,4 @@
 <?php
-
     // Backend php page
 
     // Admin page creation
@@ -131,13 +130,6 @@
             echo "</div>";
         }
         $stmt->close();
-
-
-        // Statistics
-        // echo "<h3>Statestik</h3>";
-        // echo "<p>Antal tilmeldte: participentCount</p>";
-        // echo "<p>Antal input felter: inputCount</p>";
-
 
         // Danger zone - Reset tables - (Skal laves om til at køre direkte load på siden (reload med post), istedet for via jquery)
         echo "<h2>Farlig zone</h2>";
