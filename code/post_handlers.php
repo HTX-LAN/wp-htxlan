@@ -503,7 +503,7 @@ function htx_update_column() {
             if($result2->num_rows === 0) {} else {
                 while($row2 = $result2->fetch_assoc()) {
                     if ($row2['columnType'] == 'text area') 
-                        $placeholderText = trim($_POST['placeholder']);
+                        $placeholderText = htmlspecialchars($_POST['placeholder'],ENT_NOQUOTES);
                 }
             } 
             $stmt2->close();

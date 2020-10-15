@@ -1413,7 +1413,7 @@
             break;
             case "text area":
                 $html .= "\n<h5 id='$columnId[$i]-input'>$columnNameFront[$i]</h5>";
-                $html .= "\n<p>$placeholderText[$i]</p>";
+                $html .= "\n<p>".stripslashes(html_entity_decode($placeholderText[$i]))."</p>";
             break;
             case "spacing":
                 $html .= "\n<div style='width: 100%; height: ".$placeholderText[$i]."rem; margin: 0px; padding: 0px;'></div>";

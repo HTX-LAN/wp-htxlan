@@ -1161,7 +1161,7 @@
                             // function - show if criteria is met
                             HTX_formcreator_showElementIf($ColumnInfo,$allColumnInfo,$tableId);
                             // Placeholder text
-                            echo "<div><label for='settingPlaceholder'>Tekst </label><br><textarea id='settingPlaceholder' class='textArea' name='placeholderText'>$placeholderText</textarea></div>";
+                            echo "<div><label for='settingPlaceholder'>Tekst </label><br><textarea id='settingPlaceholder' class='textArea' name='placeholderText'>".stripslashes(html_entity_decode($placeholderText))."</textarea></div>";
                             // Sorting
                             echo "<div><label for='settingSorting'>Sortering </label> <input type='number' id='settingSorting' class='inputBox' name='sorting' value='$sorting'></div>";
                             
