@@ -391,7 +391,9 @@
                         echo "<input type='$format' value='$placeholderText' class='inputBox'";
                         if ($format == 'range') echo "min='$formatExtra' max='$specialNameExtra3'";
                         echo" disabled>";
-                        if ($format == 'tel') echo "<small>Format: $placeholderText</small>";
+                        
+                        $formatAvailable = array('text', 'date', 'search', 'url', 'tel', 'email');
+                        if (in_array($format, $formatAvailable) AND $formatExtra != "") echo "<small>Format: $placeholderText</small>";
                     break;
                 }
                 // End write
