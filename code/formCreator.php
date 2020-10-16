@@ -1083,12 +1083,13 @@
                                 echo "placeholder tekst";
                                 echo "</label><input type='$format' id='settingPlaceholder' class='inputBox' name='placeholderText' value='$placeholderText'></div>";
                             }
-                            // Tel format
-                            if ($format == 'tel') {
-                                echo "<div><label for='settingTelformat'>Telefon format <span class='material-icons' style='font-size: 15px; cursor: help;'
+                            //format
+                            $formatAvailable = array('text', 'date', 'search', 'url', 'tel', 'email');
+                            if (in_array($format, $formatAvailable)) {
+                                echo "<div><label for='settingTelformat'>Format <span class='material-icons' style='font-size: 15px; cursor: help;'
                                 title='Telefon format kører på \"RegExp\"\nEksempler:\nFormat: [0-9]{8} visuelt: 11223344\nFormat: [0-9]{2} [0-9]{2} [0-9]{2} [0-9]{2} visuelt: 11 22 33 44\nFormat: [+][0-9]{2} [0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2} visuelt: +00 11-22-33-44\n\nHusk at opdatere \"Format tekst\", så det stemmer overens med \"Telefon format\"'
                                 >info</span></label>
-                                <input type='text' id='settingTelformat' class='inputBox' name='telformat' value='$formatExtra'></div>";
+                                <input type='text' id='settingTelformat' class='inputBox' name='telformat' value='".stripslashes($formatExtra)."'></div>";
                             } else if ($format == 'range') {
                                 echo "<div><label for='settingTelformat'>Min. værdi 
                                 <span class='material-icons' style='font-size: 15px; cursor: help;'title='Mindste værdi for slider'>info</span></label>

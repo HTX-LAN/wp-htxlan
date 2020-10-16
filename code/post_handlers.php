@@ -483,8 +483,9 @@ function htx_update_column() {
             }
 
             // format extra
-            if ($formatPost == 'tel') {
-                $formatExtra = htmlspecialchars(trim($_POST['formatExtra']));
+            $formatAvailable = array('text', 'date', 'search', 'url', 'tel', 'email');
+            if (in_array($formatPost, $formatAvailable)) {
+                $formatExtra = trim($_POST['formatExtra']);
             } else if ($formatPost == 'range') {
                 $formatExtra = floatval(trim($_POST['formatExtra']));
                 $placeholderText = floatval($placeholderText);
