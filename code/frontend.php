@@ -247,7 +247,7 @@
         global $wpdb;
 
         // add to $html, to return it at the end -> It is how to do shortcodes in Wordpress
-        $html = "";
+        $html = HTX_load_standard_frontend();
 
         // Check and get form from shortcode
         if (!isset($atts['form'])) $tableId = 0; else $tableId = intval($atts['form']);
