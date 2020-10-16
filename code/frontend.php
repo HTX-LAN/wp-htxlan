@@ -54,6 +54,7 @@
         else {
             while($row = $result->fetch_assoc()) {
                 $formName = $row['tableName'];
+                $formEmail = $row['emailEnable'];
 
                 // Cehck for open date
                 if (strtotime($row['openForm']) > strtotime('now'))
@@ -71,10 +72,6 @@
 
         // Post handling
         $postError = HTX_frontend_post($tableId);
-
-        // Error handling block !Needs to be made to popup window
-        // if (isset($postError))
-        $html .= "\n<p>$postError</p>";
 
         // Getting and writing content to form
         // Getting column info
@@ -125,7 +122,8 @@
         }
         $stmt->close();
         // Setting up form
-        $html .= "\n<form method=\"post\">";
+        $html .= "\n<form method=\"post\" id='HTX_form_$tableId'>";
+        $html .= "\n<p>$postError</p>";
         $html .= "\n<script>var price = {};</script>";
         // Writing for every column entry
         for ($i=0; $i < count($columnNameFront); $i++) {
@@ -224,7 +222,7 @@
         $result = $stmt->get_result();
         if($result->num_rows === 0) exit('Something went wrong...');
         while($row = $result->fetch_assoc()) {
-            $html .= "\n<p><button type='submit' name='submit' value='new'>";
+            $html .= "\n<p><input type='hidden' name='postForm' value='new'><input type='hidden' id='email-$tableId' name='form-email-$tableId' value='$formEmail'><button onclick='HTX_submit_form($tableId);'>";
             if ($row['registration'] == 1) {
                 $html .= "Tilmeld";
             } else {
@@ -247,7 +245,7 @@
         global $wpdb;
 
         // add to $html, to return it at the end -> It is how to do shortcodes in Wordpress
-        $html = "";
+        $html = HTX_load_standard_frontend();
 
         // Check and get form from shortcode
         if (!isset($atts['form'])) $tableId = 0; else $tableId = intval($atts['form']);

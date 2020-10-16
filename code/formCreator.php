@@ -391,7 +391,9 @@
                         echo "<input type='$format' value='$placeholderText' class='inputBox'";
                         if ($format == 'range') echo "min='$formatExtra' max='$specialNameExtra3'";
                         echo" disabled>";
-                        if ($format == 'tel') echo "<small>Format: $placeholderText</small>";
+                        
+                        $formatAvailable = array('text', 'date', 'search', 'url', 'tel', 'email');
+                        if (in_array($format, $formatAvailable) AND $formatExtra != "") echo "<small>Format: $placeholderText</small>";
                     break;
                 }
                 // End write
@@ -1336,7 +1338,10 @@
                     // Open and close datetime for form
                     echo "<h4>Dato of tid for åbning og lukning af formular</h4>";
                     echo "<div><label for='tableOpenDate'>Formularen åbner d.: </label> <input type='datetime-local' id='tableOpenDate' class='inputBox' name='tableOpenDate' value='".date('Y-m-d\TH:i', strtotime($row['openForm']))."'
-                    oninput='document.getElementById(\"tableCloseDate\").min = this.value;' max='".date('Y-m-d\TH:i', strtotime($row['closeForm']))."'></div>";
+                    oninput='document.getElementById(\"tableCloseDate\").min = this.value;' ";
+                    if ($row['closeFormActive'] == 1)
+                        echo "max='".date('Y-m-d\TH:i', strtotime($row['closeForm']))."'";
+                    echo "></div>";
                     echo "<div><input id='closeFormActive' type='checkbox' class='inputCheckbox special' name='closeFormActive' value='1' onchange='if (this.checked) {document.getElementById(\"closeFormInput\").classList.remove(\"hidden\");} else {document.getElementById(\"closeFormInput\").classList.add(\"hidden\");}'";
                     if ($row['closeFormActive'] == 1) {echo "checked"; $visible = '';} else $visible = 'hidden';
                     echo "><label for='closeFormActive'>Luk formular på dato </label></div>";

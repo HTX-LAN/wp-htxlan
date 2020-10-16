@@ -41,6 +41,43 @@ function liveParticipantCount(tableId,countDown,countDownFrom,id) {
     liveParticipantCountLoop()
 }
 
+function HTX_submit_form(tableId) {
+    // Setting element for form
+    form = document.getElementById("HTX_form_1");
+
+    email = document.getElementById('email-'+tableId);
+
+    if (form.checkValidity() == true) {
+        // Submit form
+        form.submit();
+
+        sendingEmailMessage = `<div class='form_loading'>
+        <div class='form_loading_icon'>
+            <div class="form_loader"></div>
+        </div>
+        <div class='form_loading_text'>
+            <span>
+                Formularen bliver indsendt<br>Vent venligst mens formularen bliver indsendt og emails sendt.<br>Du vil blive viderstillet når formularen er indsendt.
+            </span>
+        </div></div>`;
+
+        formSending = `<div class='form_loading'>
+        <div class='form_loading_icon'>
+            <div class="form_loader"></div>
+        </div>
+        <div class='form_loading_text'>
+            <span>
+                Formularen bliver indsendt<br>Vent venligst mens formularen bliver indsendt<br>Du vil blive viderstillet når formularen er indsendt.
+            </span>
+        </div></div>`;
+
+        if (email.value == 1)
+            form.innerHTML = sendingEmailMessage;
+        else 
+            form.innerHTML = formSending;
+    }
+}
+
 function HTX_charAmount(i, id) {
     // Getting input length
     input = document.getElementById(id).value;

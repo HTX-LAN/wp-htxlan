@@ -13,7 +13,7 @@
             if (!is_numeric($tableId)) return "Sql injection attempt";
             $tableId = intval($tableId);
 
-            switch  ($_POST['submit']) {
+            switch  ($_POST['postForm']) {
                 // New submission
                 case 'new':
                     $possibleInput = array("inputbox", "dropdown", "user dropdown", "text area", "radio", "checkbox", "price");
@@ -22,30 +22,30 @@
                     $nonUserInput = array("text area", "price");
                     
                     // Predefined error text
-                    $errorRegistration = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorRegistration = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support
                         </span>
                     </div></div>";
-                    $error = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $error = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Formularen blev ikke indsend - Der er noget galt med indholdet af formularen - Venligst kontakt support
                         </span>
                     </div></div>";
 
-                    $errorSettings = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorSettings = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>
                             Der var en fejl ved en valgmulighed du valgte.<br>
                             den pågældene valgmulighed er ikke længere tilgængelig.<br>
@@ -70,32 +70,32 @@
                         elementInput.setAttribute('style', 'border-color:red;color: red;');
                         text = '";
 
-                    $errorRequired = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorRequired = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>
                             Venligst udfyld alle felter med *.
                             </span>";
                     $errorRequiredSmall = "Dette felt skal udfyldes.";
 
-                    $errorUnique = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorUnique = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>Værdien i det røde felt skal være unik for hver person,<br>
                             venligst indtast en unik værdi i det røde felt.<br>
                             Hvis du mener at dette er en fejl, eller du skal lave om i din tilmelding, er du velkommen til at tage kontakt til os.<br><br>
                             Felt med fejl: ";
                     $errorUniqueSmall = "Dette felt skal være unikt for hver tilmelding.";
 
-                    $errorEmail = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorEmail = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>
                                 Emailen findes allerede,
                                 venligst kontakt en administrator,
@@ -104,33 +104,33 @@
                         </div></div>";
                     $errorEmailSmall = "Denne email findes allerede.";
 
-                    $errorInvalidEmail = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorInvalidEmail = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>
                                 Den indtastede email er ikke gyldig.
                             </span>
                         </div></div>";
                     $errorInvalidEmailSmall = "Denne email er ikke gyldig.";
 
-                    $errorInvalidLengthMin = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorInvalidLengthMin = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Det indtastet svar var for kort.
                         </span>
                     </div></div>";
                     $errorInvalidLengthMinSmall = "Venligst ændre svaret til minimum at have det angivet antal tegn.";
 
-                    $errorInvalidLengthMax = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorInvalidLengthMax = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Det indtastet svar var for langt.
                         </span>
@@ -505,30 +505,30 @@
                     $nonUserInput = array("text area", "price");
                     
                     // Predefined error text
-                    $errorRegistration = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorRegistration = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Tilmeldingen blev ikke tilføjet - Der er noget galt med tilmeldingen - Venligst kontakt support
                         </span>
                     </div></div>";
-                    $error = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $error = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Formularen blev ikke indsend - Der er noget galt med indholdet af formularen - Venligst kontakt support
                         </span>
                     </div></div>";
 
-                    $errorSettings = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorSettings = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>
                             Der var en fejl ved en valgmulighed du valgte.<br>
                             den pågældene valgmulighed er ikke længere tilgængelig.<br>
@@ -553,32 +553,32 @@
                         elementText.innerHTML = text;
                         }, 300);</script>";
 
-                    $errorRequired = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorRequired = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>
                             Venligst udfyld alle felter med *.
                             </span>";
                     $errorRequiredSmall = "Dette felt skal udfyldes.";
 
-                    $errorUnique = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorUnique = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>Værdien i det røde felt skal være unik for hver person,<br>
                             venligst indtast en unik værdi i det røde felt.<br>
                             Hvis du mener at dette er en fejl, eller du skal lave om i din tilmelding, er du velkommen til at tage kontakt til os.<br><br>
                             Felt med fejl: ";
                     $errorUniqueSmall = "Dette felt skal være unikt for hver tilmelding.";
 
-                    $errorEmail = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorEmail = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>
                                 Emailen findes allerede,
                                 venligst kontakt en administrator,
@@ -587,33 +587,33 @@
                         </div></div>";
                     $errorEmailSmall = "Denne email findes allerede.";
 
-                    $errorInvalidEmail = "<div class='form_warning'>
-                        <div class='form_warning_icon'>
-                            <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorInvalidEmail = "<div class='form_error'>
+                        <div class='form_error_icon'>
+                            <span class='material-icons form_error_icon_span'>error_outline</span>
                         </div>
-                        <div class='form_warning_text'>
+                        <div class='form_error_text'>
                             <span>
                                 Den indtastede email er ikke gyldig.
                             </span>
                         </div></div>";
                     $errorInvalidEmailSmall = "Denne email er ikke gyldig.";
 
-                    $errorInvalidLengthMin = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorInvalidLengthMin = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Det indtastet svar var for kort.
                         </span>
                     </div></div>";
                     $errorInvalidLengthMinSmall = "Venligst ændre svaret til minimum at have det angivet antal tegn.";
 
-                    $errorInvalidLengthMax = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorInvalidLengthMax = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Det indtastet svar var for langt.
                         </span>
@@ -971,20 +971,20 @@
             switch  ($_POST['massAction']) {
                 case "massAction_email";
                     // Error messages
-                    $errorUser = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorUser = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Der er nogle brugere, som ikke længere eksistere
                         </span>
                     </div></div>";
-                    $errorText = "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    $errorText = "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Der blev ikke angivet nogen email tekst.
                         </span>
@@ -1116,11 +1116,11 @@
                     
                 break;
                 default:
-                    return "<div class='form_warning'>
-                    <div class='form_warning_icon'>
-                        <span class='material-icons form_warning_icon_span'>error_outline</span>
+                    return "<div class='form_error'>
+                    <div class='form_error_icon'>
+                        <span class='material-icons form_error_icon_span'>error_outline</span>
                     </div>
-                    <div class='form_warning_text'>
+                    <div class='form_error_text'>
                         <span>
                             Der var ikke angivet nogen masse ændring funktion
                         </span>
@@ -1228,7 +1228,7 @@
                     }
                 }
                 $stmt->close();
-                $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
+                $html .= "\n<small id='$columnId[$i]-text' class='form_error_smalltext'></small>";
                 $html .= "\n</p>";
             break;
             case "user dropdown":
@@ -1283,14 +1283,14 @@
                     $html .= "\n<small><i><label>Andet: </label>";
                     $html .= "\n<input name='$columnNameBack[$i]-extra' type='$format[$i]' id='extraUserSetting-$i' ";
                     if (in_array('maxChar', $specialName[$i])) $html .= "oninput='HTX_charAmount($i, \"extraUserSetting-$i\");' maxlength='".$maxChar[$i]."'";
-                    $html .= " class='inputBox  $disabledClass' style='width: unset; margin-top: 5px;' value='".htmlspecialchars($POSTextra)."'></i> <span id='extraUserSetting-$i-text' class='form_warning_smalltext'></span> <span id='charAmount-$i' class='charAmount'></span></small>";
+                    $html .= " class='inputBox  $disabledClass' style='width: unset; margin-top: 5px;' value='".htmlspecialchars($POSTextra)."'></i> <span id='extraUserSetting-$i-text' class='form_error_smalltext'></span> <span id='charAmount-$i' class='charAmount'></span></small>";
                     if (in_array('maxChar', $specialName[$i])) 
                         $html .= "\n<input type='hidden' id='char-$i' value='max'>
                         <input type='hidden' id='maxChar-$i' value='$maxChar[$i]'>
                         <script>setTimeout(() => {HTX_charAmount($i, \"extraUserSetting-$i\");}, 300);</script>";
                 }
                 $stmt->close();
-                $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
+                $html .= "\n<small id='$columnId[$i]-text' class='form_error_smalltext'></small>";
                 $html .= "\n</p>";
             break;
             case "radio":
@@ -1356,7 +1356,7 @@
                     $stmt3->close();
                 }
                 $stmt->close();
-                $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
+                $html .= "\n<small id='$columnId[$i]-text' class='form_error_smalltext'></small>";
                 $html .= "\n</p>";
             break;
             case "checkbox":
@@ -1409,7 +1409,7 @@
                     $stmt3->close();
                 }
                 $stmt->close();
-                $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
+                $html .= "\n<small id='$columnId[$i]-text' class='form_error_smalltext'></small>";
                 $html .= "\n</p>";
             break;
             case "text area":
@@ -1457,7 +1457,7 @@
                     <input type='hidden' id='maxChar-$i' value='$maxChar[$i]'>
                     <script>setTimeout(() => {HTX_charAmount($i, \"$columnId[$i]-input\");}, 300);</script>";
                 }
-                $html .= "\n<small id='$columnId[$i]-text' class='form_warning_smalltext'></small>";
+                $html .= "\n<small id='$columnId[$i]-text' class='form_error_smalltext'></small>";
                 $html .= "\n</p>";
         }
         return $html;
