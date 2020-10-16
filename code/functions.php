@@ -1437,7 +1437,7 @@
                     if (in_array('minChar', $specialName[$i])) $html .= "minlength='".$minChar[$i]."' ";
                     if (in_array('maxChar', $specialName[$i])) $html .= "maxlength='".$maxChar[$i]."' ";
                 }
-                if ($format[$i] == 'tel') $html .= "pattern='$formatExtra[$i]' ";
+                if ($format[$i] == 'tel') $html .= "pattern='".stripslashes($formatExtra[$i])."' ";
                 $html .= "class='inputBox  $disabledClass' value='".$POST."' $isRequired>";
                 if ($format[$i] == 'textarea') $html .= "\n".$POST."\n</textarea>";
                 if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
