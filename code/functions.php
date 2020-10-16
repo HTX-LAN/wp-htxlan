@@ -1136,6 +1136,7 @@
         global $wpdb;
         HTX_load_standard_frontend();
         $html = "";
+        $formatAvailable = array('text', 'date', 'search', 'url', 'tel', 'email');
         // Get all elements
         $columnId[$i] = $ColumnInfo['columnId'];
         $columnNameFront[$i] = $ColumnInfo['columnNameFront'];
@@ -1437,10 +1438,10 @@
                     if (in_array('minChar', $specialName[$i])) $html .= "minlength='".$minChar[$i]."' ";
                     if (in_array('maxChar', $specialName[$i])) $html .= "maxlength='".$maxChar[$i]."' ";
                 }
-                if ($format[$i] == 'tel') $html .= "pattern='".stripslashes($formatExtra[$i])."' ";
+                if (in_array($format[$i],$formatAvailable) AND $formatExtra[$i] != "") $html .= "pattern='".stripslashes($formatExtra[$i])."' ";
                 $html .= "class='inputBox  $disabledClass' value='".$POST."' $isRequired>";
                 if ($format[$i] == 'textarea') $html .= "\n".$POST."\n</textarea>";
-                if ($format[$i] == 'tel') $html .= "\n<small>Format: $placeholderText[$i]</small>";
+                if (in_array($format[$i],$formatAvailable) AND $formatExtra[$i] != "") $html .= "\n<small>Format: $placeholderText[$i]</small>";
                 else if ($format[$i] == 'range') $html .= "\n<small>værdi: <span id='$columnId[$i]-rangeValue'>$placeholderText[$i]</span></small>";
                 else {
                     if (in_array('minChar', $specialName[$i]) AND in_array('maxChar', $specialName[$i])) 
