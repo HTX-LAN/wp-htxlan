@@ -269,12 +269,12 @@
             // Pre main column
             echo "<th><input type='checkbox' class='userid-checkbox-master' id='userid-checkbox-master' value='1' onchange='HTX_participant_massAction_master();'></th>";
             echo "<th></th>";
-            echo "<th onClick='sortTable(1,1,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer' class='table_header'>
+            echo "<th onClick='sortTable(1,2,\"participantListTable\",true,\"participantListTable\")' title='Sorter efter denne kolonne' style='cursor: pointer' class='table_header'>
             <span>Id</span>
             <span class='material-icons arrowInline sortingCell_participantListTable' id='sortingSymbol_participantListTable_1'></span></th>";
 
             // Writing every column and insert into table head
-            $columnNumber = 2;
+            $columnNumber = 3;
             for ($i=0; $i < count($columnNameBack); $i++) {
                 // Check if input should not be shown
                 if (!in_array($columnType[$i], $nonUserInput)) {
