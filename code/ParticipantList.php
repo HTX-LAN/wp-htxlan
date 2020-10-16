@@ -667,8 +667,6 @@
         echo "</div>";
         echo "<p style='height: 1rem;'></p>";
 
-        echo "<div>".$postError."</div>";
-
         // Mass action
         echo "<div id='massAction' class='hidden'>";
         echo "<input type='hidden' name='tableId' value='$tableId'>";
@@ -702,6 +700,7 @@
                 echo "\n<script>var price = {};</script>";
                 echo "<form name='editForm-$i' id='editForm-$i' method='POST'><div id='userEdit' style='margin-top: 2rem;'>";
                 echo "<input type='hidden' name='userId' value='$userId'>";
+                echo "<p>$postError</p>";
                 echo "<h3>Opdater tilmelding - $userId</h3>";
                 for ($i=0; $i < count($columnNameFront); $i++) {
                     $html = "";
