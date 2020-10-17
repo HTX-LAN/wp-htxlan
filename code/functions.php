@@ -1460,6 +1460,7 @@
                 $html .= "\n<small id='$columnId[$i]-text' class='form_error_smalltext'></small>";
                 $html .= "\n</p>";
         }
+        $html .= "\n</div>";
         return $html;
     }
 

@@ -152,7 +152,6 @@
                 "POSTextra" => $POSTextra
             );
             $html .= HTX_frontend_switch($ColumnInfo, $tableId, $possiblePriceFunctions, $i, $priceSet, $possiblePrice);
-            $html .= "\n</div>";
         }
         // Writing script for showing elements based on other elements
         $html .= "\n<script>function HTX_frontend_js() {";
