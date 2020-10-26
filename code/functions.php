@@ -1079,7 +1079,7 @@
 
                         // Check email text is set
                         if (isset($_POST['emailtext']) and strlen($_POST['emailtext']) > 0) {
-                            $emailText = $_POST['emailtext'];
+                            $emailText = html_entity_decode(stripslashes($_POST['emailtext']));
                         } else {
                             $link->rollback(); //remove all queries from queue if error (undo)
                             return $errorText;
@@ -1091,6 +1091,10 @@
                         $headers[] = "Reply-To: $emailSender";
                         $headers[] = "MIME-Version: 1.0" . "\r\n";
                         $headers[] = "Content-type:text/html;charset=UTF-8" . "\r\n";
+
+                        add_filter('wp_mail_content_type', function( $content_type ) {
+                            return 'text/html';
+                        });
 
                         foreach($emails as $email){
                             $headers[] = 'Bcc: '.$email;
