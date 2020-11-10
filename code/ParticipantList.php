@@ -135,42 +135,52 @@
 
         // Post handling
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            switch  ($_POST['post']) {
-                case 'updateUserPreference':
-                    if(!current_user_can("manage_options")){
-                        echo "User can not do that!";
-                        break;
+            try {
+                $link->autocommit(FALSE);
+                switch  ($_POST['post']) {
+                    case 'updateUserPreference':
+                        if(!current_user_can("manage_options")){
+                            echo "User can not do that!";
+                            break;
+                        }
+                    $tempArray = array();
+                    $tempSrting = "";
+                    for ($i=0; $i < count($_POST['shownColumns']); $i++) { 
+                        if (in_array($_POST['shownColumns'][$i], $columns)) {
+                            $tempArray[] = $_POST['shownColumns'][$i];
+                        }
                     }
-                $tempArray = array();
-                $tempSrting = "";
-                for ($i=0; $i < count($_POST['shownColumns']); $i++) { 
-                    if (in_array($_POST['shownColumns'][$i], $columns)) {
-                        $tempArray[] = $_POST['shownColumns'][$i];
-                    }
-                }
-                if (count(array_intersect($columns, $tempArray)) == count($tempArray)) {
-                    $headsShown = $tempArray;
-                    $headsShownString = implode(",",$headsShown);
+                    if (count(array_intersect($columns, $tempArray)) == count($tempArray) and count($tempArray) > 0) {
+                        $headsShown = $tempArray;
+                        $headsShownString = implode(",",$headsShown);
 
-                    // Update database
-                    if ($userSetting == false) {
-                        // Make new record in database
-                        $table_name = $wpdb->prefix . 'htx_settings';
-                        $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type, tableId) VALUES (?, ?, 'participantUserPreference', ?)");
-                        $stmt->bind_param("isi", $userId, $headsShownString, $tableId);
-                        $stmt->execute();
-                        $stmt->close();
-                    } else {
-                        // Update record
-                        $table_name = $wpdb->prefix . 'htx_settings';
-                        $stmt = $link->prepare("UPDATE `$table_name` SET value = ? WHERE settingName = ? and tableId = ?");
-                        $stmt->bind_param("sii", $headsShownString, $userId, $tableId);
-                        $stmt->execute();
-                        $stmt->close();
+                        // Update database
+                        if ($userSetting == false) {
+                            // Make new record in database
+                            $table_name = $wpdb->prefix . 'htx_settings';
+                            $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type, tableId) VALUES (?, ?, 'participantUserPreference', ?)");
+                            if(!$stmt) echo "<p style='color: red;'>Der skete en fejl ved indsætning af dine præferencer.</p>";
+                            $stmt->bind_param("isi", $userId, $headsShownString, $tableId);
+                            if(!$stmt->execute()) echo "<p style='color: red;'>Der skete en fejl ved indsætning af dine præferencer.</p>";
+                            $stmt->close();
+                        } else {
+                            // Update record
+                            $table_name = $wpdb->prefix . 'htx_settings';
+                            $stmt = $link->prepare("UPDATE `$table_name` SET value = ? where type = 'participantUserPreference' and settingName = ? AND active = 1 AND tableId = ? LIMIT 1");
+                            if(!$stmt) echo "<p style='color: red;'>Der skete en fejl ved opdatering af dine præferencer.</p>";
+                            $stmt->bind_param("sii", $headsShownString, $userId, $tableId);
+                            if(!$stmt->execute()) echo "<p style='color: red;'>Der skete en fejl ved opdatering af dine præferencer.</p>";
+                            $stmt->close();
+                        }
+                    } else if (count($tempArray) <= 0) {
+                        echo "<p style='color: red;'>Venligst vælg en mulighed.</p>";
                     }
+                    break;
                 }
-
-                break;
+                $link->autocommit(TRUE);
+            } catch(Exception $e) {
+                throw $e;
+                $link->rollback(); //remove all queries from queue if error (undo)
             }
         }
 

@@ -141,28 +141,30 @@
                         $tempArray[] = $_POST['shownColumns'][$i];
                     }
                 }
-                if (count(array_intersect($columns, $tempArray)) == count($tempArray)) {
+                if (count(array_intersect($columns, $tempArray)) == count($tempArray) and count($tempArray) > 0) {
                     $headsShown = $tempArray;
                     $headsShownString = implode(",",$headsShown);
 
                     // Update database
-                    if ($userSetting == false and $headsShownString != "") {
+                    if ($userSetting == false) {
                         // Make new record in database
                         $table_name = $wpdb->prefix . 'htx_settings';
                         $stmt = $link->prepare("INSERT INTO `$table_name` (settingName, value, type, tableId) VALUES (?, ?, 'teamsUserPreference', ?)");
+                        if(!$stmt) echo "<p style='color: red;'>Der skete en fejl ved indsætning af dine præferencer.</p>";
                         $stmt->bind_param("isi", $userId, $headsShownString, $tableId);
-                        $stmt->execute();
-                        $stmt->close();
-                    } else if ($headsShownString != "") {
-                        // Update record
-                        $table_name = $wpdb->prefix . 'htx_settings';
-                        $stmt = $link->prepare("UPDATE `$table_name` SET value = ? WHERE settingName = ? and tableId = ?");
-                        $stmt->bind_param("sii", $headsShownString, $userId, $tableId);
-                        $stmt->execute();
+                        if(!$stmt->execute()) echo "<p style='color: red;'>Der skete en fejl ved indsætning af dine præferencer.</p>";
                         $stmt->close();
                     } else {
-                        echo "<span style='color: red'>Der gik noget galt, prøv igen</span>";
+                        // Update record
+                        $table_name = $wpdb->prefix . 'htx_settings';
+                        $stmt = $link->prepare("UPDATE `$table_name` SET value = ? where type = 'teamsUserPreference' and settingName = ? AND active = 1 AND tableId = ? LIMIT 1");
+                        if(!$stmt) echo "<p style='color: red;'>Der skete en fejl ved opdatering af dine præferencer.</p>";
+                        $stmt->bind_param("sii", $headsShownString, $userId, $tableId);
+                        if(!$stmt->execute()) echo "<p style='color: red;'>Der skete en fejl ved opdatering af dine præferencer.</p>";
+                        $stmt->close();
                     }
+                } else if (count($tempArray) <= 0) {
+                    echo "<p style='color: red;'>Venligst vælg en mulighed.</p>";
                 }
 
             break;
