@@ -20,6 +20,33 @@ function downloadData() {
     tempLink.click();
 }
 
+function deleteAll(formId) {
+    var confirmDelete = confirm("Er du sikker på at du vil slette de markerede tilmedlinger i denne formular?\nDette er en permanent handling!!");
+    if (confirmDelete == true) {
+        if (users.length < 1) {
+            informationwindowInsert(2, "Ingen brugere markeret")
+            return;
+        }
+        var form = {
+            formid: formId,
+            users: users, // From mass action
+            type: 'POST',
+            action: 'htx_participant_delete'
+        };
+        $.post(ajaxurl, form, function(data) {
+            console.log(data);
+            if(data.success == true) {
+                informationwindowInsert(1, "Markerede brugere blev slettet.");
+                setTimeout(() => {
+                    location.reload();
+                }, 100);
+            } else {
+                informationwindowInsert(3, "Kunne ikke fjerne de markerede brugere");
+            }
+        });
+    }
+}
+
 function participantUpdate(cell,rowId,formId,userId,price) {
     var form = {
         formid: formId,

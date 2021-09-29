@@ -673,7 +673,11 @@
         echo "<button class='btn updateBtn' onclick='";
         if ($participantError == 0) echo "downloadData()";
         else echo "informationwindowInsert(2,\"Der var ingen data at downloade\")";
-        echo "'>Download data</button>";
+        echo "'>Download data</button> ";
+        echo "<button class='btn deleteBtn' onclick='";
+        if ($participantError == 0) echo "deleteAll( $tableId )";
+        else echo "informationwindowInsert(2,\"Der var ingen felter at slette\")";
+        echo "'>Slet markerede brugere</button>";
         echo "</div>";
         echo "<p style='height: 1rem;'></p>";
 
