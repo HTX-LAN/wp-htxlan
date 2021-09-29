@@ -7,6 +7,8 @@
     //Handle post requests
     add_action('wp_ajax_htx_parse_dangerzone_request', 'htx_parse_dangerzone_request');
     add_action('wp_ajax_htx_delete_form', 'htx_delete_form');
+    add_action('wp_ajax_htx_delete_participants', 'htx_delete_participants');
+    add_action('wp_ajax_htx_participant_delete', 'htx_participant_delete');
     add_action('wp_ajax_htx_update_form', 'htx_update_form');
     add_action('wp_ajax_htx_create_form', 'htx_create_form');
     add_action('wp_ajax_htx_new_column', 'htx_new_column');
