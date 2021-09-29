@@ -90,6 +90,26 @@ function HTXJS_dublicateForm(formid) {
     });
 }
 
+function HTXJS_dropAllPartcipantForm(formid) {
+    var confirmDelete = confirm("Er du sikker på at du vil slette alle tilmedlinger i denne formular?\nDette er en permanent handling!!");
+    if (confirmDelete == true) {
+        var id = informationwindowInsert(2, "Arbejder på det...");
+        $.post(ajaxurl, {
+            formid: formid,
+            action: "htx_delete_participants"
+        }, function(data) {
+            informationwindowremove(id);
+            if(data.success) {
+                informationwindowInsert(1, "Alle deltagere blev slettet.");
+                location.search = "page=" + getParameterByName("page");
+            } else {
+                informationwindowInsert(3, "Kunne ikke slette deltagere.");
+                console.error(data.error);
+            }
+        });
+    }
+}
+
 
 function HTXJS_createForm() {
     var id = informationwindowInsert(2, "Arbejder på det...");

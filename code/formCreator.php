@@ -1387,6 +1387,7 @@
                     // make submit button
                     echo "<button type='submit' value='updateForm' class='btn updateBtn' style='margin-right: 0.5rem;' onclick='HTXJS_updateForm(" . $tableId .")'>Opdater</button>";
                     echo "<button type='submit' value='updateForm' class='btn normalBtn' style='margin-right: 0.5rem;' onclick='HTXJS_dublicateForm(" . $tableId .")'>Dupliker</button>";
+                    echo "<button type='submit' value='updateForm' class='btn cancelBtn' style='margin-right: 0.5rem;' onclick='HTXJS_dropAllPartcipantForm(" . $tableId .")'>Slet alle tilmeldinger</button>";
                     echo "<button type='delete' class='btn deleteBtn' onclick='HTXJS_deleteForm(" . $tableId . ")'>Slet</button>";
 
                 }

@@ -130,6 +130,60 @@ function htx_delete_form() {
     }
 }
 
+function htx_delete_participants() {
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid'])) {
+        if(!current_user_can("manage_options"))
+            return;
+        $response = new stdClass();
+        header('Content-type: application/json');
+        try {
+            global $wpdb;
+            $link = database_connection();
+            $tableId = intval($_POST['formid']);
+            $link->autocommit(FALSE); //turn on transactions
+
+            // Check if form exist
+            $table_name = $wpdb->prefix . 'htx_form_tables';
+            $stmt = $link->prepare("SELECT * FROM $table_name WHERE id = ?");
+            if(!$stmt)
+                throw new Exception($link->error);
+            $stmt->bind_param("i", $tableId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows === 0) throw new Exception("Form does not exist");
+            $stmt->close();
+
+            // Delete submission to form
+            $table_name = $wpdb->prefix . "htx_form";
+            $stmt = $link->prepare('DELETE FROM `' . $table_name . '` WHERE `tableId`=?');
+            if(!$stmt)
+                throw new Exception("error at ".$table_name);
+            $stmt->bind_param('i', $tableId);
+            $stmt->execute();
+            $stmt->close();
+
+            // Delete users for form
+            $table_name = $wpdb->prefix . "htx_form_users";
+            $stmt = $link->prepare('DELETE FROM `' . $table_name . '` WHERE `tableId`=?');
+            if(!$stmt)
+                throw new Exception("error at ".$table_name);
+            $stmt->bind_param('i', $tableId);
+            $stmt->execute();
+            $stmt->close();
+            
+            $link->autocommit(TRUE); //turn off transactions + commit queued queries
+            $link->close();
+            $response->success = true;
+        } catch(Exception $e) {
+            $link->rollback(); //remove all queries from queue if error (undo)
+            $response->success = false;
+            $response->error = $e->getMessage();
+        }
+        echo json_encode($response);
+        wp_die();
+    }
+}
+
 function htx_update_form() {
     if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['formid']) && isset($_POST['tableName']) && isset($_POST['tableDescription'])) {
         if(!current_user_can("manage_options"))
