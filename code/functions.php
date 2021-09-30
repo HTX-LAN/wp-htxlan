@@ -1219,7 +1219,12 @@
 
                         if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
                             $html .= "\n<script>price['$setting_id']='".$row['value']."';</script>";
+
+                        $allSettings[] = $setting_id;
                     }
+
+                    if (isset($POST) AND !in_array($POST, $allSettings))
+                        $_POST[$columnNameBack[$i]."Other"] = $POST;
 
                     // Finishing dropdown
                     $html .= "\n</select>";
@@ -1333,6 +1338,7 @@
                             if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
                                 $html .= "\n<script>price[0]='0';</script>";
                         }
+                        $allSettings = array();
                         while($row3 = $result3->fetch_assoc()) {
                             // Getting data
                             $setting_settingName = $row3['settingName'];
@@ -1349,7 +1355,10 @@
                             if (count(array_intersect($specialName[$i],$possiblePriceFunctions)) > 0)
                                 $html .= "\n<script>price['$setting_id']='".$row3['value']."';</script>";
 
+                            $allSettings[] = $setting_id;
                         }
+                        if (isset($POST) AND !in_array($POST, $allSettings))
+                            $_POST[$columnNameBack[$i]."Other"] = $POST;
                         // Other input option
                         if (in_array('otherInput',$specialName[$i])) {
                             $html .= "\n<small><i><label>Andet: </label>";
@@ -1393,7 +1402,7 @@
 
                             // Set as selected from post
                             if (isset($POST)) {
-                                if(in_array($setting_id, $POST)) $postSelected = 'checked="checked"'; else $postSelected = '';
+                                if(in_array($setting_id, explode(",",$POST))) $postSelected = 'checked="checked"'; else $postSelected = '';
                             }
 
                             // Price function

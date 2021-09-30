@@ -195,7 +195,7 @@
                         $html .= "\nvar checked = false;
                         $('.$specialNameExtra[$i]-checkbox').each(function() {
                             thatValue = $(this).val();
-                            if($(this).is(':checked')) {
+                            if($(this).is(':checked') || checked) {
                                 if (isValue.includes(thatValue)) {
                                     checked = true;
                                     document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
