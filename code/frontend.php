@@ -192,10 +192,11 @@
                         });";
                     } else if ($columnTypeID[$specialNameExtra[$i]] == 'checkbox') {
                         // Use -checkbox
-                        $html .= "\n
+                        $html .= "var checked = false;\n
                         $('.$specialNameExtra[$i]-checkbox').each(function() {
                             thatValue = $(this).val()
-                            if($(this).is(':checked')) {
+                            if($(this).is(':checked') || checked) {
+                                checked = true;
                                 if (isValue.includes(thatValue)) 
                                     document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
                             } else {
