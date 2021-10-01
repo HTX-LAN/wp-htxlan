@@ -786,12 +786,14 @@
                                 });";
                             } else if ($columnTypeID[$specialNameExtra[$i]] == 'checkbox') {
                                 // Use -checkbox
-                                $html .= "\n
+                                $html .= "\nvar checked = false;
                                 $('.$specialNameExtra[$i]-checkbox').each(function() {
-                                    thatValue = $(this).val()
-                                    if($(this).is(':checked')) {
-                                        if (isValue.includes(thatValue)) 
+                                    thatValue = $(this).val();
+                                    if($(this).is(':checked') || checked) {
+                                        if (isValue.includes(thatValue)) {
+                                            checked = true;
                                             document.getElementById('$columnId[$i]-div').classList.remove('hidden'); 
+                                        }
                                     } else {
                                         if (isValue.includes(thatValue)) 
                                             document.getElementById('$columnId[$i]-div').classList.add('hidden');
