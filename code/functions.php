@@ -1402,7 +1402,7 @@
 
                             // Set as selected from post
                             if (isset($POST)) {
-                                if(in_array($setting_id, explode(",",$POST))) $postSelected = 'checked="checked"'; else $postSelected = '';
+                                if(in_array($setting_id, !is_array($POST) ? explode(",", $POST) : $POST)) $postSelected = 'checked="checked"'; else $postSelected = '';
                             }
 
                             // Price function
